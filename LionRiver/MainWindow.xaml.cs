@@ -18,11 +18,14 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using LiveCharts;
 using LiveCharts.Wpf;
+using LiveCharts.Configurations;
 
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
-
+using System.Xaml;
+using LiveCharts.Defaults;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace LionRiver
 {
@@ -177,7 +180,9 @@ namespace LionRiver
             Panning,
             CreatingRoute,
             MovingMark,
-            SettingMeasureStart
+            SettingMeasureStart,
+            SelectingPlotRange,
+            MovingPlotCursor
         }
 
         public enum MapOrientationMode
@@ -302,9 +307,8 @@ namespace LionRiver
         #endregion
 
         #region Plot
-        public SeriesCollection SeriesCollection { get; set; }
-        public Func<double, string> YFormatter { get; set; }
 
+        public NavPlotModel MainNavPlotModel= new NavPlotModel();
 
         #endregion
 
@@ -555,9 +559,6 @@ namespace LionRiver
 
                 maxReplayTime = maxDt1 > maxDt2 ? maxDt1 : maxDt2;
 
-                ReplaySlider.Value = ReplaySlider.Maximum;
-                PlayButton.IsChecked = true;
-
                 var boatList =
                     (from b in context.FleetTracks
                      select b.Name).Distinct();
@@ -746,21 +747,51 @@ namespace LionRiver
 
             #region Nav Plots
 
-            SeriesCollection = new SeriesCollection
+            DateTime minV;
+
+            using (var context = new LionRiverDBContext())
             {
-                new LineSeries
+                var twsValues = (from x in context.Logs
+                                 where (x.level==4 )
+                                 orderby x.timestamp descending
+                                 select new DateModel() { DateTime = x.timestamp, Value = (double)x.SOG }).Take(300);
+                
+                ChartValues<DateModel> chartVal = new ChartValues<DateModel>();
+
+                chartVal.AddRange(twsValues.ToList());
+
+                var dayConfig = Mappers.Xy<DateModel>()
+                .X(dayModel => (double)dayModel.DateTime.Ticks )
+                .Y(dayModel => dayModel.Value);
+
+                MainNavPlotModel.SeriesCollection = new SeriesCollection(dayConfig)
                 {
+                    new LineSeries
+                    {
                     Title = "Series 1",
-                    Values = new ChartValues<double> { 4, 6, 5, 2 ,4 },
+                    Values = chartVal,
                     Fill=System.Windows.Media.Brushes.Transparent,
+                    PointGeometry = null,
                     LineSmoothness=0,
                     StrokeThickness=1
-                }
-            };
+                    }
+                };
 
-            YFormatter = value => value.ToString("C");
+                minV = twsValues.Min(z => z.DateTime);
 
-            this.MainNavPlot.DataContext = this ;
+            }
+
+            MainNavPlotModel.MinAxisValue = minV.Ticks;
+            MainNavPlotModel.CursorValue = DateTime.Now.Ticks;
+            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CursorValue +
+                                            (MainNavPlotModel.CursorValue - MainNavPlotModel.MinAxisValue) * 0.2;
+
+            MainNavPlotModel.YFormatter = value => value.ToString("0.0");
+            MainNavPlotModel.XFormatter = value => new System.DateTime((long)(value * TimeSpan.FromTicks(1).Ticks)).ToString("dd MMM");
+
+            MainNavPlot.DataContext = MainNavPlotModel;
+
+            PlayButton.IsChecked = true;
 
             #endregion
 
@@ -1136,9 +1167,6 @@ namespace LionRiver
 
                 // Adjust replay slider Max/Min and current value
 
-                double ts = (maxReplayTime - minReplayTime).TotalSeconds * ReplaySlider.Value / (ReplaySlider.Maximum + 1);
-                DateTime oldDt = minReplayTime + TimeSpan.FromSeconds(ts); 
-
                 var minDt1 =
                     (from f in context.FleetTracks
                      orderby f.timestamp ascending
@@ -1154,22 +1182,29 @@ namespace LionRiver
 
                 if (maxDt1 > maxReplayTime)
                     maxReplayTime = maxDt1;
-
-                if(ReplaySlider.Value!=ReplaySlider.Maximum) // Adjust replay slider to keep at the same position
-                {
-                    double totalsec = (oldDt - minReplayTime).TotalSeconds;
-                    double newval = totalsec * (ReplaySlider.Maximum + 1) / (maxReplayTime - minReplayTime).TotalSeconds;
-
-                    ReplaySlider.Value = newval;
-                }
-
             }
             FleetDownloadProgressGrid.Visibility = Visibility.Hidden;
         }
 
         private void ReplayTimer_Tick(object sender, EventArgs e)
         {
-            ReplaySlider.Value += FwdBackSlider.Value;
+            double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+            
+            MainNavPlotModel.CursorValue += deltaT * FwdBackSlider.Value / 1000;
+
+            double lim = MainNavPlotModel.MinAxisValue + 0.8 * deltaT;
+
+            if (MainNavPlotModel.CursorValue > lim)
+            {
+                MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CursorValue - 0.8 * deltaT);
+                MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CursorValue + 0.2 * deltaT);
+            }
+
+            if (MainNavPlotModel.CursorValue > DateTime.Now.Ticks)
+                PlayButton.IsChecked = true;
+
+            DateTime dt = new DateTime((long)MainNavPlotModel.CursorValue);
+            UpdateFleet(dt);
         }
 
         #endregion
@@ -2873,25 +2908,94 @@ namespace LionRiver
             MapGrid.Children.Remove(routeCalculationControl);
         }
 
-        private void ReplaySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void PlayButton_Checked(object sender, RoutedEventArgs e)
         {
-            double ts = (maxReplayTime - minReplayTime).TotalSeconds * ReplaySlider.Value / (ReplaySlider.Maximum + 1);
-            DateTime dt = minReplayTime + TimeSpan.FromSeconds(ts);
-            DateTime minDt = dt.AddHours(-Properties.Settings.Default.FleetBoatTrackLength); // Fleet track range
+            DateTime dt = DateTime.Now;
 
-            if (ReplaySlider.Value != ReplaySlider.Maximum)
-                PlayButton.IsChecked = false;
+            MainNavPlotModel.CursorValue = dt.Ticks;
+
+            double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+            MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CursorValue - 0.8 * deltaT);
+            MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CursorValue + 0.2 * deltaT);
+
+            UpdateFleet(dt);
+
+            if(FwdBackSlider!=null)
+                FwdBackSlider.Value = 0;
+
+            ReplayTimer.Stop();
+
+        }
+
+        private void FwdBackSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (FwdBackSlider.Value != 0)
+            {
+                if(ReplayTimer.IsEnabled==false)
+                    ReplayTimer.Start();
+            }
             else
-                PlayButton.IsChecked = true;
+                ReplayTimer.Stop();
+        }
+
+        private void MainNavPlot_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                PanStartingPoint = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
+
+                MainNavPlotModel.SelectionFromValue = PanStartingPoint.X;
+                MainNavPlotModel.SelectionToValue = PanStartingPoint.X;
+
+                mouseHandlingMode = MouseHandlingMode.SelectingPlotRange;
+
+                e.Handled = true;
+            }
+
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                ClickTime = e.Timestamp;
+                mouseHandlingMode = MouseHandlingMode.MovingPlotCursor;
+            }
+        }
+
+        private void MainNavPlot_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (mouseHandlingMode==MouseHandlingMode.SelectingPlotRange)
+            {
+                mouseHandlingMode = MouseHandlingMode.None;
+
+                e.Handled = true;
+            }
+
+            if (mouseHandlingMode == MouseHandlingMode.MovingPlotCursor && (e.Timestamp-ClickTime)<300)
+            {
+                var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
+                MainNavPlotModel.CursorValue = point.X;
+
+                mouseHandlingMode = MouseHandlingMode.None;
+
+                PlayButton.IsChecked = false;
+
+                DateTime dt = new DateTime((long)MainNavPlotModel.CursorValue);
+                UpdateFleet(dt);
+
+            }
+
+        }
+
+        private void UpdateFleet(DateTime dt)
+        {
+            DateTime minDt = dt.AddHours(-Properties.Settings.Default.FleetBoatTrackLength); // Fleet track range
+            DateTime minDt1 = dt.AddMinutes(-10); // Short lookup range for position
 
             using (var context = new LionRiverDBContext())
             {
-                var logEntries = (from x in context.Logs
-                                      where (x.level == 3 && (x.timestamp <= dt) && (x.timestamp>minDt))
-                                      orderby x.timestamp descending
-                                      select x);
 
-                var logEntry = logEntries.FirstOrDefault();
+                var logEntry = (from x in context.Logs
+                                where (x.level == 2 && (x.timestamp <= dt) && (x.timestamp > minDt1))
+                                orderby x.timestamp descending
+                                select x).FirstOrDefault();
 
                 if (logEntry != null)
                 {
@@ -2950,6 +3054,11 @@ namespace LionRiver
 
                 map.Children.Remove(track);
 
+                var logEntries = (from x in context.Logs
+                                  where (x.level == 3 && (x.timestamp <= dt) && (x.timestamp > minDt))
+                                  orderby x.timestamp descending
+                                  select x);
+
                 track = new Track(logEntries.ToList(), Properties.Settings.Default.TrackResolution, Properties.Settings.Default.SPDminVal,
                                         Properties.Settings.Default.SPDminIndex, Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
 
@@ -2969,14 +3078,14 @@ namespace LionRiver
                          orderby x.timestamp ascending
                          select x).ToList();
 
-                    if (fTrackEntries!=null && fTrackEntries.Count()>0)
+                    if (fTrackEntries != null && fTrackEntries.Count() > 0)
                     {
                         var lastTrackEntry = fTrackEntries.Last();
 
                         b.Location = new Location(lastTrackEntry.Latitude, lastTrackEntry.Longitude);
                         b.Heading = lastTrackEntry.COG; ;
 
-                        if(Properties.Settings.Default.FleetBoatsVisible)
+                        if (Properties.Settings.Default.FleetBoatsVisible)
                             b.BoatVisible = Visibility.Visible;
 
                         Track tr = new Track(fTrackEntries, Properties.Settings.Default.SPDminVal, Properties.Settings.Default.SPDminIndex,
@@ -3011,25 +3120,21 @@ namespace LionRiver
                     }
                 }
             }
-        }
-
-        private void PlayButton_Checked(object sender, RoutedEventArgs e)
-        {
-            if(ReplaySlider!=null)
-                ReplaySlider.Value = ReplaySlider.Maximum;
 
         }
 
-        private void FwdBackSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void MainNavPlot_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (FwdBackSlider.Value != 0)
+            if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
             {
-                if(ReplayTimer.IsEnabled==false)
-                    ReplayTimer.Start();
+                PanStartingPoint = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
+
+                MainNavPlotModel.SelectionToValue = PanStartingPoint.X;
+
+                e.Handled = true;
             }
-            else
-                ReplayTimer.Stop();
         }
+
 
         #endregion
 

@@ -776,51 +776,43 @@
                 <GridSplitter Grid.Row="1" Grid.RowSpan="1" Height="6" HorizontalAlignment="Stretch" Margin="0" x:Name="gridSplitter3" VerticalAlignment="Stretch" Width="Auto" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows" Background="Black" />
 
                 <Grid x:Name="TransportGrid" Grid.Row="2">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">
 
-                            <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" VerticalAlignment="Top" IsChecked="True" Checked="PlayButton_Checked" HorizontalAlignment="Center">
-                                <ToggleButton.Content>
-                                    <Image Source="Images/play-button.png" Stretch="None" HorizontalAlignment="Center"  Margin="2" ToolTip="Play"/>
-                                </ToggleButton.Content>
-                            </ToggleButton>
-                            
-                            <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="2,0" TickFrequency="10" Foreground="White" VerticalAlignment="Top" SmallChange="1" Minimum="-10" Width="60" HorizontalAlignment="Center" ValueChanged="FwdBackSlider_ValueChanged" AutoToolTipPlacement="BottomRight" Delay="488" >
-                                <Slider.Triggers>
-                                    <EventTrigger SourceName="FwdBackSlider" RoutedEvent="Thumb.DragCompleted">
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="FwdBackSlider" Storyboard.TargetProperty="Value" From="{Binding Value, ElementName=FwdBackSlider}" To="0" Duration="0:0:0.1"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Slider.Triggers>
-                            </Slider>
 
-                        </StackPanel>
 
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            
-                            <mycontrols:NavPlot Grid.Row="0" x:Name="MainNavPlot">
-                            </mycontrols:NavPlot>
-
-                            <Slider Grid.Row="1" x:FieldModifier="public" Name="ReplaySlider" Orientation="Horizontal" Height="30" TickPlacement="BottomRight" Maximum="5000" Margin="5,0" TickFrequency="250" Foreground="White" VerticalAlignment="Center" SmallChange="1" LargeChange="250" ValueChanged="ReplaySlider_ValueChanged" />
-                        </Grid>
                         
-                    
-                    </Grid>
+                        <mycontrols:NavPlot  x:Name="MainNavPlot"
+                                             PreviewMouseDown="MainNavPlot_PreviewMouseDown"
+                                             PreviewMouseUp="MainNavPlot_PreviewMouseUp"
+                                             PreviewMouseMove="MainNavPlot_PreviewMouseMove"/>
+                            
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top">
+
+                                <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" VerticalAlignment="Top" Checked="PlayButton_Checked" HorizontalAlignment="Center">
+                                    <ToggleButton.Content>
+                                        <Image Source="Images/play-button.png" Stretch="None" HorizontalAlignment="Center"  Margin="2" ToolTip="Play"/>
+                                    </ToggleButton.Content>
+                                </ToggleButton>
+
+                                <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="2,0" TickFrequency="10" Foreground="White" VerticalAlignment="Top" SmallChange="1" Minimum="-10" Width="50" HorizontalAlignment="Center" ValueChanged="FwdBackSlider_ValueChanged" AutoToolTipPlacement="BottomRight" Delay="488" >
+                                    <Slider.Triggers>
+                                        <EventTrigger SourceName="FwdBackSlider" RoutedEvent="Thumb.DragCompleted">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="FwdBackSlider" Storyboard.TargetProperty="Value" From="{Binding Value, ElementName=FwdBackSlider}" To="0" Duration="0:0:0.1"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Slider.Triggers>
+                                </Slider>
+
+                            </StackPanel>
+                            
+
+
+               
                 </Grid>
-                
+
             </Grid>
             
             <GridSplitter Grid.Column="1" Height="Auto" HorizontalAlignment="Left" Margin="0" x:Name="gridSplitter1" VerticalAlignment="Stretch" Width="6" ResizeBehavior="PreviousAndNext" Background="Black" ShowsPreview="False"/>

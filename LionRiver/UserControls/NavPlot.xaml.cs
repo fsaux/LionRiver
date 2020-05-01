@@ -12,17 +12,24 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LiveCharts;
+using LiveCharts.Wpf;
+using LiveCharts.Configurations;
+
 
 namespace LionRiver.UserControls
 {
     /// <summary>
     /// Interaction logic for NavPlot.xaml
     /// </summary>
+    /// 
+
     public partial class NavPlot : UserControl
     {
         public NavPlot()
         {
             InitializeComponent();
+
         }
     }
 }

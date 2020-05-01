@@ -20,6 +20,9 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using MapControl;
 using CircularBuffer;
+using LiveCharts;
+using LiveCharts.Wpf;
+using LiveCharts.Configurations;
 
 using OSGeo.GDAL;
 using OSGeo.OSR;
@@ -2600,6 +2603,102 @@ namespace LionRiver
 
     #endregion
 
+    #region Plot
+    public class DateModel
+    {
+        public System.DateTime DateTime { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class NavPlotModel : INotifyPropertyChanged
+    {
+        private Double _cursorValue;
+        private Double _minAxisValue;
+        private Double _maxAxisValue;
+        private Double _selectionFromValue;
+        private Double _selectionToValue;
+        public SeriesCollection SeriesCollection { get; set; }
+        public Func<double, string> YFormatter { get; set; }
+        public Func<double, string> XFormatter { get; set; }
+
+
+        public Double CursorValue
+        {
+            get
+            { return _cursorValue; }
+
+            set
+            {
+                _cursorValue = value;
+                OnPropertyChanged("CursorValue");
+            }
+        }
+        public Double MinAxisValue
+        {
+            get
+            { return _minAxisValue; }
+
+            set
+            {
+                _minAxisValue = value;
+                OnPropertyChanged("MinAxisValue");
+            }
+        }
+        public Double MaxAxisValue
+        {
+            get
+            { return _maxAxisValue; }
+
+            set
+            {
+                _maxAxisValue = value;
+                OnPropertyChanged("MaxAxisValue");
+            }
+        }
+        public Double SelectionFromValue
+        {
+            get
+            { return _selectionFromValue; }
+
+            set
+            {
+                _selectionFromValue = value;
+                OnPropertyChanged("SelectionFromValue");
+            }
+        }
+        public Double SelectionToValue
+        {
+            get
+            { return _selectionToValue; }
+
+            set
+            {
+                _selectionToValue = value;
+                OnPropertyChanged("SelectionToValue");
+            }
+        }
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        //private void NotifyPropertyChanged(string property)
+        //{
+        //    if (PropertyChanged != null)
+        //    {
+        //        PropertyChanged(this, new PropertyChangedEventArgs(property));
+        //    }
+        //}
+
+        protected virtual void OnPropertyChanged(string propertyName = null)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+    }
+
+
+
+    #endregion
     public static class CommandLibrary
     {
         private static RoutedUICommand addMark = new RoutedUICommand("AddMark", "AddMark", typeof(CommandLibrary));
