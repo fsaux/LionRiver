@@ -2612,7 +2612,9 @@ namespace LionRiver
 
     public class NavPlotModel : INotifyPropertyChanged
     {
+        private Double _currentValue;
         private Double _cursorValue;
+        private Visibility _cursorVisible;
         private Double _minAxisValue;
         private Double _maxAxisValue;
         private Double _selectionFromValue;
@@ -2621,6 +2623,18 @@ namespace LionRiver
         public Func<double, string> YFormatter { get; set; }
         public Func<double, string> XFormatter { get; set; }
 
+
+        public Double CurrentValue
+        {
+            get
+            { return _currentValue; }
+
+            set
+            {
+                _currentValue = value;
+                OnPropertyChanged("CurrentValue");
+            }
+        }
 
         public Double CursorValue
         {
@@ -2633,6 +2647,19 @@ namespace LionRiver
                 OnPropertyChanged("CursorValue");
             }
         }
+
+        public Visibility CursorVisible
+        {
+            get
+            { return _cursorVisible; }
+
+            set
+            {
+                _cursorVisible = value;
+                OnPropertyChanged("CursorVisible");
+            }
+        }
+
         public Double MinAxisValue
         {
             get

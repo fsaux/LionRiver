@@ -745,6 +745,12 @@
                             </ToggleButton.Content>
                         </ToggleButton>
 
+                        <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="PlayButton_Checked">
+                            <ToggleButton.Content>
+                                <Image Source="Images/play-button.png" Stretch="None" HorizontalAlignment="Center"  Margin="2" ToolTip="Play"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+
                         <ToggleButton  Name="RouteCalcButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="RouteCalcButton_Checked" Unchecked="RouteCalcButton_Unchecked"  >
                             <ToggleButton.Content>
                                 <Image Source="Images/Numbers-2-icon.png" Stretch="None" Margin="2" ToolTip="Route Calculation"/>
@@ -777,24 +783,14 @@
 
                 <Grid x:Name="TransportGrid" Grid.Row="2">
 
+                    <mycontrols:NavPlot  x:Name="MainNavPlot"
+                                            PreviewMouseDown="MainNavPlot_PreviewMouseDown"
+                                            PreviewMouseUp="MainNavPlot_PreviewMouseUp"
+                                            PreviewMouseMove="MainNavPlot_PreviewMouseMove" 
+                                            MouseEnter="MainNavPlot_MouseEnter"
+                                            MouseLeave="MainNavPlot_MouseLeave"/>
 
-
-
-                        
-                        <mycontrols:NavPlot  x:Name="MainNavPlot"
-                                             PreviewMouseDown="MainNavPlot_PreviewMouseDown"
-                                             PreviewMouseUp="MainNavPlot_PreviewMouseUp"
-                                             PreviewMouseMove="MainNavPlot_PreviewMouseMove"/>
-                            
-                        <StackPanel Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top">
-
-                                <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" VerticalAlignment="Top" Checked="PlayButton_Checked" HorizontalAlignment="Center">
-                                    <ToggleButton.Content>
-                                        <Image Source="Images/play-button.png" Stretch="None" HorizontalAlignment="Center"  Margin="2" ToolTip="Play"/>
-                                    </ToggleButton.Content>
-                                </ToggleButton>
-
-                                <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="2,0" TickFrequency="10" Foreground="White" VerticalAlignment="Top" SmallChange="1" Minimum="-10" Width="50" HorizontalAlignment="Center" ValueChanged="FwdBackSlider_ValueChanged" AutoToolTipPlacement="BottomRight" Delay="488" >
+                    <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="2,0" TickFrequency="10" Foreground="White" VerticalAlignment="Bottom" SmallChange="1" Minimum="-10" Width="50" HorizontalAlignment="Right" ValueChanged="FwdBackSlider_ValueChanged" AutoToolTipPlacement="BottomRight" Delay="488" >
                                     <Slider.Triggers>
                                         <EventTrigger SourceName="FwdBackSlider" RoutedEvent="Thumb.DragCompleted">
                                             <BeginStoryboard>
@@ -805,12 +801,7 @@
                                         </EventTrigger>
                                     </Slider.Triggers>
                                 </Slider>
-
-                            </StackPanel>
-                            
-
-
-               
+                                       
                 </Grid>
 
             </Grid>

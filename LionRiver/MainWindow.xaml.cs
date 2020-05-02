@@ -784,9 +784,9 @@ namespace LionRiver
             }
 
             MainNavPlotModel.MinAxisValue = minV.Ticks;
-            MainNavPlotModel.CursorValue = DateTime.Now.Ticks;
-            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CursorValue +
-                                            (MainNavPlotModel.CursorValue - MainNavPlotModel.MinAxisValue) * 0.2;
+            MainNavPlotModel.CurrentValue = DateTime.Now.Ticks;
+            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue +
+                                            (MainNavPlotModel.CurrentValue - MainNavPlotModel.MinAxisValue) * 0.2;
 
             MainNavPlotModel.YFormatter = value => value.ToString("0.0");
             MainNavPlotModel.XFormatter = value => new System.DateTime((long)(value * TimeSpan.FromTicks(1).Ticks)).ToString("dd MMM");
@@ -1192,20 +1192,20 @@ namespace LionRiver
         {
             double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
             
-            MainNavPlotModel.CursorValue += deltaT * FwdBackSlider.Value / 1000;
+            MainNavPlotModel.CurrentValue += deltaT * FwdBackSlider.Value / 1000;
 
             double lim = MainNavPlotModel.MinAxisValue + 0.8 * deltaT;
 
-            if (MainNavPlotModel.CursorValue > lim)
+            if (MainNavPlotModel.CurrentValue > lim)
             {
-                MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CursorValue - 0.8 * deltaT);
-                MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CursorValue + 0.2 * deltaT);
+                MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
+                MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
             }
 
-            if (MainNavPlotModel.CursorValue > DateTime.Now.Ticks)
+            if (MainNavPlotModel.CurrentValue > DateTime.Now.Ticks)
                 PlayButton.IsChecked = true;
 
-            DateTime dt = new DateTime((long)MainNavPlotModel.CursorValue);
+            DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
             UpdateFleet(dt);
         }
 
@@ -2914,11 +2914,11 @@ namespace LionRiver
         {
             DateTime dt = DateTime.Now;
 
-            MainNavPlotModel.CursorValue = dt.Ticks;
+            MainNavPlotModel.CurrentValue = dt.Ticks;
 
             double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
-            MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CursorValue - 0.8 * deltaT);
-            MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CursorValue + 0.2 * deltaT);
+            MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
+            MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
 
             UpdateFleet(dt);
 
@@ -2973,13 +2973,13 @@ namespace LionRiver
             if (mouseHandlingMode == MouseHandlingMode.MovingPlotCursor && (e.Timestamp-ClickTime)<300)
             {
                 var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
-                MainNavPlotModel.CursorValue = point.X;
+                MainNavPlotModel.CurrentValue = point.X;
 
                 mouseHandlingMode = MouseHandlingMode.None;
 
                 PlayButton.IsChecked = false;
 
-                DateTime dt = new DateTime((long)MainNavPlotModel.CursorValue);
+                DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
                 UpdateFleet(dt);
 
             }
@@ -3127,14 +3127,26 @@ namespace LionRiver
 
         private void MainNavPlot_PreviewMouseMove(object sender, MouseEventArgs e)
         {
+            var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
+            MainNavPlotModel.CursorValue = point.X;
+
             if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
             {
-                PanStartingPoint = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
-
-                MainNavPlotModel.SelectionToValue = PanStartingPoint.X;
+                MainNavPlotModel.SelectionToValue = point.X;
 
                 e.Handled = true;
             }
+        }
+
+        private void MainNavPlot_MouseEnter(object sender, MouseEventArgs e)
+        {
+            MainNavPlotModel.CursorVisible = Visibility.Visible;
+
+        }
+
+        private void MainNavPlot_MouseLeave(object sender, MouseEventArgs e)
+        {
+            MainNavPlotModel.CursorVisible = Visibility.Hidden;
         }
 
 
