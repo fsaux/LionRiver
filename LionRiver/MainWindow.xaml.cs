@@ -388,10 +388,12 @@ namespace LionRiver
             path += ";" + GDAL_HOME;
             SetEnvironmentVariable("PATH", path);
 
-            GdalEnvironment.SetupEnvironment(GDAL_HOME);
+            //GdalEnvironment.SetupEnvironment(GDAL_HOME);
+            //Gdal.AllRegister();
+            //Ogr.RegisterAll();
 
-            Gdal.AllRegister();
-            Ogr.RegisterAll();
+            GdalConfiguration.ConfigureGdal();
+            GdalConfiguration.ConfigureOgr();
 
             MapLayer1.TileSource = new TileSource();
             MapLayer1.TileSource.UriFormat="file:\\" + Properties.Settings.Default.Layer1Directory + "\\{z}\\{x}\\{v}.png";

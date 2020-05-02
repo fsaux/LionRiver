@@ -850,31 +850,31 @@ namespace LionRiver
 
     }
 
-    class GdalEnvironment
-    {
-        public static void SetupEnvironment(string binFolder)
-        {
-            SetEnvironmentVariables(binFolder);
-        }
+    //class GdalEnvironment
+    //{
+    //    public static void SetupEnvironment(string binFolder)
+    //    {
+    //        SetEnvironmentVariables(binFolder);
+    //    }
 
-        public static void SetEnvironmentVariables(string binPath)
-        {
-            string ss = System.IO.Path.Combine(binPath, @"gdal-data");
-            Gdal.SetConfigOption("GDAL_DATA", ss);
-            Gdal.PushFinderLocation(System.IO.Path.Combine(binPath, @"gdal-data"));
-            setValueNewVariable("GEOTIFF_CSV", System.IO.Path.Combine(binPath, @"gdal-data"));
-            setValueNewVariable("GDAL_DRIVER_PATH", System.IO.Path.Combine(binPath, @"gdal-plugins"));
-            setValueNewVariable("PROJ_LIB", System.IO.Path.Combine(binPath, @"proj\SHARE"));
-        }
+    //    public static void SetEnvironmentVariables(string binPath)
+    //    {
+    //        string ss = System.IO.Path.Combine(binPath, @"gdal-data");
+    //        Gdal.SetConfigOption("GDAL_DATA", ss);
+    //        Gdal.PushFinderLocation(System.IO.Path.Combine(binPath, @"gdal-data"));
+    //        setValueNewVariable("GEOTIFF_CSV", System.IO.Path.Combine(binPath, @"gdal-data"));
+    //        setValueNewVariable("GDAL_DRIVER_PATH", System.IO.Path.Combine(binPath, @"gdal-plugins"));
+    //        setValueNewVariable("PROJ_LIB", System.IO.Path.Combine(binPath, @"proj\SHARE"));
+    //    }
 
-        private static void setValueNewVariable(string name, string value)
-        {
-            if (Environment.GetEnvironmentVariable(name) == null)
-                Environment.SetEnvironmentVariable(name, value);
-        }
+    //    private static void setValueNewVariable(string name, string value)
+    //    {
+    //        if (Environment.GetEnvironmentVariable(name) == null)
+    //            Environment.SetEnvironmentVariable(name, value);
+    //    }
 
 
-    }
+    //}
 
     #region Map Items
 
