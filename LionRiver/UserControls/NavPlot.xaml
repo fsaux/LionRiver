@@ -12,15 +12,15 @@
         <lvc:CartesianChart Grid.Row="0" 
                             Name="Chart"
                             Series="{Binding SeriesCollection}" 
-                            Zoom="X" Pan="X" 
+                            Zoom="None"
+                            Pan="None"
                             DisableAnimations="True"
                             DataTooltip="{x:Null}"
                             Hoverable="False">
             <lvc:CartesianChart.AxisX>
                 <lvc:Axis LabelFormatter="{Binding XFormatter}"  ShowLabels="False"
                           MinValue="{Binding MinAxisValue, Mode=TwoWay}" 
-                          MaxValue="{Binding MaxAxisValue, Mode=TwoWay}"
-                          RangeChangedCommand="{Binding RangeChangedCommand}">
+                          MaxValue="{Binding MaxAxisValue, Mode=TwoWay}">
                     <lvc:Axis.Sections>
                         <lvc:AxisSection FromValue="{Binding SelectionFromValue}" ToValue="{Binding SelectionToValue}">
                             <lvc:AxisSection.Fill>

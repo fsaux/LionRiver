@@ -784,11 +784,12 @@
                 <Grid x:Name="TransportGrid" Grid.Row="2">
 
                     <mycontrols:NavPlot  x:Name="MainNavPlot"
-                                            PreviewMouseDown="MainNavPlot_PreviewMouseDown"
-                                            PreviewMouseUp="MainNavPlot_PreviewMouseUp"
-                                            PreviewMouseMove="MainNavPlot_PreviewMouseMove" 
-                                            MouseEnter="MainNavPlot_MouseEnter"
-                                            MouseLeave="MainNavPlot_MouseLeave"/>
+                                         MouseEnter="MainNavPlot_MouseEnter"
+                                         MouseLeave="MainNavPlot_MouseLeave"
+                                         MouseMove="MainNavPlot_MouseMove"
+                                         MouseDown="MainNavPlot_MouseDown"
+                                         MouseUp="MainNavPlot_MouseUp" 
+                                         MouseWheel="MainNavPlot_MouseWheel"/>
 
                     <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
                         
@@ -811,9 +812,7 @@
                         </Slider>
 
                     </StackPanel>
-
-
-                    
+                 
                 </Grid>
 
             </Grid>

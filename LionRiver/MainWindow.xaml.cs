@@ -183,7 +183,8 @@ namespace LionRiver
             MovingMark,
             SettingMeasureStart,
             SelectingPlotRange,
-            SettingPlotCurrentValue
+            SettingPlotCurrentValue,
+            PlotPanning
         }
 
         public enum MapOrientationMode
@@ -786,20 +787,27 @@ namespace LionRiver
 
             MainNavPlotModel.MinAxisValue = minV.Ticks;
             MainNavPlotModel.CurrentValue = DateTime.Now.Ticks;
+
             MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue +
                                             (MainNavPlotModel.CurrentValue - MainNavPlotModel.MinAxisValue) * 0.2;
 
             MainNavPlotModel.YFormatter = value => value.ToString("0.0");
             MainNavPlotModel.XFormatter = value => new System.DateTime((long)(value * TimeSpan.FromTicks(1).Ticks)).ToString("dd MMM");
 
-            MainNavPlotModel.RangeChangedCommand = new MyCommand<RangeChangedEventArgs>
-            {
-                ExecuteDelegate = e => RangeChanged(e)
-            };
+            //MainNavPlotModel.RangeChangedCommand = new MyCommand<RangeChangedEventArgs>
+            //{
+            //    ExecuteDelegate = e => RangeChanged(e)
+            //};
+
+
+            MainNavPlotModel.CurrentValue = DateTime.Parse("07-09-2019").Ticks;
+            MainNavPlotModel.MinAxisValue = DateTime.Parse("07-08-2019").Ticks;
+            MainNavPlotModel.MaxAxisValue = DateTime.Parse("07-10-2019").Ticks;
+            PlotCenterButton.IsChecked = true;
 
             MainNavPlot.DataContext = MainNavPlotModel;
 
-            PlayButton.IsChecked = true;
+            //PlayButton.IsChecked = true;
 
             #endregion
 
@@ -1213,9 +1221,6 @@ namespace LionRiver
                 MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
                 MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
             }
-
-            if (MainNavPlotModel.CurrentValue > DateTime.Now.Ticks)
-                PlayButton.IsChecked = true;
 
             DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
             UpdateFleet(dt);
@@ -2786,18 +2791,18 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        private void RangeChanged(RangeChangedEventArgs e)
-        {
-            var x = (Axis)e.Axis;
+        //private void RangeChanged(RangeChangedEventArgs e)
+        //{
+        //    var x = (Axis)e.Axis;
 
-            if (PlotCenterButton.IsChecked == true)
-            {
-                MainNavPlotModel.CurrentValue = (x.MaxValue + x.MinValue) / 2;
-                DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
-                UpdateFleet(dt);
-            }
+        //    if (PlotCenterButton.IsChecked == true)
+        //    {
+        //        MainNavPlotModel.CurrentValue = (x.MaxValue + x.MinValue) / 2;
+        //        DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
+        //        UpdateFleet(dt);
+        //    }
 
-        }
+        //}
 
         #endregion
 
@@ -2973,7 +2978,7 @@ namespace LionRiver
                 ReplayTimer.Stop();
         }
 
-        private void MainNavPlot_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void MainNavPlot_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.RightButton == MouseButtonState.Pressed)
             {
@@ -2990,43 +2995,142 @@ namespace LionRiver
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 ClickTime = e.Timestamp;
-                mouseHandlingMode = MouseHandlingMode.SettingPlotCurrentValue;
+                PanStartingPoint = e.GetPosition(MainNavPlot.Chart);
+                mouseHandlingMode = MouseHandlingMode.PlotPanning;
+            }
+
+        }
+        
+        private void MainNavPlot_MouseMove(object sender, MouseEventArgs e)
+        {
+            var pos = e.GetPosition(MainNavPlot.Chart);
+            var point = MainNavPlot.Chart.ConvertToChartValues(pos);
+
+            MainNavPlotModel.CursorValue = point.X;
+
+            if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
+            {
+                MainNavPlotModel.SelectionToValue = point.X;
+
+                e.Handled = true;
+            }
+
+            if (mouseHandlingMode == MouseHandlingMode.PlotPanning)
+            {
+
+                MainNavPlotModel.CursorVisible = Visibility.Hidden;
+
+                double deltaX = PanStartingPoint.X - pos.X;
+
+                var dx = ChartFunctions.FromPlotArea(deltaX, LiveCharts.AxisOrientation.X, MainNavPlot.Chart.Model,0) -
+                             ChartFunctions.FromPlotArea(0, LiveCharts.AxisOrientation.X, MainNavPlot.Chart.Model, 0);
+
+                MainNavPlotModel.MinAxisValue += dx;
+                MainNavPlotModel.MaxAxisValue += dx;
+
+                PanStartingPoint = pos;
+
+                if (PlotCenterButton.IsChecked == true)
+                {
+                    MainNavPlotModel.CurrentValue = (MainNavPlotModel.MinAxisValue + MainNavPlotModel.MaxAxisValue) / 2; ;
+
+                    if (ReplayTimer.IsEnabled == false)
+                        ReplayTimer.Start();
+                }
             }
         }
 
-        private void MainNavPlot_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        private void MainNavPlot_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (mouseHandlingMode==MouseHandlingMode.SelectingPlotRange)
+            var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
+
+            if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
             {
                 mouseHandlingMode = MouseHandlingMode.None;
 
                 e.Handled = true;
             }
 
-            if (mouseHandlingMode == MouseHandlingMode.SettingPlotCurrentValue && (e.Timestamp-ClickTime)<300)
-            {
-                var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
-                MainNavPlotModel.CurrentValue = point.X;
-
-                mouseHandlingMode = MouseHandlingMode.None;
-
-                PlayButton.IsChecked = false;
-
-                if(PlotCenterButton.IsChecked==true)
+            if (mouseHandlingMode == MouseHandlingMode.PlotPanning)
+                if ((e.Timestamp - ClickTime) < 300)
                 {
-                    double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+                    MainNavPlotModel.CurrentValue = point.X;
 
-                    MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
-                    MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
+                    mouseHandlingMode = MouseHandlingMode.None;
+
+                    PlayButton.IsChecked = false;
+
+                    if (PlotCenterButton.IsChecked == true)
+                    {
+                        double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+
+                        MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
+                        MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
+                    }
+
+                    if (ReplayTimer.IsEnabled == false)
+                        ReplayTimer.Start();
+                }
+                else
+                {
+                    MainNavPlotModel.CursorValue = point.X;
+                    MainNavPlotModel.CursorVisible = Visibility.Visible;
+
+                    mouseHandlingMode = MouseHandlingMode.None;
                 }
 
-                DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
-                UpdateFleet(dt);
+        }        
 
+        private void MainNavPlot_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            double zoomPos;
+            double zoom;
+
+            if (PlotCenterButton.IsChecked == true)
+                zoomPos = MainNavPlotModel.CurrentValue;
+            else
+                zoomPos = MainNavPlotModel.CursorValue;
+
+            double deltaT1 = zoomPos - MainNavPlotModel.MinAxisValue;
+            double deltaT2 = zoomPos - MainNavPlotModel.MaxAxisValue;
+
+
+            if (e.Delta > 0)
+                zoom = 0.9;
+            else
+                zoom = 1 / 0.9;
+
+            MainNavPlotModel.MinAxisValue += deltaT1 * (1 - zoom);
+            MainNavPlotModel.MaxAxisValue += deltaT2 * (1 - zoom);
+
+            if (PlotCenterButton.IsChecked == true)
+            {
+                var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
+                MainNavPlotModel.CursorValue = point.X;
             }
+        }
+
+        private void MainNavPlot_MouseEnter(object sender, MouseEventArgs e)
+        {
+            MainNavPlotModel.CursorVisible = Visibility.Visible;
 
         }
 
+        private void MainNavPlot_MouseLeave(object sender, MouseEventArgs e)
+        {
+            MainNavPlotModel.CursorVisible = Visibility.Hidden;
+        }
+
+        private void PlotCenterButton_Checked(object sender, RoutedEventArgs e)
+        {
+            double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+
+            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
+            MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
+
+            PlayButton.IsChecked = false;
+        }
+        
         private void UpdateFleet(DateTime dt)
         {
             DateTime minDt = dt.AddHours(-Properties.Settings.Default.FleetBoatTrackLength); // Fleet track range
@@ -3172,40 +3276,7 @@ namespace LionRiver
 
         }
 
-        private void MainNavPlot_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
-            MainNavPlotModel.CursorValue = point.X;
 
-            if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
-            {
-                MainNavPlotModel.SelectionToValue = point.X;
-
-                e.Handled = true;
-            }
-
-        }
-
-        private void MainNavPlot_MouseEnter(object sender, MouseEventArgs e)
-        {
-            MainNavPlotModel.CursorVisible = Visibility.Visible;
-
-        }
-
-        private void MainNavPlot_MouseLeave(object sender, MouseEventArgs e)
-        {
-            MainNavPlotModel.CursorVisible = Visibility.Hidden;
-        }
-
-        private void PlotCenterButton_Checked(object sender, RoutedEventArgs e)
-        {
-            double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
-
-            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
-            MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
-
-            PlayButton.IsChecked = false;
-        }
 
 
         #endregion
