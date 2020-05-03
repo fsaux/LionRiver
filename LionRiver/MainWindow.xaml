@@ -747,7 +747,7 @@
 
                         <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="PlayButton_Checked">
                             <ToggleButton.Content>
-                                <Image Source="Images/play-button.png" Stretch="None" HorizontalAlignment="Center"  Margin="2" ToolTip="Play"/>
+                                <Image  Source="Images/iconfinder_icon-play_211876.png" Stretch="Fill" Margin="2" ToolTip="Play" Width="28" Height="28"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
@@ -790,18 +790,30 @@
                                             MouseEnter="MainNavPlot_MouseEnter"
                                             MouseLeave="MainNavPlot_MouseLeave"/>
 
-                    <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="2,0" TickFrequency="10" Foreground="White" VerticalAlignment="Bottom" SmallChange="1" Minimum="-10" Width="50" HorizontalAlignment="Right" ValueChanged="FwdBackSlider_ValueChanged" AutoToolTipPlacement="BottomRight" Delay="488" >
-                                    <Slider.Triggers>
-                                        <EventTrigger SourceName="FwdBackSlider" RoutedEvent="Thumb.DragCompleted">
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation Storyboard.TargetName="FwdBackSlider" Storyboard.TargetProperty="Value" From="{Binding Value, ElementName=FwdBackSlider}" To="0" Duration="0:0:0.1"/>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </Slider.Triggers>
-                                </Slider>
-                                       
+                    <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                        
+                        <ToggleButton   Name="PlotCenterButton"  Style="{StaticResource MainToggleButton}" Margin="8" HorizontalAlignment="Center" Checked="PlotCenterButton_Checked" >
+                            <ToggleButton.Content>
+                                <Image  Source="Images/Image-Edition-Tools-Collapse-icon.png" Stretch="Fill" Margin="2" ToolTip="Center Plot" Width="20" Height="20"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+
+                        <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="2,0" TickFrequency="10" Foreground="White"  SmallChange="1" Minimum="-10" Width="50"  ValueChanged="FwdBackSlider_ValueChanged" AutoToolTipPlacement="BottomRight" Delay="488" >
+                            <Slider.Triggers>
+                                <EventTrigger SourceName="FwdBackSlider" RoutedEvent="Thumb.DragCompleted">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="FwdBackSlider" Storyboard.TargetProperty="Value" From="{Binding Value, ElementName=FwdBackSlider}" To="0" Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Slider.Triggers>
+                        </Slider>
+
+                    </StackPanel>
+
+
+                    
                 </Grid>
 
             </Grid>

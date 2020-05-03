@@ -26,6 +26,7 @@ using LiveCharts.Configurations;
 
 using OSGeo.GDAL;
 using OSGeo.OSR;
+using LiveCharts.Events;
 
 namespace LionRiver
 {
@@ -2705,6 +2706,7 @@ namespace LionRiver
             }
         }
 
+        public MyCommand<RangeChangedEventArgs> RangeChangedCommand { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         //private void NotifyPropertyChanged(string property)
@@ -2723,9 +2725,10 @@ namespace LionRiver
 
     }
 
-
-
     #endregion
+
+    #region Commands
+
     public static class CommandLibrary
     {
         private static RoutedUICommand addMark = new RoutedUICommand("AddMark", "AddMark", typeof(CommandLibrary));
@@ -2801,6 +2804,29 @@ namespace LionRiver
             get { return setLinePin; }
         }
     }
+    public class MyCommand<T> : ICommand where T : class
+    {
+        public Predicate<T> CanExecuteDelegate { get; set; }
+        public Action<T> ExecuteDelegate { get; set; }
+
+        public bool CanExecute(object parameter)
+        {
+            return CanExecuteDelegate == null || CanExecuteDelegate((T)parameter);
+        }
+
+        public void Execute(object parameter)
+        {
+            if (ExecuteDelegate != null) ExecuteDelegate((T)parameter);
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+    }
+
+    #endregion
 
     public enum RxTxResult
     {

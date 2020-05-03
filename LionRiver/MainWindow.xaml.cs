@@ -26,6 +26,7 @@ using OSGeo.OSR;
 using System.Xaml;
 using LiveCharts.Defaults;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using LiveCharts.Events;
 
 namespace LionRiver
 {
@@ -182,7 +183,7 @@ namespace LionRiver
             MovingMark,
             SettingMeasureStart,
             SelectingPlotRange,
-            MovingPlotCursor
+            SettingPlotCurrentValue
         }
 
         public enum MapOrientationMode
@@ -791,6 +792,11 @@ namespace LionRiver
             MainNavPlotModel.YFormatter = value => value.ToString("0.0");
             MainNavPlotModel.XFormatter = value => new System.DateTime((long)(value * TimeSpan.FromTicks(1).Ticks)).ToString("dd MMM");
 
+            MainNavPlotModel.RangeChangedCommand = new MyCommand<RangeChangedEventArgs>
+            {
+                ExecuteDelegate = e => RangeChanged(e)
+            };
+
             MainNavPlot.DataContext = MainNavPlotModel;
 
             PlayButton.IsChecked = true;
@@ -1200,6 +1206,12 @@ namespace LionRiver
             {
                 MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
                 MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
+            }
+
+            if (PlotCenterButton.IsChecked == true)
+            {
+                MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
+                MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
             }
 
             if (MainNavPlotModel.CurrentValue > DateTime.Now.Ticks)
@@ -2774,6 +2786,19 @@ namespace LionRiver
             e.Handled = true;
         }
 
+        private void RangeChanged(RangeChangedEventArgs e)
+        {
+            var x = (Axis)e.Axis;
+
+            if (PlotCenterButton.IsChecked == true)
+            {
+                MainNavPlotModel.CurrentValue = (x.MaxValue + x.MinValue) / 2;
+                DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
+                UpdateFleet(dt);
+            }
+
+        }
+
         #endregion
 
         #region UI Events
@@ -2830,6 +2855,12 @@ namespace LionRiver
         private void CenterButton_Checked(object sender, RoutedEventArgs e)
         {
             mapCenterMode = MapCenterMode.Centered;
+
+            if(PlayButton.IsChecked==false)
+            {
+                DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
+                UpdateFleet(dt);
+            }
         }
 
         private void CenterButton_Unchecked(object sender, RoutedEventArgs e)
@@ -2927,6 +2958,8 @@ namespace LionRiver
 
             ReplayTimer.Stop();
 
+            PlotCenterButton.IsChecked = false;
+
         }
 
         private void FwdBackSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -2957,7 +2990,7 @@ namespace LionRiver
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 ClickTime = e.Timestamp;
-                mouseHandlingMode = MouseHandlingMode.MovingPlotCursor;
+                mouseHandlingMode = MouseHandlingMode.SettingPlotCurrentValue;
             }
         }
 
@@ -2970,7 +3003,7 @@ namespace LionRiver
                 e.Handled = true;
             }
 
-            if (mouseHandlingMode == MouseHandlingMode.MovingPlotCursor && (e.Timestamp-ClickTime)<300)
+            if (mouseHandlingMode == MouseHandlingMode.SettingPlotCurrentValue && (e.Timestamp-ClickTime)<300)
             {
                 var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
                 MainNavPlotModel.CurrentValue = point.X;
@@ -2978,6 +3011,14 @@ namespace LionRiver
                 mouseHandlingMode = MouseHandlingMode.None;
 
                 PlayButton.IsChecked = false;
+
+                if(PlotCenterButton.IsChecked==true)
+                {
+                    double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+
+                    MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
+                    MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
+                }
 
                 DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
                 UpdateFleet(dt);
@@ -2989,7 +3030,7 @@ namespace LionRiver
         private void UpdateFleet(DateTime dt)
         {
             DateTime minDt = dt.AddHours(-Properties.Settings.Default.FleetBoatTrackLength); // Fleet track range
-            DateTime minDt1 = dt.AddMinutes(-10); // Short lookup range for position
+            DateTime minDt1 = dt.AddMinutes(-60); // Short lookup range for position
 
             using (var context = new LionRiverDBContext())
             {
@@ -3053,30 +3094,36 @@ namespace LionRiver
 
                     boat.BoatVisible = Visibility.Visible;
                 }
+                else
+                {
+                    boat.BoatVisible = Visibility.Hidden;
 
-                map.Children.Remove(track);
 
-                var logEntries = (from x in context.Logs
-                                  where (x.level == 3 && (x.timestamp <= dt) && (x.timestamp > minDt))
-                                  orderby x.timestamp descending
-                                  select x);
+                }
 
-                track = new Track(logEntries.ToList(), Properties.Settings.Default.TrackResolution, Properties.Settings.Default.SPDminVal,
-                                        Properties.Settings.Default.SPDminIndex, Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
+                //map.Children.Remove(track);
 
-                map.Children.Add(track);
-                Panel.SetZIndex(track, 5);
+                //var logEntries = (from x in context.Logs
+                //                  where (x.level == 3 && (x.timestamp <= dt) && (x.timestamp > minDt))
+                //                  orderby x.timestamp descending
+                //                  select x);
 
-                foreach (Track ft in fleetTracks)
-                    map.Children.Remove(ft);
-                fleetTracks.Clear();
+                //track = new Track(logEntries.ToList(), Properties.Settings.Default.TrackResolution, Properties.Settings.Default.SPDminVal,
+                //                        Properties.Settings.Default.SPDminIndex, Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
+
+                //map.Children.Add(track);
+                //Panel.SetZIndex(track, 5);
+
+                //foreach (Track ft in fleetTracks)
+                //    map.Children.Remove(ft);
+                //fleetTracks.Clear();
 
                 foreach (Boat b in fleetBoats)
                 {
 
                     var fTrackEntries =
                         (from x in context.FleetTracks
-                         where x.Name == b.Name && x.timestamp <= dt && x.timestamp > minDt
+                         where x.Name == b.Name && x.timestamp <= dt && x.timestamp > minDt1
                          orderby x.timestamp ascending
                          select x).ToList();
 
@@ -3090,17 +3137,17 @@ namespace LionRiver
                         if (Properties.Settings.Default.FleetBoatsVisible)
                             b.BoatVisible = Visibility.Visible;
 
-                        Track tr = new Track(fTrackEntries, Properties.Settings.Default.SPDminVal, Properties.Settings.Default.SPDminIndex,
-                                                Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
+                        //Track tr = new Track(fTrackEntries, Properties.Settings.Default.SPDminVal, Properties.Settings.Default.SPDminIndex,
+                        //                        Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
 
-                        if (Properties.Settings.Default.FleetTracksVisible)
-                            tr.Visibility = Visibility.Visible;
-                        else
-                            tr.Visibility = Visibility.Hidden;
+                        //if (Properties.Settings.Default.FleetTracksVisible)
+                        //    tr.Visibility = Visibility.Visible;
+                        //else
+                        //    tr.Visibility = Visibility.Hidden;
 
-                        fleetTracks.Add(tr);
-                        map.Children.Add(tr);
-                        Panel.SetZIndex(tr, 5);
+                        //fleetTracks.Add(tr);
+                        //map.Children.Add(tr);
+                        //Panel.SetZIndex(tr, 5);
                     }
                     else
                     {
@@ -3136,6 +3183,7 @@ namespace LionRiver
 
                 e.Handled = true;
             }
+
         }
 
         private void MainNavPlot_MouseEnter(object sender, MouseEventArgs e)
@@ -3147,6 +3195,16 @@ namespace LionRiver
         private void MainNavPlot_MouseLeave(object sender, MouseEventArgs e)
         {
             MainNavPlotModel.CursorVisible = Visibility.Hidden;
+        }
+
+        private void PlotCenterButton_Checked(object sender, RoutedEventArgs e)
+        {
+            double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+
+            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
+            MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
+
+            PlayButton.IsChecked = false;
         }
 
 
