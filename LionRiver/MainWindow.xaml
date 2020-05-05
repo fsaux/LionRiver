@@ -783,6 +783,8 @@
 
                 <Grid x:Name="TransportGrid" Grid.Row="2">
 
+                    <TextBlock Name="DebugText" Text="Hola" Foreground="White"/>
+
                     <mycontrols:NavPlot  x:Name="MainNavPlot"
                                          MouseEnter="MainNavPlot_MouseEnter"
                                          MouseLeave="MainNavPlot_MouseLeave"

@@ -2620,9 +2620,12 @@ namespace LionRiver
         private Double _maxAxisValue;
         private Double _selectionFromValue;
         private Double _selectionToValue;
+
+        public const int MaxData = 300;
         public SeriesCollection SeriesCollection { get; set; }
         public Func<double, string> YFormatter { get; set; }
         public Func<double, string> XFormatter { get; set; }
+        public int Resolution { get; set; }
 
 
         public Double CurrentValue
@@ -2636,7 +2639,6 @@ namespace LionRiver
                 OnPropertyChanged("CurrentValue");
             }
         }
-
         public Double CursorValue
         {
             get
@@ -2648,7 +2650,6 @@ namespace LionRiver
                 OnPropertyChanged("CursorValue");
             }
         }
-
         public Visibility CursorVisible
         {
             get
@@ -2660,7 +2661,6 @@ namespace LionRiver
                 OnPropertyChanged("CursorVisible");
             }
         }
-
         public Double MinAxisValue
         {
             get
@@ -2709,14 +2709,6 @@ namespace LionRiver
         public MyCommand<RangeChangedEventArgs> RangeChangedCommand { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        //private void NotifyPropertyChanged(string property)
-        //{
-        //    if (PropertyChanged != null)
-        //    {
-        //        PropertyChanged(this, new PropertyChangedEventArgs(property));
-        //    }
-        //}
-
         protected virtual void OnPropertyChanged(string propertyName = null)
         {
             if (PropertyChanged != null)

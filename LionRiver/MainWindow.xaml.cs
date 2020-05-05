@@ -138,9 +138,8 @@ namespace LionRiver
         DispatcherTimer XLNavTimer = new DispatcherTimer();
         DispatcherTimer FleetUpdateTimer = new DispatcherTimer();
         DispatcherTimer ReplayTimer = new DispatcherTimer();
-        //DispatcherTimer UpdateFleetTracksTimer = new DispatcherTimer();
-
-        
+        DispatcherTimer PlotPanTimer = new DispatcherTimer();
+        DispatcherTimer UpdatePlotResolution = new DispatcherTimer();
 
         #endregion
 
@@ -311,6 +310,9 @@ namespace LionRiver
         #region Plot
 
         public NavPlotModel MainNavPlotModel= new NavPlotModel();
+        ChartValues<DateModel> MainPlotValues = new ChartValues<DateModel>();
+        ChartValues<DateModel> AuxPlotValues = new ChartValues<DateModel>();
+
 
         #endregion
 
@@ -659,8 +661,11 @@ namespace LionRiver
             ReplayTimer.Tick += new EventHandler(ReplayTimer_Tick);
             ReplayTimer.Interval = new TimeSpan(0, 0, 0, 0,150);
 
-            //UpdateFleetTracksTimer.Tick += new EventHandler(UpdateFleetTracksTimer_Tick);
-            //UpdateFleetTracksTimer.Interval = new TimeSpan(0, 0, 1);
+            PlotPanTimer.Tick += new EventHandler(PlotPanTimer_Tick);
+            PlotPanTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
+
+            UpdatePlotResolution.Tick += new EventHandler(UpdatePlotResolution_Tick);
+            UpdatePlotResolution.Interval = new TimeSpan(0, 0, 1);
 
             NMEATimer.Start();
             ShortNavTimer.Start();
@@ -758,11 +763,10 @@ namespace LionRiver
                 var twsValues = (from x in context.Logs
                                  where (x.level==4 )
                                  orderby x.timestamp descending
-                                 select new DateModel() { DateTime = x.timestamp, Value = (double)x.SOG }).Take(300);
+                                 select new DateModel() { DateTime = x.timestamp, Value = (double)x.SOG }).Take(NavPlotModel.MaxData);
                 
-                ChartValues<DateModel> chartVal = new ChartValues<DateModel>();
 
-                chartVal.AddRange(twsValues.ToList());
+                MainPlotValues.AddRange(twsValues.ToList());
 
                 var dayConfig = Mappers.Xy<DateModel>()
                 .X(dayModel => (double)dayModel.DateTime.Ticks )
@@ -773,7 +777,7 @@ namespace LionRiver
                     new LineSeries
                     {
                     Title = "Series 1",
-                    Values = chartVal,
+                    Values = MainPlotValues,
                     Fill=System.Windows.Media.Brushes.Transparent,
                     PointGeometry = null,
                     LineSmoothness=0,
@@ -803,7 +807,7 @@ namespace LionRiver
             MainNavPlotModel.CurrentValue = DateTime.Parse("07-09-2019").Ticks;
             MainNavPlotModel.MinAxisValue = DateTime.Parse("07-08-2019").Ticks;
             MainNavPlotModel.MaxAxisValue = DateTime.Parse("07-10-2019").Ticks;
-            PlotCenterButton.IsChecked = true;
+            //PlotCenterButton.IsChecked = true;
 
             MainNavPlot.DataContext = MainNavPlotModel;
 
@@ -1226,6 +1230,87 @@ namespace LionRiver
             UpdateFleet(dt);
         }
 
+        private void PlotPanTimer_Tick(object sender, EventArgs e)
+        {
+            PlotPanTimer.Stop();
+
+            DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
+            UpdateFleet(dt);
+        }
+
+
+        private void UpdatePlotResolution_Tick(object sender, EventArgs e)
+        {
+            UpdatePlotResolution.Stop();
+
+            const double minWSize = 1;
+            const double tgtWSize = 1.3;
+            const double maxWSize = 1.5;
+
+            double PlotWStart = MainNavPlotModel.MinAxisValue;
+            double PlotWEnd = MainNavPlotModel.MaxAxisValue;
+            double PlotWindowSize = PlotWEnd - PlotWStart;
+
+            double DataWStart, DataWEnd;
+
+            if (MainPlotValues.Count()!=0)
+            {
+                DataWStart = MainPlotValues.Last().DateTime.Ticks;
+                DataWEnd = MainPlotValues.First().DateTime.Ticks;
+            }
+            else
+            {
+                DataWStart = PlotWStart;
+                DataWEnd = PlotWEnd;
+            }
+
+            double DataWindowSize = DataWEnd - DataWStart;
+
+            double checkW = DataWindowSize / PlotWindowSize;
+
+            if (DataWindowSize < minWSize * PlotWindowSize ||
+                DataWindowSize > maxWSize * PlotWindowSize ||
+                DataWStart > PlotWStart ||
+                DataWEnd < PlotWEnd)
+            {
+                DateTime newDataWStart = new DateTime((long)(PlotWStart - PlotWindowSize * (tgtWSize - 1) / 2));
+                DateTime newDataWEnd = new DateTime((long)(PlotWEnd + PlotWindowSize * (tgtWSize - 1) / 2));
+
+                double k = TimeSpan.FromSeconds(1).Ticks;
+
+                double deltaStep = tgtWSize * PlotWindowSize / NavPlotModel.MaxData / k;
+
+                double n = Math.Round(Math.Log(deltaStep) / Math.Log(Inst.ZoomFactor+1));
+
+                if (n > Inst.MaxBuffers - 1)
+                    n = Inst.MaxBuffers - 1;
+
+                if (n < 1)
+                    n = 1;
+
+                MainNavPlotModel.Resolution = (int)n;
+
+
+                using (var context = new LionRiverDBContext())
+                {
+                    var twsValues = (from x in context.Logs
+                                     where (x.level == n && x.timestamp > newDataWStart && x.timestamp < newDataWEnd)
+                                     orderby x.timestamp descending
+                                     select new DateModel() { DateTime = x.timestamp, Value = (double)x.SOG });
+
+                    var result = twsValues.ToList();
+
+                    DebugText.Text = n.ToString() + " - " + result.Count().ToString();
+
+
+                    if (result.Count() != 0)
+                    {
+                        MainPlotValues.Clear();
+                        MainPlotValues.AddRange(result);
+                    }
+                }
+            }
+        }
         #endregion
 
         #region Mouse Manipulation
@@ -3033,9 +3118,9 @@ namespace LionRiver
                 if (PlotCenterButton.IsChecked == true)
                 {
                     MainNavPlotModel.CurrentValue = (MainNavPlotModel.MinAxisValue + MainNavPlotModel.MaxAxisValue) / 2; ;
-
-                    if (ReplayTimer.IsEnabled == false)
-                        ReplayTimer.Start();
+                    
+                    if(PlotPanTimer.IsEnabled==false)
+                        PlotPanTimer.Start();
                 }
             }
         }
@@ -3068,8 +3153,8 @@ namespace LionRiver
                         MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
                     }
 
-                    if (ReplayTimer.IsEnabled == false)
-                        ReplayTimer.Start();
+                    if (PlotPanTimer.IsEnabled == false)
+                        PlotPanTimer.Start();
                 }
                 else
                 {
@@ -3077,6 +3162,9 @@ namespace LionRiver
                     MainNavPlotModel.CursorVisible = Visibility.Visible;
 
                     mouseHandlingMode = MouseHandlingMode.None;
+
+                    UpdatePlotResolution.Start();
+
                 }
 
         }        
@@ -3108,6 +3196,8 @@ namespace LionRiver
                 var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
                 MainNavPlotModel.CursorValue = point.X;
             }
+
+            UpdatePlotResolution.Start();
         }
 
         private void MainNavPlot_MouseEnter(object sender, MouseEventArgs e)
@@ -3140,7 +3230,7 @@ namespace LionRiver
             {
 
                 var logEntry = (from x in context.Logs
-                                where (x.level == 2 && (x.timestamp <= dt) && (x.timestamp > minDt1))
+                                where (x.level == MainNavPlotModel.Resolution && (x.timestamp <= dt) && (x.timestamp > minDt1))
                                 orderby x.timestamp descending
                                 select x).FirstOrDefault();
 
@@ -3275,8 +3365,6 @@ namespace LionRiver
             }
 
         }
-
-
 
 
         #endregion
