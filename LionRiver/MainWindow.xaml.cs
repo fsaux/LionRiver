@@ -43,6 +43,10 @@ namespace LionRiver
         public static extern bool SetEnvironmentVariable(string lpName, string lpValue);
 
 
+        TimeSpan deltaLog;
+
+
+
         #region Comm
 
         static DataReceiverStatus DataReceiverStatus1 = new DataReceiverStatus();
@@ -343,10 +347,10 @@ namespace LionRiver
 
         #endregion
 
-        #region Replay
-        DateTime minReplayTime, maxReplayTime;
+        //#region Replay
+        //DateTime minReplayTime, maxReplayTime;
 
-        #endregion
+        //#endregion
 
         #endregion
 
@@ -517,53 +521,38 @@ namespace LionRiver
         private void MainWindow_Initialize()
         {
             #region Track
-            using (var context = new LionRiverDBContext())
-            {
-                var dt1= DateTime.Now.AddYears(-5);
-                var res = Properties.Settings.Default.TrackResolution;
 
-                var lastLogEntries = (from e in context.Logs
-                                      where (e.level == res && (e.timestamp > dt1))
-                                      orderby e.timestamp descending
-                                      select e).Take(Track.MaxLength).ToList();
-
-
-                track = new Track(lastLogEntries,Properties.Settings.Default.TrackResolution, Properties.Settings.Default.SPDminVal,
-                                    Properties.Settings.Default.SPDminIndex, Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
-            }
-            map.Children.Add(track);
-            Panel.SetZIndex(track, 5);
             #endregion
 
             #region Replay & Fleet
             using (var context = new LionRiverDBContext())
             {
-                var minDt1 =
-                    (from f in context.FleetTracks
-                     orderby f.timestamp ascending
-                     select f.timestamp).FirstOrDefault();
+                //var minDt1 =
+                //    (from f in context.FleetTracks
+                //     orderby f.timestamp ascending
+                //     select f.timestamp).FirstOrDefault();
 
-                var minDt2 =
-                    (from f in context.Logs
-                     orderby f.timestamp ascending
-                     select f.timestamp).FirstOrDefault();
+                //var minDt2 =
+                //    (from f in context.Logs
+                //     orderby f.timestamp ascending
+                //     select f.timestamp).FirstOrDefault();
 
-                var maxDt1 =
-                    (from f in context.FleetTracks
-                     orderby f.timestamp descending
-                     select f.timestamp).FirstOrDefault();
+                //var maxDt1 =
+                //    (from f in context.FleetTracks
+                //     orderby f.timestamp descending
+                //     select f.timestamp).FirstOrDefault();
 
-                var maxDt2 =
-                    (from f in context.Logs
-                     orderby f.timestamp descending
-                     select f.timestamp).FirstOrDefault();
+                //var maxDt2 =
+                //    (from f in context.Logs
+                //     orderby f.timestamp descending
+                //     select f.timestamp).FirstOrDefault();
 
-                if (minDt1 == DateTime.MinValue)
-                    minReplayTime = minDt2;
-                else
-                    minReplayTime = minDt1 < minDt2 ? minDt1 : minDt2;
+                //if (minDt1 == DateTime.MinValue)
+                //    minReplayTime = minDt2;
+                //else
+                //    minReplayTime = minDt1 < minDt2 ? minDt1 : minDt2;
 
-                maxReplayTime = maxDt1 > maxDt2 ? maxDt1 : maxDt2;
+                //maxReplayTime = maxDt1 > maxDt2 ? maxDt1 : maxDt2;
 
                 var boatList =
                     (from b in context.FleetTracks
@@ -575,7 +564,8 @@ namespace LionRiver
                 {
                     Boat b = new Boat()
                     {
-                        Name = name
+                        Name = name,
+                        IsSelected = false
                     };
 
                     MapItem boatMapItem = new MapItem();
@@ -756,15 +746,28 @@ namespace LionRiver
 
             #region Nav Plots
 
-            DateTime minV;
+            
+            MainNavPlotModel.CurrentValue = DateTime.Now.Ticks;
+
+            DateTime minV = new DateTime((long)(MainNavPlotModel.CurrentValue - TimeSpan.FromDays(1).Ticks));
+            DateTime maxV = new DateTime((long)(MainNavPlotModel.CurrentValue));
+
+            MainNavPlotModel.MinAxisValue = minV.Ticks;
+
+            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue +
+                                            (MainNavPlotModel.CurrentValue - MainNavPlotModel.MinAxisValue) * 0.2;
+
+            MainNavPlotModel.Resolution = 4;
+
+            MainNavPlotModel.YFormatter = value => value.ToString("0.0");
+            MainNavPlotModel.XFormatter = value => new System.DateTime((long)(value * TimeSpan.FromTicks(1).Ticks)).ToString("dd MMM");
 
             using (var context = new LionRiverDBContext())
             {
                 var twsValues = (from x in context.Logs
-                                 where (x.level==4 )
+                                 where (x.level == MainNavPlotModel.Resolution && x.timestamp > minV && x.timestamp < maxV)
                                  orderby x.timestamp descending
                                  select new DateModel() { DateTime = x.timestamp, Value = (double)x.SOG }).Take(NavPlotModel.MaxData);
-                
 
                 MainPlotValues.AddRange(twsValues.ToList());
 
@@ -785,18 +788,7 @@ namespace LionRiver
                     }
                 };
 
-                minV = twsValues.Min(z => z.DateTime);
-
             }
-
-            MainNavPlotModel.MinAxisValue = minV.Ticks;
-            MainNavPlotModel.CurrentValue = DateTime.Now.Ticks;
-
-            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue +
-                                            (MainNavPlotModel.CurrentValue - MainNavPlotModel.MinAxisValue) * 0.2;
-
-            MainNavPlotModel.YFormatter = value => value.ToString("0.0");
-            MainNavPlotModel.XFormatter = value => new System.DateTime((long)(value * TimeSpan.FromTicks(1).Ticks)).ToString("dd MMM");
 
             //MainNavPlotModel.RangeChangedCommand = new MyCommand<RangeChangedEventArgs>
             //{
@@ -1028,7 +1020,8 @@ namespace LionRiver
                                 Longitude = bp.longitud
                             },
                             BoatVisible = Visibility.Hidden,
-                            Heading = Convert.ToDouble(bp.rumbo.TrimEnd('°'))
+                            Heading = Convert.ToDouble(bp.rumbo.TrimEnd('°')),
+                            IsSelected = false
                         };
 
                         if (Properties.Settings.Default.FleetBoatsVisible)
@@ -1187,21 +1180,21 @@ namespace LionRiver
 
                 // Adjust replay slider Max/Min and current value
 
-                var minDt1 =
-                    (from f in context.FleetTracks
-                     orderby f.timestamp ascending
-                     select f.timestamp).FirstOrDefault();
+                //var minDt1 =
+                //    (from f in context.FleetTracks
+                //     orderby f.timestamp ascending
+                //     select f.timestamp).FirstOrDefault();
                 
-                var maxDt1 =
-                    (from f in context.FleetTracks
-                     orderby f.timestamp descending
-                     select f.timestamp).FirstOrDefault();
+                //var maxDt1 =
+                //    (from f in context.FleetTracks
+                //     orderby f.timestamp descending
+                //     select f.timestamp).FirstOrDefault();
 
-                if (minDt1 < minReplayTime)
-                    minReplayTime = minDt1;
+                //if (minDt1 < minReplayTime)
+                //    minReplayTime = minDt1;
 
-                if (maxDt1 > maxReplayTime)
-                    maxReplayTime = maxDt1;
+                //if (maxDt1 > maxReplayTime)
+                //    maxReplayTime = maxDt1;
             }
             FleetDownloadProgressGrid.Visibility = Visibility.Hidden;
         }
@@ -1228,6 +1221,9 @@ namespace LionRiver
 
             DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
             UpdateFleet(dt);
+
+            if (UpdatePlotResolution.IsEnabled == false)
+                UpdatePlotResolution.Start();
         }
 
         private void PlotPanTimer_Tick(object sender, EventArgs e)
@@ -1238,12 +1234,11 @@ namespace LionRiver
             UpdateFleet(dt);
         }
 
-
         private void UpdatePlotResolution_Tick(object sender, EventArgs e)
         {
             UpdatePlotResolution.Stop();
 
-            const double minWSize = 1;
+            const double minWSize = 1.1;
             const double tgtWSize = 1.3;
             const double maxWSize = 1.5;
 
@@ -1266,8 +1261,6 @@ namespace LionRiver
 
             double DataWindowSize = DataWEnd - DataWStart;
 
-            double checkW = DataWindowSize / PlotWindowSize;
-
             if (DataWindowSize < minWSize * PlotWindowSize ||
                 DataWindowSize > maxWSize * PlotWindowSize ||
                 DataWStart > PlotWStart ||
@@ -1280,13 +1273,13 @@ namespace LionRiver
 
                 double deltaStep = tgtWSize * PlotWindowSize / NavPlotModel.MaxData / k;
 
-                double n = Math.Round(Math.Log(deltaStep) / Math.Log(Inst.ZoomFactor+1));
+                double n = Math.Round(Math.Log(deltaStep) / Math.Log(Inst.ZoomFactor));
 
                 if (n > Inst.MaxBuffers - 1)
                     n = Inst.MaxBuffers - 1;
 
-                if (n < 1)
-                    n = 1;
+                if (n < 0)
+                    n = 0;
 
                 MainNavPlotModel.Resolution = (int)n;
 
@@ -1300,8 +1293,7 @@ namespace LionRiver
 
                     var result = twsValues.ToList();
 
-                    DebugText.Text = n.ToString() + " - " + result.Count().ToString();
-
+                    DebugText.Text = n.ToString() + " - " + result.Count.ToString();
 
                     if (result.Count() != 0)
                     {
@@ -1794,7 +1786,7 @@ namespace LionRiver
                 replayLog = true;
                 ReplayFile = new StreamReader(filename);
 
-                ShortNavTimer.Interval = new TimeSpan(0, 0, 0, 0,200);
+                ShortNavTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
             }
 
         }
@@ -1862,7 +1854,12 @@ namespace LionRiver
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
             dlg.Filter = "Polar files|*.pol";
-            dlg.InitialDirectory = System.IO.Path.GetDirectoryName(Properties.Settings.Default.PolarFile);
+            try
+            {
+                dlg.InitialDirectory = System.IO.Path.GetDirectoryName(Properties.Settings.Default.PolarFile);
+            }
+            catch { };
+
             Nullable<bool> result = dlg.ShowDialog();
 
             if (result == true)
@@ -3131,6 +3128,11 @@ namespace LionRiver
 
             if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
             {
+                DateTime startTime = new DateTime((long)MainNavPlotModel.SelectionFromValue);
+                DateTime endTime = new DateTime((long)MainNavPlotModel.SelectionToValue);
+
+                UpdateTracks(startTime, endTime);
+
                 mouseHandlingMode = MouseHandlingMode.None;
 
                 e.Handled = true;
@@ -3171,6 +3173,9 @@ namespace LionRiver
 
         private void MainNavPlot_MouseWheel(object sender, MouseWheelEventArgs e)
         {
+
+            const double zoomFactor = 0.85;
+
             double zoomPos;
             double zoom;
 
@@ -3184,9 +3189,9 @@ namespace LionRiver
 
 
             if (e.Delta > 0)
-                zoom = 0.9;
+                zoom = zoomFactor;
             else
-                zoom = 1 / 0.9;
+                zoom = 1 / zoomFactor;
 
             MainNavPlotModel.MinAxisValue += deltaT1 * (1 - zoom);
             MainNavPlotModel.MaxAxisValue += deltaT2 * (1 - zoom);
@@ -3221,150 +3226,6 @@ namespace LionRiver
             PlayButton.IsChecked = false;
         }
         
-        private void UpdateFleet(DateTime dt)
-        {
-            DateTime minDt = dt.AddHours(-Properties.Settings.Default.FleetBoatTrackLength); // Fleet track range
-            DateTime minDt1 = dt.AddMinutes(-60); // Short lookup range for position
-
-            using (var context = new LionRiverDBContext())
-            {
-
-                var logEntry = (from x in context.Logs
-                                where (x.level == MainNavPlotModel.Resolution && (x.timestamp <= dt) && (x.timestamp > minDt1))
-                                orderby x.timestamp descending
-                                select x).FirstOrDefault();
-
-                if (logEntry != null)
-                {
-                    boat.Location = new Location(logEntry.LAT, logEntry.LON);
-                    boat.Course = Convert.ToDouble(logEntry.COG);
-                    boat.BoatSpeed = Convert.ToDouble(logEntry.SOG);
-                    boat.Heading = Convert.ToDouble(logEntry.HDT);
-                    boat.BoatPerf = Convert.ToDouble(logEntry.PERF);
-                    boat.WindDirection = Convert.ToDouble(logEntry.TWD);
-                    boat.WindSpeed = Convert.ToDouble(logEntry.TWS);
-                    boat.CurrentDirection = Convert.ToDouble(logEntry.SET);
-                    boat.CurrentSpeed = Convert.ToDouble(logEntry.DRIFT);
-
-                    if (wgrib != null && Properties.Settings.Default.PredictedWindDirectionCheck)
-                    {
-                        double twd, tws;
-
-                        uvpair wuv = wgrib.GetWindInterpolated(boat.Location.Latitude, boat.Location.Longitude, dt);
-                        if (wuv != null)
-                        {
-                            twd = Math.Atan2(wuv.u, wuv.v) * 180 / Math.PI + 180;
-                            tws = Math.Sqrt(wuv.u * wuv.u + wuv.v * wuv.v) * 3600 / 1852;
-
-                            boat.PredictedWindDirection = twd;
-                            boat.PredictedWindSpeed = tws;
-                            boat.PredictedWindVisible = Visibility.Visible;
-                        }
-                        else
-                            boat.PredictedWindVisible = Visibility.Hidden;
-                    }
-                    else
-                        boat.PredictedWindVisible = Visibility.Hidden;
-
-                    if (cgrib != null && Properties.Settings.Default.PredictedWindDirectionCheck)
-                    {
-                        double set, drift;
-
-                        uvpair cuv = cgrib.GetCurrentInterpolated(boat.Location.Latitude, boat.Location.Longitude, dt);
-                        if (cuv != null)
-                        {
-                            set = Math.Atan2(cuv.u, cuv.v) * 180 / Math.PI + 180;
-                            drift = Math.Sqrt(cuv.u * cuv.u + cuv.v * cuv.v) * 3600 / 1852;
-
-                            boat.PredictedCurrentDirection = set;
-                            boat.PredictedCurrentSpeed = drift;
-                            boat.PredictedCurrentVisible = Visibility.Visible;
-                        }
-                        else
-                            boat.PredictedCurrentVisible = Visibility.Hidden;
-                    }
-                    else
-                        boat.PredictedCurrentVisible = Visibility.Hidden;
-
-                    boat.BoatVisible = Visibility.Visible;
-                }
-                else
-                {
-                    boat.BoatVisible = Visibility.Hidden;
-
-
-                }
-
-                //map.Children.Remove(track);
-
-                //var logEntries = (from x in context.Logs
-                //                  where (x.level == 3 && (x.timestamp <= dt) && (x.timestamp > minDt))
-                //                  orderby x.timestamp descending
-                //                  select x);
-
-                //track = new Track(logEntries.ToList(), Properties.Settings.Default.TrackResolution, Properties.Settings.Default.SPDminVal,
-                //                        Properties.Settings.Default.SPDminIndex, Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
-
-                //map.Children.Add(track);
-                //Panel.SetZIndex(track, 5);
-
-                //foreach (Track ft in fleetTracks)
-                //    map.Children.Remove(ft);
-                //fleetTracks.Clear();
-
-                foreach (Boat b in fleetBoats)
-                {
-
-                    var fTrackEntries =
-                        (from x in context.FleetTracks
-                         where x.Name == b.Name && x.timestamp <= dt && x.timestamp > minDt1
-                         orderby x.timestamp ascending
-                         select x).ToList();
-
-                    if (fTrackEntries != null && fTrackEntries.Count() > 0)
-                    {
-                        var lastTrackEntry = fTrackEntries.Last();
-
-                        b.Location = new Location(lastTrackEntry.Latitude, lastTrackEntry.Longitude);
-                        b.Heading = lastTrackEntry.COG; ;
-
-                        if (Properties.Settings.Default.FleetBoatsVisible)
-                            b.BoatVisible = Visibility.Visible;
-
-                        //Track tr = new Track(fTrackEntries, Properties.Settings.Default.SPDminVal, Properties.Settings.Default.SPDminIndex,
-                        //                        Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
-
-                        //if (Properties.Settings.Default.FleetTracksVisible)
-                        //    tr.Visibility = Visibility.Visible;
-                        //else
-                        //    tr.Visibility = Visibility.Hidden;
-
-                        //fleetTracks.Add(tr);
-                        //map.Children.Add(tr);
-                        //Panel.SetZIndex(tr, 5);
-                    }
-                    else
-                    {
-                        b.BoatVisible = Visibility.Hidden;
-                    }
-                }
-
-                if (mapCenterMode == MapCenterMode.Centered)
-                {
-                    if (mapOrientationMode == MapOrientationMode.CourseUp)
-                    {
-                        Point p = map.LocationToViewportPoint(boat.Location);
-                        map.TargetCenter = map.ViewportPointToLocation(new Point(p.X, p.Y - map.ActualHeight / 3));
-                    }
-                    else
-                    {
-                        Point p = map.LocationToViewportPoint(boat.Location);
-                        map.TargetCenter = map.ViewportPointToLocation(new Point(p.X, p.Y));
-                    }
-                }
-            }
-
-        }
 
 
         #endregion
@@ -4128,6 +3989,207 @@ namespace LionRiver
                     PrtBearingTarget.Visibility = Visibility.Hidden;
                 }
             }
+        }
+
+        private void UpdateFleet(DateTime dt)
+        {
+            DateTime minDt = dt.AddHours(-Properties.Settings.Default.FleetBoatTrackLength); // Fleet track range
+            DateTime minDt1 = dt.AddMinutes(-60); // Short lookup range for position
+
+            using (var context = new LionRiverDBContext())
+            {
+
+                var logEntry = (from x in context.Logs
+                                where (x.level == MainNavPlotModel.Resolution && (x.timestamp <= dt) && (x.timestamp > minDt1))
+                                orderby x.timestamp descending
+                                select x).FirstOrDefault();
+
+                if (logEntry != null)
+                {
+                    boat.Location = new Location(logEntry.LAT, logEntry.LON);
+                    boat.Course = Convert.ToDouble(logEntry.COG);
+                    boat.BoatSpeed = Convert.ToDouble(logEntry.SOG);
+                    boat.Heading = Convert.ToDouble(logEntry.HDT);
+                    boat.BoatPerf = Convert.ToDouble(logEntry.PERF);
+                    boat.WindDirection = Convert.ToDouble(logEntry.TWD);
+                    boat.WindSpeed = Convert.ToDouble(logEntry.TWS);
+                    boat.CurrentDirection = Convert.ToDouble(logEntry.SET);
+                    boat.CurrentSpeed = Convert.ToDouble(logEntry.DRIFT);
+
+                    if (wgrib != null && Properties.Settings.Default.PredictedWindDirectionCheck)
+                    {
+                        double twd, tws;
+
+                        uvpair wuv = wgrib.GetWindInterpolated(boat.Location.Latitude, boat.Location.Longitude, dt);
+                        if (wuv != null)
+                        {
+                            twd = Math.Atan2(wuv.u, wuv.v) * 180 / Math.PI + 180;
+                            tws = Math.Sqrt(wuv.u * wuv.u + wuv.v * wuv.v) * 3600 / 1852;
+
+                            boat.PredictedWindDirection = twd;
+                            boat.PredictedWindSpeed = tws;
+                            boat.PredictedWindVisible = Visibility.Visible;
+                        }
+                        else
+                            boat.PredictedWindVisible = Visibility.Hidden;
+                    }
+                    else
+                        boat.PredictedWindVisible = Visibility.Hidden;
+
+                    if (cgrib != null && Properties.Settings.Default.PredictedWindDirectionCheck)
+                    {
+                        double set, drift;
+
+                        uvpair cuv = cgrib.GetCurrentInterpolated(boat.Location.Latitude, boat.Location.Longitude, dt);
+                        if (cuv != null)
+                        {
+                            set = Math.Atan2(cuv.u, cuv.v) * 180 / Math.PI + 180;
+                            drift = Math.Sqrt(cuv.u * cuv.u + cuv.v * cuv.v) * 3600 / 1852;
+
+                            boat.PredictedCurrentDirection = set;
+                            boat.PredictedCurrentSpeed = drift;
+                            boat.PredictedCurrentVisible = Visibility.Visible;
+                        }
+                        else
+                            boat.PredictedCurrentVisible = Visibility.Hidden;
+                    }
+                    else
+                        boat.PredictedCurrentVisible = Visibility.Hidden;
+
+                    boat.BoatVisible = Visibility.Visible;
+                }
+                else
+                {
+                    boat.BoatVisible = Visibility.Hidden;
+
+
+                }
+
+                //map.Children.Remove(track);
+
+                //var logEntries = (from x in context.Logs
+                //                  where (x.level == 3 && (x.timestamp <= dt) && (x.timestamp > minDt))
+                //                  orderby x.timestamp descending
+                //                  select x);
+
+                //track = new Track(logEntries.ToList(), Properties.Settings.Default.TrackResolution, Properties.Settings.Default.SPDminVal,
+                //                        Properties.Settings.Default.SPDminIndex, Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
+
+                //map.Children.Add(track);
+                //Panel.SetZIndex(track, 5);
+
+                //foreach (Track ft in fleetTracks)
+                //    map.Children.Remove(ft);
+                //fleetTracks.Clear();
+
+                foreach (Boat b in fleetBoats)
+                {
+
+                    var fTrackEntries =
+                        (from x in context.FleetTracks
+                         where x.Name == b.Name && x.timestamp <= dt && x.timestamp > minDt1
+                         orderby x.timestamp ascending
+                         select x).ToList();
+
+                    if (fTrackEntries != null && fTrackEntries.Count() > 0)
+                    {
+                        var lastTrackEntry = fTrackEntries.Last();
+
+                        b.Location = new Location(lastTrackEntry.Latitude, lastTrackEntry.Longitude);
+                        b.Heading = lastTrackEntry.COG; ;
+
+                        if (Properties.Settings.Default.FleetBoatsVisible)
+                            b.BoatVisible = Visibility.Visible;
+
+                        //Track tr = new Track(fTrackEntries, Properties.Settings.Default.SPDminVal, Properties.Settings.Default.SPDminIndex,
+                        //                        Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
+
+                        //if (Properties.Settings.Default.FleetTracksVisible)
+                        //    tr.Visibility = Visibility.Visible;
+                        //else
+                        //    tr.Visibility = Visibility.Hidden;
+
+                        //fleetTracks.Add(tr);
+                        //map.Children.Add(tr);
+                        //Panel.SetZIndex(tr, 5);
+                    }
+                    else
+                    {
+                        b.BoatVisible = Visibility.Hidden;
+                    }
+                }
+
+                if (mapCenterMode == MapCenterMode.Centered)
+                {
+                    if (mapOrientationMode == MapOrientationMode.CourseUp)
+                    {
+                        Point p = map.LocationToViewportPoint(boat.Location);
+                        map.TargetCenter = map.ViewportPointToLocation(new Point(p.X, p.Y - map.ActualHeight / 3));
+                    }
+                    else
+                    {
+                        Point p = map.LocationToViewportPoint(boat.Location);
+                        map.TargetCenter = map.ViewportPointToLocation(new Point(p.X, p.Y));
+                    }
+                }
+            }
+
+        }
+
+        private void UpdateTracks(DateTime startTime, DateTime endTime)
+        {
+
+            using (var context = new LionRiverDBContext())
+            {
+
+                map.Children.Remove(track);
+
+                var logEntries = (from x in context.Logs
+                                  where (x.level == MainNavPlotModel.Resolution && x.timestamp <= endTime && x.timestamp > startTime)
+                                  orderby x.timestamp descending
+                                  select x);
+
+                track = new Track(logEntries.ToList(), MainNavPlotModel.Resolution, Properties.Settings.Default.SPDminVal,
+                                        Properties.Settings.Default.SPDminIndex, Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
+
+                map.Children.Add(track);
+                Panel.SetZIndex(track, 5);
+
+                foreach (Track ft in fleetTracks)
+                    map.Children.Remove(ft);
+                fleetTracks.Clear();
+
+                foreach (Boat b in fleetBoats)
+                {
+                    if (b.IsSelected)
+                    {
+
+                        var fTrackEntries =
+                            (from x in context.FleetTracks
+                             where x.Name == b.Name && x.timestamp <= endTime && x.timestamp > startTime
+                             orderby x.timestamp ascending
+                             select x).ToList();
+
+                        if (fTrackEntries != null && fTrackEntries.Count() > 0)
+                        {
+
+                            Track tr = new Track(fTrackEntries, Properties.Settings.Default.SPDminVal, Properties.Settings.Default.SPDminIndex,
+                                                    Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
+
+                            if (Properties.Settings.Default.FleetTracksVisible)
+                                tr.Visibility = Visibility.Visible;
+                            else
+                                tr.Visibility = Visibility.Hidden;
+
+                            fleetTracks.Add(tr);
+                            map.Children.Add(tr);
+                            Panel.SetZIndex(tr, 5);
+                        }
+                    }
+                }
+
+            }
+
         }
 
         private Version GetRunningVersion()

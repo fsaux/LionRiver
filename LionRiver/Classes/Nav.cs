@@ -579,6 +579,16 @@ namespace LionRiver
 
             #endregion
 
+            if (replayLog == true)
+            {
+                if (deltaLog == TimeSpan.Zero)
+                    deltaLog = now - DateTime.Now;
+
+                now = now - deltaLog;
+
+            }
+
+                
             PushToLogDB(now);
         }
 
@@ -699,11 +709,15 @@ namespace LionRiver
                 TWD.PushToBuffer(TWD.Val, dt, 0);
                 PERF.PushToBuffer(PERF.Val, dt, 0);
                 DPT.PushToBuffer(DPT.Val, dt, 0);
+                TWS.PushToBuffer(TWS.Val, dt, 0);
+                DRIFT.PushToBuffer(DRIFT.Val, dt, 0);
+                SET.PushToBuffer(SET.Val, dt, 0);
+
 
                 using (var context = new LionRiverDBContext())
                 {
 
-                    for (int i = 0; i < Inst.MaxBuffers - 1; i++)
+                    for (int i = 0; i < Inst.MaxBuffers ; i++)
                     {
                         if (POS.AvgBufferDataAvailable(i))
                         {
@@ -720,7 +734,10 @@ namespace LionRiver
                                     HDT = HDT.GetLastVal(i).Val,
                                     TWD = TWD.GetLastVal(i).Val,
                                     PERF = PERF.GetLastVal(i).Val,
-                                    DPT = DPT.GetLastVal(i).Val
+                                    DPT = DPT.GetLastVal(i).Val,
+                                    TWS = TWS.GetLastVal(i).Val,
+                                    DRIFT = DRIFT.GetLastVal(i).Val,
+                                    SET = SET.GetLastVal(i).Val
                                 };
                                 context.Logs.Add(log);
 
@@ -734,7 +751,9 @@ namespace LionRiver
                                 TWD.ClearAvgBufferDataAvailable(i);
                                 PERF.ClearAvgBufferDataAvailable(i);
                                 DPT.ClearAvgBufferDataAvailable(i);
-
+                                TWS.ClearAvgBufferDataAvailable(i);
+                                DRIFT.ClearAvgBufferDataAvailable(i);
+                                SET.ClearAvgBufferDataAvailable(i);
                             }
                         }
                     }

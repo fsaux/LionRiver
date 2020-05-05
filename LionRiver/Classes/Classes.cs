@@ -906,6 +906,8 @@ namespace LionRiver
         private double predictedCurrentSpeed;
         private Visibility predictedCurrentVisible;
 
+        private bool isSelected;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public string Name
@@ -1095,6 +1097,16 @@ namespace LionRiver
             {
                 boatColor = value;
                 OnPropertyChanged("BoatColor");
+            }
+        }
+
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set
+            {
+                isSelected = value;
+                OnPropertyChanged("IsSelected");
             }
         }
 
