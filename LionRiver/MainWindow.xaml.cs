@@ -519,40 +519,81 @@ namespace LionRiver
         }
 
         private void MainWindow_Initialize()
-        {
+        {           
+            
+            #region Nav Plots
+
+            
+            MainNavPlotModel.CurrentValue = DateTime.Now.Ticks;
+
+            DateTime minV = new DateTime((long)(MainNavPlotModel.CurrentValue - TimeSpan.FromDays(1).Ticks));
+            DateTime maxV = new DateTime((long)(MainNavPlotModel.CurrentValue));
+
+            MainNavPlotModel.MinAxisValue = minV.Ticks;
+
+            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue +
+                                            (MainNavPlotModel.CurrentValue - MainNavPlotModel.MinAxisValue) * 0.2;
+
+            MainNavPlotModel.Resolution = 4;
+
+            MainNavPlotModel.YFormatter = value => value.ToString("0.0");
+            MainNavPlotModel.XFormatter = value => new System.DateTime((long)(value * TimeSpan.FromTicks(1).Ticks)).ToString("dd MMM");
+
+            using (var context = new LionRiverDBContext())
+            {
+                var twsValues = (from x in context.Logs
+                                 where (x.level == MainNavPlotModel.Resolution && x.timestamp > minV && x.timestamp < maxV)
+                                 orderby x.timestamp descending
+                                 select new DateModel() { DateTime = x.timestamp, Value = (double)x.SOG }).Take(NavPlotModel.MaxData);
+
+                MainPlotValues.AddRange(twsValues.ToList());
+
+                var dayConfig = Mappers.Xy<DateModel>()
+                .X(dayModel => (double)dayModel.DateTime.Ticks )
+                .Y(dayModel => dayModel.Value);
+
+                MainNavPlotModel.SeriesCollection = new SeriesCollection(dayConfig)
+                {
+                    new LineSeries
+                    {
+                    Title = "Series 1",
+                    Values = MainPlotValues,
+                    Fill=System.Windows.Media.Brushes.Transparent,
+                    PointGeometry = null,
+                    LineSmoothness=0,
+                    StrokeThickness=1
+                    }
+                };
+
+            }
+
+            //MainNavPlotModel.RangeChangedCommand = new MyCommand<RangeChangedEventArgs>
+            //{
+            //    ExecuteDelegate = e => RangeChanged(e)
+            //};
+
+
+            //MainNavPlotModel.CurrentValue = DateTime.Parse("07-09-2019").Ticks;
+            //MainNavPlotModel.MinAxisValue = DateTime.Parse("07-08-2019").Ticks;
+            //MainNavPlotModel.MaxAxisValue = DateTime.Parse("07-10-2019").Ticks;
+            //PlotCenterButton.IsChecked = true;
+
+            MainNavPlot.DataContext = MainNavPlotModel;
+
+            PlayButton.IsChecked = true;
+
+            #endregion
+
+
             #region Track
+
+            UpdateTracks(minV, maxV);
 
             #endregion
 
             #region Replay & Fleet
             using (var context = new LionRiverDBContext())
             {
-                //var minDt1 =
-                //    (from f in context.FleetTracks
-                //     orderby f.timestamp ascending
-                //     select f.timestamp).FirstOrDefault();
-
-                //var minDt2 =
-                //    (from f in context.Logs
-                //     orderby f.timestamp ascending
-                //     select f.timestamp).FirstOrDefault();
-
-                //var maxDt1 =
-                //    (from f in context.FleetTracks
-                //     orderby f.timestamp descending
-                //     select f.timestamp).FirstOrDefault();
-
-                //var maxDt2 =
-                //    (from f in context.Logs
-                //     orderby f.timestamp descending
-                //     select f.timestamp).FirstOrDefault();
-
-                //if (minDt1 == DateTime.MinValue)
-                //    minReplayTime = minDt2;
-                //else
-                //    minReplayTime = minDt1 < minDt2 ? minDt1 : minDt2;
-
-                //maxReplayTime = maxDt1 > maxDt2 ? maxDt1 : maxDt2;
 
                 var boatList =
                     (from b in context.FleetTracks
@@ -744,68 +785,7 @@ namespace LionRiver
 
             #endregion
 
-            #region Nav Plots
 
-            
-            MainNavPlotModel.CurrentValue = DateTime.Now.Ticks;
-
-            DateTime minV = new DateTime((long)(MainNavPlotModel.CurrentValue - TimeSpan.FromDays(1).Ticks));
-            DateTime maxV = new DateTime((long)(MainNavPlotModel.CurrentValue));
-
-            MainNavPlotModel.MinAxisValue = minV.Ticks;
-
-            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue +
-                                            (MainNavPlotModel.CurrentValue - MainNavPlotModel.MinAxisValue) * 0.2;
-
-            MainNavPlotModel.Resolution = 4;
-
-            MainNavPlotModel.YFormatter = value => value.ToString("0.0");
-            MainNavPlotModel.XFormatter = value => new System.DateTime((long)(value * TimeSpan.FromTicks(1).Ticks)).ToString("dd MMM");
-
-            using (var context = new LionRiverDBContext())
-            {
-                var twsValues = (from x in context.Logs
-                                 where (x.level == MainNavPlotModel.Resolution && x.timestamp > minV && x.timestamp < maxV)
-                                 orderby x.timestamp descending
-                                 select new DateModel() { DateTime = x.timestamp, Value = (double)x.SOG }).Take(NavPlotModel.MaxData);
-
-                MainPlotValues.AddRange(twsValues.ToList());
-
-                var dayConfig = Mappers.Xy<DateModel>()
-                .X(dayModel => (double)dayModel.DateTime.Ticks )
-                .Y(dayModel => dayModel.Value);
-
-                MainNavPlotModel.SeriesCollection = new SeriesCollection(dayConfig)
-                {
-                    new LineSeries
-                    {
-                    Title = "Series 1",
-                    Values = MainPlotValues,
-                    Fill=System.Windows.Media.Brushes.Transparent,
-                    PointGeometry = null,
-                    LineSmoothness=0,
-                    StrokeThickness=1
-                    }
-                };
-
-            }
-
-            //MainNavPlotModel.RangeChangedCommand = new MyCommand<RangeChangedEventArgs>
-            //{
-            //    ExecuteDelegate = e => RangeChanged(e)
-            //};
-
-
-            MainNavPlotModel.CurrentValue = DateTime.Parse("07-09-2019").Ticks;
-            MainNavPlotModel.MinAxisValue = DateTime.Parse("07-08-2019").Ticks;
-            MainNavPlotModel.MaxAxisValue = DateTime.Parse("07-10-2019").Ticks;
-            //PlotCenterButton.IsChecked = true;
-
-            MainNavPlot.DataContext = MainNavPlotModel;
-
-            //PlayButton.IsChecked = true;
-
-            #endregion
 
         }
 
@@ -1717,8 +1697,8 @@ namespace LionRiver
 
             DateTime dt;
 
-            //try
-            //{
+            try
+            {
                 if (DateTime.TryParse(str[0], out dt))
                 {
                     lat = double.Parse(str[1]);
@@ -1736,9 +1716,9 @@ namespace LionRiver
                         CalcNav(dt.ToLocalTime(), true);
                 }
 
-            //}
-            //catch
-            //{ }
+        }
+            catch
+            { }
         }
         
         private void WriteToLog()
