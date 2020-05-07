@@ -22,7 +22,9 @@
                           MinValue="{Binding MinAxisValue, Mode=TwoWay}" 
                           MaxValue="{Binding MaxAxisValue, Mode=TwoWay}">
                     <lvc:Axis.Sections>
-                        <lvc:AxisSection FromValue="{Binding SelectionFromValue}" ToValue="{Binding SelectionToValue}">
+                        <lvc:AxisSection FromValue="{Binding SelectionFromValue}"
+                                         ToValue="{Binding SelectionToValue}" 
+                                         Visibility="{Binding SelectionVisible}">
                             <lvc:AxisSection.Fill>
                                 <SolidColorBrush Color="Gray" Opacity=".4"></SolidColorBrush>
                             </lvc:AxisSection.Fill>
@@ -34,8 +36,7 @@
             </lvc:CartesianChart.AxisX>
             <lvc:CartesianChart.AxisY>
                 <lvc:Axis Title="SOG" LabelFormatter="{Binding YFormatter}" Foreground="LimeGreen" 
-                          MinValue="0" 
-                          MaxValue="10">
+                          MinValue="0">
                     <lvc:Axis.Separator>
                         <lvc:Separator StrokeThickness="1" StrokeDashArray="4">
                             <lvc:Separator.Stroke>

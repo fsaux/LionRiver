@@ -1585,22 +1585,25 @@ namespace LionRiver
 
                     TimeSpan duration = logEntries[i + 1].timestamp.Subtract(logEntries[i].timestamp);
 
-                    if (duration < maxDuration) //Don't add this segment
+                    if (!(logEntries[i].SOG == null || logEntries[i + 1].SOG == null))
                     {
-                        MapSegment ts = new MapSegment();
+                        if (duration < maxDuration) //Don't add this segment
+                        {
+                            MapSegment ts = new MapSegment();
 
-                        SolidColorBrush br;
-                        double avgSOG = ((double)logEntries[i].SOG + (double)logEntries[i + 1].SOG) / 2;
-                        Color c = GetColor(avgSOG, cm);
-                        br = new SolidColorBrush(c);
+                            SolidColorBrush br;
+                            double avgSOG = ((double)logEntries[i].SOG + (double)logEntries[i + 1].SOG) / 2;
+                            Color c = GetColor(avgSOG, cm);
+                            br = new SolidColorBrush(c);
 
-                        ts.Stroke = br;
-                        ts.StrokeThickness = 2;
-                        ts.FromLocation = fromloc;
-                        ts.ToLocation = toloc;
+                            ts.Stroke = br;
+                            ts.StrokeThickness = 2;
+                            ts.FromLocation = fromloc;
+                            ts.ToLocation = toloc;
 
-                        //TrackSegments.Add(ts);
-                        this.Children.Add(ts);
+                            //TrackSegments.Add(ts);
+                            this.Children.Add(ts);
+                        }
                     }
 
                     fromloc = toloc;
@@ -1682,6 +1685,9 @@ namespace LionRiver
 
                 this.Children.Add(ts);
             }
+
+            if (this.Children.Count > Track.MaxLength)
+                this.Children.RemoveAt(0);
 
             lastLocation = new Location(toLoc.Latitude, toLoc.Longitude);
             lastLocationTime = dt;
@@ -2620,7 +2626,7 @@ namespace LionRiver
     public class DateModel
     {
         public System.DateTime DateTime { get; set; }
-        public double Value { get; set; }
+        public double? Value { get; set; }
     }
 
     public class NavPlotModel : INotifyPropertyChanged
@@ -2628,6 +2634,7 @@ namespace LionRiver
         private Double _currentValue;
         private Double _cursorValue;
         private Visibility _cursorVisible;
+        private Visibility _selectionVisible;
         private Double _minAxisValue;
         private Double _maxAxisValue;
         private Double _selectionFromValue;
@@ -2673,6 +2680,18 @@ namespace LionRiver
                 OnPropertyChanged("CursorVisible");
             }
         }
+        public Visibility SelectionVisible
+        {
+            get
+            { return _selectionVisible; }
+
+            set
+            {
+                _selectionVisible = value;
+                OnPropertyChanged("SelectionVisible");
+            }
+        }
+
         public Double MinAxisValue
         {
             get

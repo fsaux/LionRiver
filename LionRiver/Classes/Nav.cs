@@ -741,7 +741,7 @@ namespace LionRiver
                                 };
                                 context.Logs.Add(log);
 
-                                if (i == Properties.Settings.Default.TrackResolution)
+                                if (i == MainNavPlotModel.Resolution)
                                     newTrackPositionAvailable = true;
 
                                 POS.ClearAvgBufferDataAvailable(i);
