@@ -543,7 +543,6 @@ namespace LionRiver
                     .Select(x => new DateModel() { DateTime = x.timestamp, Value = (double)x.SOG })
                     .ToList();
 
-
                 MainPlotValues.AddRange(vList);
 
                 var dayConfig = Mappers.Xy<DateModel>()
@@ -1190,25 +1189,11 @@ namespace LionRiver
                 context.FleetTracks.AddRange(zz);
                 await context.SaveChangesAsync();
 
-                // Adjust replay slider Max/Min and current value
-
-                //var minDt1 =
-                //    (from f in context.FleetTracks
-                //     orderby f.timestamp ascending
-                //     select f.timestamp).FirstOrDefault();
-                
-                //var maxDt1 =
-                //    (from f in context.FleetTracks
-                //     orderby f.timestamp descending
-                //     select f.timestamp).FirstOrDefault();
-
-                //if (minDt1 < minReplayTime)
-                //    minReplayTime = minDt1;
-
-                //if (maxDt1 > maxReplayTime)
-                //    maxReplayTime = maxDt1;
             }
             FleetDownloadProgressGrid.Visibility = Visibility.Hidden;
+
+            UpdatePlotResolutionTimer.Start(); // Forces updating tracks on Map s well
+
         }
 
         private void ReplayTimer_Tick(object sender, EventArgs e)
@@ -1311,7 +1296,7 @@ namespace LionRiver
                 }
 
                 if (PlayButton.IsChecked == true)
-                    UpdateTracks(new DateTime((long)MainNavPlotModel.MinAxisValue), new DateTime((long)MainNavPlotModel.MaxAxisValue));
+                    UpdateTracks(newDataWStart, new DateTime((long)MainNavPlotModel.MaxAxisValue));
             }
         }
         #endregion
