@@ -335,6 +335,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Resource Include="Images\iconfinder_icon-play_211876.png" />
+    <Resource Include="Images\Mathematic-Multiply2-icon.png" />
     <Content Include="X64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -394,9 +395,10 @@
     <Resource Include="Images\Maps-and-Geolocation-Street-view-icon.png" />
     <Resource Include="Images\Maps-and-Geolocation-Marker-icon.png" />
     <Resource Include="Images\City-Gps-device-icon.png" />
-    <Resource Include="Images\Mathematic-Multiply2-icon.png" />
     <Resource Include="Images\Maps-and-Geolocation-Street-view-icon - Copy.png" />
-    <Resource Include="Images\Numbers-2-icon.png" />
+    <Resource Include="Images\Numbers-2-icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\Maps-and-Geolocation-Layers-icon.png" />
     <Resource Include="Images\1426166_10152063560557490_1984197782_n.jpg" />
     <Resource Include="Images\Very-Basic-Ruler-icon.png" />

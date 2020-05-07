@@ -346,12 +346,6 @@ namespace LionRiver
         bool insideCourse;
 
         #endregion
-
-        //#region Replay
-        //DateTime minReplayTime, maxReplayTime;
-
-        //#endregion
-
         #endregion
 
         #region MainWindow Constructor (Initializers)
@@ -525,7 +519,7 @@ namespace LionRiver
      
             MainNavPlotModel.CurrentValue = DateTime.Now.Ticks;
 
-            DateTime minV = new DateTime((long)(MainNavPlotModel.CurrentValue - TimeSpan.FromDays(1).Ticks));
+            DateTime minV = new DateTime((long)(MainNavPlotModel.CurrentValue - TimeSpan.FromHours(1).Ticks));
             DateTime maxV = new DateTime((long)(MainNavPlotModel.CurrentValue));
 
             MainNavPlotModel.MinAxisValue = minV.Ticks;
@@ -571,49 +565,52 @@ namespace LionRiver
 
                 // Insert Empty values on Timestamp = Last available data an Timestamp = Now. This avoids connecting plot points from previous Logs
 
-                var vLast = twsValues.ToList().Last();
-
-                for (int i = 0; i < Inst.MaxBuffers; i++)
+                if (vList.Count != 0)
                 {
-                    var logLast = new Log()
+                    var vLast = twsValues.ToList().Last();
+
+                    for (int i = 0; i < Inst.MaxBuffers; i++)
                     {
-                        timestamp = vLast.timestamp,
-                        level = i,
-                        LAT = vLast.LAT,
-                        LON = vLast.LON,
-                        COG = double.NaN,
-                        SOG = double.NaN,
-                        HDT = double.NaN,
-                        TWD = double.NaN,
-                        PERF = double.NaN,
-                        DPT = double.NaN,
-                        TWS = double.NaN,
-                        DRIFT = double.NaN,
-                        SET = double.NaN
-                    };
+                        var logLast = new Log()
+                        {
+                            timestamp = vLast.timestamp,
+                            level = i,
+                            LAT = vLast.LAT,
+                            LON = vLast.LON,
+                            COG = double.NaN,
+                            SOG = double.NaN,
+                            HDT = double.NaN,
+                            TWD = double.NaN,
+                            PERF = double.NaN,
+                            DPT = double.NaN,
+                            TWS = double.NaN,
+                            DRIFT = double.NaN,
+                            SET = double.NaN
+                        };
 
-                    var logFirst = new Log()
-                    {
-                        timestamp = maxV,
-                        level = i,
-                        LAT = vLast.LAT,
-                        LON = vLast.LON,
-                        COG = double.NaN,
-                        SOG = double.NaN,
-                        HDT = double.NaN,
-                        TWD = double.NaN,
-                        PERF = double.NaN,
-                        DPT = double.NaN,
-                        TWS = double.NaN,
-                        DRIFT = double.NaN,
-                        SET = double.NaN
-                    };
+                        var logFirst = new Log()
+                        {
+                            timestamp = maxV,
+                            level = i,
+                            LAT = vLast.LAT,
+                            LON = vLast.LON,
+                            COG = double.NaN,
+                            SOG = double.NaN,
+                            HDT = double.NaN,
+                            TWD = double.NaN,
+                            PERF = double.NaN,
+                            DPT = double.NaN,
+                            TWS = double.NaN,
+                            DRIFT = double.NaN,
+                            SET = double.NaN
+                        };
 
-                    context.Logs.Add(logLast);
-                    context.Logs.Add(logFirst);
+                        context.Logs.Add(logLast);
+                        context.Logs.Add(logFirst);
 
+                    }
+                    context.SaveChanges();
                 }
-                context.SaveChanges();
             }
 
             MainNavPlot.DataContext = MainNavPlotModel;
@@ -1312,6 +1309,9 @@ namespace LionRiver
                         MainPlotValues.AddRange(result);
                     }
                 }
+
+                if (PlayButton.IsChecked == true)
+                    UpdateTracks(new DateTime((long)MainNavPlotModel.MinAxisValue), new DateTime((long)MainNavPlotModel.MaxAxisValue));
             }
         }
         #endregion
@@ -3023,7 +3023,12 @@ namespace LionRiver
 
         private void PlayButton_Checked(object sender, RoutedEventArgs e)
         {
-            DateTime dt = DateTime.Now;
+            DateTime dt;
+
+            if (POS.IsValid())
+                dt = POS.GetLastVal(0).Time;
+            else
+                dt = DateTime.Now;
 
             MainNavPlotModel.CurrentValue = dt.Ticks;
 
@@ -3031,9 +3036,11 @@ namespace LionRiver
             MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
             MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
 
+            UpdateTracks(new DateTime((long)MainNavPlotModel.MinAxisValue), dt);
+
             UpdateFleet(dt);
 
-            if(FwdBackSlider!=null)
+            if (FwdBackSlider!=null)
                 FwdBackSlider.Value = 0;
 
             ReplayTimer.Stop();
@@ -3043,6 +3050,13 @@ namespace LionRiver
             PlotCenterButton.IsChecked = false;
 
             MainNavPlotModel.SelectionVisible = Visibility.Hidden;
+
+            //Center on boat if position available
+            if (POS.IsValid())
+            {
+                Point p = map.LocationToViewportPoint(new Location(LAT.Val, LON.Val));
+                map.TargetCenter = map.ViewportPointToLocation(new Point(p.X, p.Y));
+            }
 
         }
 
@@ -3110,6 +3124,8 @@ namespace LionRiver
                 MainNavPlotModel.MaxAxisValue += dx;
 
                 PanStartingPoint = pos;
+
+                PlayButton.IsChecked = false;
 
                 if (PlotCenterButton.IsChecked == true)
                 {
@@ -3180,7 +3196,7 @@ namespace LionRiver
             double zoomPos;
             double zoom;
 
-            if (PlotCenterButton.IsChecked == true)
+            if (PlotCenterButton.IsChecked == true || PlayButton.IsChecked == true)
                 zoomPos = MainNavPlotModel.CurrentValue;
             else
                 zoomPos = MainNavPlotModel.CursorValue;
@@ -3678,6 +3694,7 @@ namespace LionRiver
         {
             if (PlayButton.IsChecked==true)
             {
+
                 if (LAT.IsValid())
                 {
                     boat.Location = new Location(LAT.Val, LON.Val);
@@ -3690,6 +3707,23 @@ namespace LionRiver
                         heading = HDT.Val;
 
                     boat.Heading = heading;
+
+                    MainNavPlotModel.CurrentValue = POS.GetLastVal(0).Time.Ticks;
+
+                    double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+                    double lim = MainNavPlotModel.MinAxisValue + 0.8 * deltaT;
+
+                    if (MainNavPlotModel.CurrentValue > lim)
+                    {
+                        MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
+                        MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
+                    }
+
+                    if (MainNavPlotModel.CurrentValue < MainNavPlotModel.MinAxisValue)
+                    {
+                        MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue);
+                        MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + deltaT);
+                    }
 
                     if (mapOrientationMode == MapOrientationMode.CourseUp)
                     {
@@ -3745,23 +3779,6 @@ namespace LionRiver
                         MainPlotValues.Add(new DateModel { DateTime = cTime, Value = cVal });
                         if (MainPlotValues.Count > NavPlotModel.MaxData)
                             MainPlotValues.RemoveAt(0);
-
-                        MainNavPlotModel.CurrentValue = POS.GetLastVal(level).Time.Ticks;
-
-                        double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
-                        double lim = MainNavPlotModel.MinAxisValue + 0.8 * deltaT;
-
-                        if (MainNavPlotModel.CurrentValue > lim)
-                        {
-                            MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
-                            MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
-                        }
-
-                        if (MainNavPlotModel.CurrentValue < MainNavPlotModel.MinAxisValue)
-                        {
-                            MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue);
-                            MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + deltaT);
-                        }
 
                         DebugText.Text = level.ToString() + " - " + MainPlotValues.Count.ToString();
                     }
@@ -4012,6 +4029,15 @@ namespace LionRiver
                     PrtBearingTarget.Visibility = Visibility.Hidden;
                 }
             }
+            else
+            {
+                StbLaylineTo.Visibility = Visibility.Hidden;
+                PrtLaylineTo.Visibility = Visibility.Hidden;
+                HitP.Visibility = Visibility.Hidden;
+                HitS.Visibility = Visibility.Hidden;
+                StbBearingTarget.Visibility = Visibility.Hidden;
+                PrtBearingTarget.Visibility = Visibility.Hidden;
+            }
         }
 
         private void UpdateFleet(DateTime dt)
@@ -4142,7 +4168,6 @@ namespace LionRiver
 
                 var logEntries = (from x in context.Logs
                                   where (x.level == MainNavPlotModel.Resolution && x.timestamp <= endTime && x.timestamp > startTime)
-                                  orderby x.timestamp descending
                                   select x);
 
                 track = new Track(logEntries.ToList(), MainNavPlotModel.Resolution, Properties.Settings.Default.SPDminVal,

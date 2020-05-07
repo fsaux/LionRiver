@@ -45,7 +45,7 @@
             </DockPanel>
 
 
-            <Image  Source="Images/Mathematic-Multiply2-icon.png" Stretch="None" HorizontalAlignment="Right" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
+            <Image Source="/LionRiver;component/Images/Mathematic-Multiply2-icon.png" Stretch="None" HorizontalAlignment="Right" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
 
             <DataGrid
             ItemsSource="{Binding}"

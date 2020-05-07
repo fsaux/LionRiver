@@ -18,7 +18,7 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Image  Source="Images/Mathematic-Multiply2-icon.png"  Stretch="None" HorizontalAlignment="Right" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
+            <Image Source="/LionRiver;component/Images/Mathematic-Multiply2-icon.png"  Stretch="None" HorizontalAlignment="Right" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
 
             <StackPanel Grid.Row="1" Margin="5">
                 <TextBlock Text="Layers" Margin="5,2,0,0" HorizontalAlignment="Left" Foreground="White"/>

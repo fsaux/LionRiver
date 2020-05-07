@@ -49,7 +49,7 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <Image  Source="Images/Mathematic-Multiply2-icon.png" Stretch="None" HorizontalAlignment="Right" MouseLeftButtonDown="Image_MouseLeftButtonDown" />
+                <Image Stretch="None" HorizontalAlignment="Right" MouseLeftButtonDown="Image_MouseLeftButtonDown" Source="/LionRiver;component/Images/Mathematic-Multiply2-icon.png" />
 
                 <DockPanel Grid.Row="1" Height="Auto" Width="Auto" Background="{x:Null}" LastChildFill="False" VerticalAlignment="Top">
                 <Button Content="Load"  Margin="2" IsEnabled="False"/>
