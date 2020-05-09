@@ -2640,6 +2640,8 @@ namespace LionRiver
         private Double _selectionFromValue;
         private Double _selectionToValue;
 
+
+
         public const int MaxData = 300;
         public SeriesCollection SeriesCollection { get; set; }
         public Func<double, string> YFormatter { get; set; }
@@ -2680,6 +2682,29 @@ namespace LionRiver
                 OnPropertyChanged("CursorVisible");
             }
         }
+
+        public Double SelectionFromValue
+        {
+            get
+            { return _selectionFromValue; }
+
+            set
+            {
+                _selectionFromValue = value;
+                OnPropertyChanged("SelectionFromValue");
+            }
+        }
+        public Double SelectionToValue
+        {
+            get
+            { return _selectionToValue; }
+
+            set
+            {
+                _selectionToValue = value;
+                OnPropertyChanged("SelectionToValue");
+            }
+        }      
         public Visibility SelectionVisible
         {
             get
@@ -2714,28 +2739,7 @@ namespace LionRiver
                 OnPropertyChanged("MaxAxisValue");
             }
         }
-        public Double SelectionFromValue
-        {
-            get
-            { return _selectionFromValue; }
 
-            set
-            {
-                _selectionFromValue = value;
-                OnPropertyChanged("SelectionFromValue");
-            }
-        }
-        public Double SelectionToValue
-        {
-            get
-            { return _selectionToValue; }
-
-            set
-            {
-                _selectionToValue = value;
-                OnPropertyChanged("SelectionToValue");
-            }
-        }
 
         public MyCommand<RangeChangedEventArgs> RangeChangedCommand { get; set; }
 

@@ -582,7 +582,9 @@ namespace LionRiver
             if (replayLog == true)
             {
                 if (deltaLog == TimeSpan.Zero)
-                    deltaLog = now - new DateTime(2019, 07, 08);
+                    //deltaLog = now - new DateTime(2019, 07, 08);
+                    deltaLog = now - DateTime.Now;
+
 
                 now = now - deltaLog;
 

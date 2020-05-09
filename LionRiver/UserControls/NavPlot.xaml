@@ -2,11 +2,66 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:LionRiver.UserControls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LionRiver"
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"       
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
+
+    <UserControl.Resources>
+        <local:CursorPositionConverter x:Key="CursorPositionConverter" />
+        <local:CurrentPositionConverter x:Key="CurrentPositionConverter" />
+        <local:XValuetoDateConverter x:Key="XValuetoDateConverter" />
+
+        <Style x:Key="CursorTextBlock" TargetType="{x:Type TextBlock}">
+            <Setter Property="Margin">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource CursorPositionConverter}">
+                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
+                                                         AncestorType={x:Type Window}}"/>
+                        <Binding Path="CursorValue"/>
+                        <Binding Path="MinAxisValue"/>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Visibility">
+                <Setter.Value>
+                    <Binding Path="CursorVisible"></Binding>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Text">
+                <Setter.Value>
+                    <Binding  Path="CursorValue" Converter="{StaticResource XValuetoDateConverter}"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CurrentTextBlock" TargetType="{x:Type TextBlock}">
+            <Setter Property="Margin">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource CurrentPositionConverter}">
+                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
+                                                         AncestorType={x:Type Window}}"/>
+                        <Binding Path="CurrentValue"/>
+                        <Binding Path="MinAxisValue"/>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Visibility">
+                <Setter.Value>
+                    <Binding Path="CurrentVisible"></Binding>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Text">
+                <Setter.Value>
+                    <Binding  Path="CurrentValue" Converter="{StaticResource XValuetoDateConverter}"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+    </UserControl.Resources>
     
     <Grid>
         <lvc:CartesianChart Grid.Row="0" 
@@ -16,7 +71,8 @@
                             Pan="None"
                             DisableAnimations="True"
                             DataTooltip="{x:Null}"
-                            Hoverable="False">
+                            Hoverable="False" 
+                            Margin="0,0,0,8">
             <lvc:CartesianChart.AxisX>
                 <lvc:Axis LabelFormatter="{Binding XFormatter}"  ShowLabels="False"
                           MinValue="{Binding MinAxisValue, Mode=TwoWay}" 
@@ -35,8 +91,8 @@
                 </lvc:Axis>
             </lvc:CartesianChart.AxisX>
             <lvc:CartesianChart.AxisY>
-                <lvc:Axis Title="SOG" LabelFormatter="{Binding YFormatter}" Foreground="LimeGreen" 
-                          MinValue="0">
+                <lvc:Axis Title="SOG" LabelFormatter="{Binding YFormatter}" Foreground="DodgerBlue" 
+                          MinValue="0" FontSize="12">
                     <lvc:Axis.Separator>
                         <lvc:Separator StrokeThickness="1" StrokeDashArray="4">
                             <lvc:Separator.Stroke>
@@ -47,5 +103,22 @@
                 </lvc:Axis>
             </lvc:CartesianChart.AxisY>
         </lvc:CartesianChart>
+
+        <TextBlock
+            x:Name="CursorTextBlock"
+            Style="{StaticResource CursorTextBlock}"
+            FontSize="12"
+            Foreground="#F9D648" 
+            VerticalAlignment="Bottom" HorizontalAlignment="Left" >
+        </TextBlock>
+
+        <TextBlock
+            x:Name="CurrentTextBlock"
+            Style="{StaticResource CurrentTextBlock}"
+            FontSize="12"
+            Foreground="LimeGreen" 
+            VerticalAlignment="Top" HorizontalAlignment="Left" >
+        </TextBlock>
+
     </Grid>
 </UserControl>

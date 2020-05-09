@@ -549,6 +549,7 @@ namespace LionRiver
                 .X(dayModel => (double)dayModel.DateTime.Ticks )
                 .Y(dayModel => dayModel.Value ?? double.NaN);
 
+                
                 MainNavPlotModel.SeriesCollection = new SeriesCollection(dayConfig)
                 {
                     new LineSeries
@@ -556,6 +557,7 @@ namespace LionRiver
                     Title = "Series 1",
                     Values = MainPlotValues,
                     Fill=System.Windows.Media.Brushes.Transparent,
+                    Stroke=System.Windows.Media.Brushes.DodgerBlue,
                     PointGeometry = null,
                     LineSmoothness=0,
                     StrokeThickness=1
@@ -1296,7 +1298,7 @@ namespace LionRiver
                 }
 
                 if (PlayButton.IsChecked == true)
-                    UpdateTracks(newDataWStart, new DateTime((long)MainNavPlotModel.MaxAxisValue));
+                    UpdateTracks(newDataWStart, new DateTime((long)MainNavPlotModel.MaxAxisValue),Track.MaxLength);
             }
         }
         #endregion
@@ -1764,7 +1766,7 @@ namespace LionRiver
                 replayLog = true;
                 ReplayFile = new StreamReader(filename);
 
-                ShortNavTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
+                ShortNavTimer.Interval = new TimeSpan(0, 0, 0, 0, 80);
             }
 
         }
@@ -3114,7 +3116,7 @@ namespace LionRiver
 
                 if (PlotCenterButton.IsChecked == true)
                 {
-                    MainNavPlotModel.CurrentValue = (MainNavPlotModel.MinAxisValue + MainNavPlotModel.MaxAxisValue) / 2; ;
+                    MainNavPlotModel.CurrentValue = (MainNavPlotModel.MinAxisValue + MainNavPlotModel.MaxAxisValue) / 2;
                     
                     if(PlotPanTimer.IsEnabled==false)
                         PlotPanTimer.Start();
@@ -3181,6 +3183,8 @@ namespace LionRiver
             double zoomPos;
             double zoom;
 
+
+
             if (PlotCenterButton.IsChecked == true || PlayButton.IsChecked == true)
                 zoomPos = MainNavPlotModel.CurrentValue;
             else
@@ -3206,6 +3210,7 @@ namespace LionRiver
 
             UpdatePlotResolutionTimer.Start();
         }
+
 
         private void MainNavPlot_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -4046,7 +4051,7 @@ namespace LionRiver
                     boat.BoatPerf = Convert.ToDouble(logEntry.PERF);
                     boat.WindDirection = Convert.ToDouble(logEntry.TWD);
                     boat.WindSpeed = Convert.ToDouble(logEntry.TWS);
-                    boat.CurrentDirection = Convert.ToDouble(logEntry.SET);
+                    boat.CurrentDirection = Convert.ToDouble(logEntry.SET) + 180;
                     boat.CurrentSpeed = Convert.ToDouble(logEntry.DRIFT);
 
                     if (wgrib != null && Properties.Settings.Default.PredictedWindDirectionCheck)
@@ -4143,7 +4148,7 @@ namespace LionRiver
 
         }
 
-        private void UpdateTracks(DateTime startTime, DateTime endTime)
+        private void UpdateTracks(DateTime startTime, DateTime endTime, int n = 0)
         {
 
             using (var context = new LionRiverDBContext())
@@ -4151,9 +4156,23 @@ namespace LionRiver
 
                 map.Children.Remove(track);
 
-                var logEntries = (from x in context.Logs
-                                  where (x.level == MainNavPlotModel.Resolution && x.timestamp <= endTime && x.timestamp > startTime)
-                                  select x);
+                IQueryable<Log> logEntries;
+
+                if (n == 0)
+                {
+                    logEntries = (from x in context.Logs
+                                      where (x.level == MainNavPlotModel.Resolution && x.timestamp <= endTime && x.timestamp > startTime)
+                                      select x);
+                }
+                else
+                {
+                    logEntries = (from x in context.Logs
+                                        where (x.level == MainNavPlotModel.Resolution)
+                                        orderby x.timestamp descending
+                                        select x
+                                        ).Take(n).OrderBy(y=>y.timestamp);
+                }
+
 
                 track = new Track(logEntries.ToList(), MainNavPlotModel.Resolution, Properties.Settings.Default.SPDminVal,
                                         Properties.Settings.Default.SPDminIndex, Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);

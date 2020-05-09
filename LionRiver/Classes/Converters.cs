@@ -7,6 +7,8 @@ using System.Windows;
 using System.Windows.Data;
 using System.Globalization;
 using MapControl;
+using LiveCharts;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace LionRiver
 {
@@ -166,6 +168,85 @@ namespace LionRiver
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return Binding.DoNothing;
+        }
+    }
+
+    public class CursorPositionConverter : IMultiValueConverter
+    {
+        object IMultiValueConverter.Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            MainWindow mWndw = values[0] as MainWindow;
+            double? cValue = values[1] as double?;
+
+            double x = 0;
+
+            if (mWndw != null)
+            {
+                var chartModel = mWndw.MainNavPlot.Chart.Model;
+
+                if (chartModel.AxisX != null)
+                    x = ChartFunctions.ToPlotArea((double)cValue, LiveCharts.AxisOrientation.X, chartModel, 0);
+
+                var aWidth = mWndw.MainNavPlot.CursorTextBlock.ActualWidth;
+             
+                x -= (double)aWidth / 2;
+            }
+
+            return new Thickness(x, 0, 0, 0);
+        }
+
+        object[] IMultiValueConverter.ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class CurrentPositionConverter : IMultiValueConverter
+    {
+        object IMultiValueConverter.Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            MainWindow mWndw = values[0] as MainWindow;
+            double? cValue = values[1] as double?;
+
+            double x = 0;
+
+            if (mWndw != null)
+            {
+                var chartModel = mWndw.MainNavPlot.Chart.Model;
+
+                if (chartModel.AxisX != null)
+                    x = ChartFunctions.ToPlotArea((double)cValue, LiveCharts.AxisOrientation.X, chartModel, 0);
+
+                var aWidth = mWndw.MainNavPlot.CurrentTextBlock.ActualWidth;
+
+                x -= (double)aWidth / 2;
+            }
+
+            return new Thickness(x, -8, 0, 0);
+        }
+
+        object[] IMultiValueConverter.ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class XValuetoDateConverter : IValueConverter
+    {
+
+        public object Convert(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            double? ticks = value as double?;
+
+            if (ticks != null)
+                return new DateTime((long)ticks).ToString("d-MMM-yy H:mm");
+            else
+                return "";
+        }
+
+        public object ConvertBack(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return null;
         }
     }
 
