@@ -522,14 +522,14 @@ namespace LionRiver
             DateTime minV = new DateTime((long)(MainNavPlotModel.CurrentValue - TimeSpan.FromHours(1).Ticks));
             DateTime maxV = new DateTime((long)(MainNavPlotModel.CurrentValue));
 
-            MainNavPlotModel.MinAxisValue = minV.Ticks;
+            MainNavPlotModel.MinXAxisValue = minV.Ticks;
 
-            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue +
-                                            (MainNavPlotModel.CurrentValue - MainNavPlotModel.MinAxisValue) * 0.2;
+            MainNavPlotModel.MaxXAxisValue = MainNavPlotModel.CurrentValue +
+                                            (MainNavPlotModel.CurrentValue - MainNavPlotModel.MinXAxisValue) * 0.2;
 
             MainNavPlotModel.Resolution = 4;
 
-            MainNavPlotModel.YFormatter = value => value.ToString("0.0");
+            MainNavPlotModel.Y1Formatter = value => value.ToString("0.0");
             MainNavPlotModel.XFormatter = value => new System.DateTime((long)(value * TimeSpan.FromTicks(1).Ticks)).ToString("dd MMM");
 
             using (var context = new LionRiverDBContext())
@@ -613,6 +613,15 @@ namespace LionRiver
                     context.SaveChanges();
                 }
             }
+
+            MainNavPlotModel.Y1AxisName = "SOG";
+            MainNavPlotModel.MinY1AxisValue = 0;
+            MainNavPlotModel.MaxY1AxisValue = double.NaN;
+
+            MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
+            MainNavPlot.Current.Y= MainNavPlotModel.MaxY1AxisValue;
+
+
 
             MainNavPlot.DataContext = MainNavPlotModel;
 
@@ -1200,22 +1209,22 @@ namespace LionRiver
 
         private void ReplayTimer_Tick(object sender, EventArgs e)
         {
-            double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+            double deltaT = MainNavPlotModel.MaxXAxisValue - MainNavPlotModel.MinXAxisValue;
             
             MainNavPlotModel.CurrentValue += deltaT * FwdBackSlider.Value / 1000;
 
-            double lim = MainNavPlotModel.MinAxisValue + 0.8 * deltaT;
+            double lim = MainNavPlotModel.MinXAxisValue + 0.8 * deltaT;
 
             if (MainNavPlotModel.CurrentValue > lim)
             {
-                MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
-                MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
+                MainNavPlotModel.MinXAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
+                MainNavPlotModel.MaxXAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
             }
 
             if (PlotCenterButton.IsChecked == true)
             {
-                MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
-                MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
+                MainNavPlotModel.MaxXAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
+                MainNavPlotModel.MinXAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
             }
 
             DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
@@ -1241,8 +1250,8 @@ namespace LionRiver
             const double tgtWSize = 1.3;
             const double maxWSize = 1.5;
 
-            double PlotWStart = MainNavPlotModel.MinAxisValue;
-            double PlotWEnd = MainNavPlotModel.MaxAxisValue;
+            double PlotWStart = MainNavPlotModel.MinXAxisValue;
+            double PlotWEnd = MainNavPlotModel.MaxXAxisValue;
             double PlotWindowSize = PlotWEnd - PlotWStart;
 
             double DataWStart, DataWEnd;
@@ -1298,8 +1307,9 @@ namespace LionRiver
                 }
 
                 if (PlayButton.IsChecked == true)
-                    UpdateTracks(newDataWStart, new DateTime((long)MainNavPlotModel.MaxAxisValue),Track.MaxLength);
+                    UpdateTracks(newDataWStart, new DateTime((long)MainNavPlotModel.MaxXAxisValue),Track.MaxLength);
             }
+
         }
         #endregion
 
@@ -3018,12 +3028,14 @@ namespace LionRiver
                 dt = DateTime.Now;
 
             MainNavPlotModel.CurrentValue = dt.Ticks;
+            MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
+            MainNavPlot.Current.Y = MainNavPlotModel.MaxY1AxisValue;
 
-            double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
-            MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
-            MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
+            double deltaT = MainNavPlotModel.MaxXAxisValue - MainNavPlotModel.MinXAxisValue;
+            MainNavPlotModel.MinXAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
+            MainNavPlotModel.MaxXAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
 
-            UpdateTracks(new DateTime((long)MainNavPlotModel.MinAxisValue), dt);
+            UpdateTracks(new DateTime((long)MainNavPlotModel.MinXAxisValue), dt);
 
             UpdateFleet(dt);
 
@@ -3089,6 +3101,8 @@ namespace LionRiver
             var point = MainNavPlot.Chart.ConvertToChartValues(pos);
 
             MainNavPlotModel.CursorValue = point.X;
+            MainNavPlot.Cursor.X = MainNavPlotModel.CursorValue;
+
 
             if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
             {
@@ -3107,8 +3121,8 @@ namespace LionRiver
                 var dx = ChartFunctions.FromPlotArea(deltaX, LiveCharts.AxisOrientation.X, MainNavPlot.Chart.Model,0) -
                              ChartFunctions.FromPlotArea(0, LiveCharts.AxisOrientation.X, MainNavPlot.Chart.Model, 0);
 
-                MainNavPlotModel.MinAxisValue += dx;
-                MainNavPlotModel.MaxAxisValue += dx;
+                MainNavPlotModel.MinXAxisValue += dx;
+                MainNavPlotModel.MaxXAxisValue += dx;
 
                 PanStartingPoint = pos;
 
@@ -3116,9 +3130,11 @@ namespace LionRiver
 
                 if (PlotCenterButton.IsChecked == true)
                 {
-                    MainNavPlotModel.CurrentValue = (MainNavPlotModel.MinAxisValue + MainNavPlotModel.MaxAxisValue) / 2;
-                    
-                    if(PlotPanTimer.IsEnabled==false)
+                    MainNavPlotModel.CurrentValue = (MainNavPlotModel.MinXAxisValue + MainNavPlotModel.MaxXAxisValue) / 2;
+                    MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
+                    MainNavPlot.Current.Y = MainNavPlotModel.MaxY1AxisValue;
+
+                    if (PlotPanTimer.IsEnabled==false)
                         PlotPanTimer.Start();
                 }
             }
@@ -3145,7 +3161,6 @@ namespace LionRiver
             if (mouseHandlingMode == MouseHandlingMode.PlotPanning)
                 if ((e.Timestamp - ClickTime) < 300)
                 {
-                    MainNavPlotModel.CurrentValue = point.X;
 
                     mouseHandlingMode = MouseHandlingMode.None;
 
@@ -3153,11 +3168,15 @@ namespace LionRiver
 
                     if (PlotCenterButton.IsChecked == true)
                     {
-                        double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+                        double deltaT = MainNavPlotModel.MaxXAxisValue - MainNavPlotModel.MinXAxisValue;
 
-                        MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
-                        MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
+                        MainNavPlotModel.MaxXAxisValue = point.X + deltaT / 2;
+                        MainNavPlotModel.MinXAxisValue = point.X - deltaT / 2;
                     }
+
+                    MainNavPlotModel.CurrentValue = point.X;
+                    MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
+                    MainNavPlot.Current.Y = MainNavPlotModel.MaxY1AxisValue;
 
                     if (PlotPanTimer.IsEnabled == false)
                         PlotPanTimer.Start();
@@ -3190,8 +3209,8 @@ namespace LionRiver
             else
                 zoomPos = MainNavPlotModel.CursorValue;
 
-            double deltaT1 = zoomPos - MainNavPlotModel.MinAxisValue;
-            double deltaT2 = zoomPos - MainNavPlotModel.MaxAxisValue;
+            double deltaT1 = zoomPos - MainNavPlotModel.MinXAxisValue;
+            double deltaT2 = zoomPos - MainNavPlotModel.MaxXAxisValue;
 
 
             if (e.Delta > 0)
@@ -3199,8 +3218,8 @@ namespace LionRiver
             else
                 zoom = 1 / zoomFactor;
 
-            MainNavPlotModel.MinAxisValue += deltaT1 * (1 - zoom);
-            MainNavPlotModel.MaxAxisValue += deltaT2 * (1 - zoom);
+            MainNavPlotModel.MinXAxisValue += deltaT1 * (1 - zoom);
+            MainNavPlotModel.MaxXAxisValue += deltaT2 * (1 - zoom);
 
             if (PlotCenterButton.IsChecked == true)
             {
@@ -3210,7 +3229,6 @@ namespace LionRiver
 
             UpdatePlotResolutionTimer.Start();
         }
-
 
         private void MainNavPlot_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -3225,10 +3243,10 @@ namespace LionRiver
 
         private void PlotCenterButton_Checked(object sender, RoutedEventArgs e)
         {
-            double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
+            double deltaT = MainNavPlotModel.MaxXAxisValue - MainNavPlotModel.MinXAxisValue;
 
-            MainNavPlotModel.MaxAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
-            MainNavPlotModel.MinAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
+            MainNavPlotModel.MaxXAxisValue = MainNavPlotModel.CurrentValue + deltaT / 2;
+            MainNavPlotModel.MinXAxisValue = MainNavPlotModel.CurrentValue - deltaT / 2;
 
             PlayButton.IsChecked = false;
         }
@@ -3699,20 +3717,22 @@ namespace LionRiver
                     boat.Heading = heading;
 
                     MainNavPlotModel.CurrentValue = POS.GetLastVal(0).Time.Ticks;
+                    MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
+                    MainNavPlot.Current.Y = MainNavPlotModel.MaxY1AxisValue;
 
-                    double deltaT = MainNavPlotModel.MaxAxisValue - MainNavPlotModel.MinAxisValue;
-                    double lim = MainNavPlotModel.MinAxisValue + 0.8 * deltaT;
+                    double deltaT = MainNavPlotModel.MaxXAxisValue - MainNavPlotModel.MinXAxisValue;
+                    double lim = MainNavPlotModel.MinXAxisValue + 0.8 * deltaT;
 
                     if (MainNavPlotModel.CurrentValue > lim)
                     {
-                        MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
-                        MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
+                        MainNavPlotModel.MinXAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
+                        MainNavPlotModel.MaxXAxisValue = (MainNavPlotModel.CurrentValue + 0.2 * deltaT);
                     }
 
-                    if (MainNavPlotModel.CurrentValue < MainNavPlotModel.MinAxisValue)
+                    if (MainNavPlotModel.CurrentValue < MainNavPlotModel.MinXAxisValue)
                     {
-                        MainNavPlotModel.MinAxisValue = (MainNavPlotModel.CurrentValue);
-                        MainNavPlotModel.MaxAxisValue = (MainNavPlotModel.CurrentValue + deltaT);
+                        MainNavPlotModel.MinXAxisValue = (MainNavPlotModel.CurrentValue);
+                        MainNavPlotModel.MaxXAxisValue = (MainNavPlotModel.CurrentValue + deltaT);
                     }
 
                     if (mapOrientationMode == MapOrientationMode.CourseUp)

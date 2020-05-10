@@ -10,55 +10,33 @@
 
 
     <UserControl.Resources>
-        <local:CursorPositionConverter x:Key="CursorPositionConverter" />
-        <local:CurrentPositionConverter x:Key="CurrentPositionConverter" />
+        <local:CenterTextboxConverter x:Key="CenterTextboxConverter" />
+        <local:TopTextboxConverter x:Key="TopTextboxConverter" />
         <local:XValuetoDateConverter x:Key="XValuetoDateConverter" />
-
-        <Style x:Key="CursorTextBlock" TargetType="{x:Type TextBlock}">
+        
+        <Style x:Key="CenteredTextBlock" TargetType="{x:Type TextBlock}">
             <Setter Property="Margin">
                 <Setter.Value>
-                    <MultiBinding Converter="{StaticResource CursorPositionConverter}">
-                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                         AncestorType={x:Type Window}}"/>
-                        <Binding Path="CursorValue"/>
-                        <Binding Path="MinAxisValue"/>
+                    <MultiBinding  Converter="{StaticResource CenterTextboxConverter}">
+                        <MultiBinding.Bindings>
+                            <Binding RelativeSource="{RelativeSource Self}" Path="ActualWidth"/>
+                            <Binding RelativeSource="{RelativeSource Self}" Path="ActualHeight"/>
+                        </MultiBinding.Bindings>
                     </MultiBinding>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Visibility">
-                <Setter.Value>
-                    <Binding Path="CursorVisible"></Binding>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Text">
-                <Setter.Value>
-                    <Binding  Path="CursorValue" Converter="{StaticResource XValuetoDateConverter}"/>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <Style x:Key="CurrentTextBlock" TargetType="{x:Type TextBlock}">
+        <!--<Style x:Key="TopTextboxBlock" TargetType="{x:Type TextBlock}">
             <Setter Property="Margin">
                 <Setter.Value>
-                    <MultiBinding Converter="{StaticResource CurrentPositionConverter}">
-                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                         AncestorType={x:Type Window}}"/>
-                        <Binding Path="CurrentValue"/>
-                        <Binding Path="MinAxisValue"/>
+                    <MultiBinding  Converter="{StaticResource TopTextboxConverter}">
+                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}"/>
+                        <Binding Path="MaxValue"/>
                     </MultiBinding>
                 </Setter.Value>
             </Setter>
-            <Setter Property="Visibility">
-                <Setter.Value>
-                    <Binding Path="CurrentVisible"></Binding>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Text">
-                <Setter.Value>
-                    <Binding  Path="CurrentValue" Converter="{StaticResource XValuetoDateConverter}"/>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        </Style>-->
 
 
     </UserControl.Resources>
@@ -71,12 +49,12 @@
                             Pan="None"
                             DisableAnimations="True"
                             DataTooltip="{x:Null}"
-                            Hoverable="False" 
-                            Margin="0,0,0,8">
+                            Hoverable="False">
             <lvc:CartesianChart.AxisX>
-                <lvc:Axis LabelFormatter="{Binding XFormatter}"  ShowLabels="False"
-                          MinValue="{Binding MinAxisValue, Mode=TwoWay}" 
-                          MaxValue="{Binding MaxAxisValue, Mode=TwoWay}">
+                <lvc:Axis Name="myXaxis"
+                          LabelFormatter="{Binding XFormatter}"  ShowLabels="False"
+                          MinValue="{Binding MinXAxisValue}" 
+                          MaxValue="{Binding MaxXAxisValue}">
                     <lvc:Axis.Sections>
                         <lvc:AxisSection FromValue="{Binding SelectionFromValue}"
                                          ToValue="{Binding SelectionToValue}" 
@@ -85,14 +63,19 @@
                                 <SolidColorBrush Color="Gray" Opacity=".4"></SolidColorBrush>
                             </lvc:AxisSection.Fill>
                         </lvc:AxisSection>
-                        <lvc:AxisSection Value="{Binding CursorValue}" StrokeThickness="2" Stroke="#F9D648" Visibility="{Binding CursorVisible}"/>
+                        <lvc:AxisSection Name="CursorSection"  Value="{Binding CursorValue}" StrokeThickness="2" Stroke="#F9D648" Visibility="{Binding CursorVisible}"/>
                         <lvc:AxisSection Value="{Binding CurrentValue}" StrokeThickness="2" Stroke="LimeGreen"/>
                     </lvc:Axis.Sections>
                 </lvc:Axis>
             </lvc:CartesianChart.AxisX>
+            
             <lvc:CartesianChart.AxisY>
-                <lvc:Axis Title="SOG" LabelFormatter="{Binding YFormatter}" Foreground="DodgerBlue" 
-                          MinValue="0" FontSize="12">
+                <lvc:Axis Title="{Binding Y1AxisName}"
+                          LabelFormatter="{Binding YFormatter}"
+                          Foreground="DodgerBlue" 
+                          MinValue="{Binding MinY1AxisValue}" 
+                          MaxValue="{Binding MaxY1AxisValue}"
+                          FontSize="12">
                     <lvc:Axis.Separator>
                         <lvc:Separator StrokeThickness="1" StrokeDashArray="4">
                             <lvc:Separator.Stroke>
@@ -102,23 +85,39 @@
                     </lvc:Axis.Separator>
                 </lvc:Axis>
             </lvc:CartesianChart.AxisY>
+
+            <lvc:CartesianChart.VisualElements>
+                <lvc:VisualElement  x:Name="Cursor"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top">
+                    <lvc:VisualElement.UIElement>
+                        <TextBlock Text="{Binding CursorValue, Converter={StaticResource XValuetoDateConverter}}"
+                                   Visibility="{Binding CursorVisible}"
+                                   FontSize="12"
+                                   Foreground="#F9D648" 
+                                   Background="Black"
+                                   Padding="2,0,2,0">
+                        </TextBlock>
+                    </lvc:VisualElement.UIElement>
+                </lvc:VisualElement>
+
+                <lvc:VisualElement  x:Name="Current" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Bottom">
+                    <lvc:VisualElement.UIElement>
+                            <TextBlock
+                                Text="{Binding CurrentValue, Converter={StaticResource XValuetoDateConverter}}"
+                                FontSize="12"
+                                Foreground="LimeGreen" 
+                                Background="Black"
+                                Padding="2,0,2,0">
+                            </TextBlock>
+                    </lvc:VisualElement.UIElement>
+                </lvc:VisualElement>
+                
+            </lvc:CartesianChart.VisualElements>
+
         </lvc:CartesianChart>
-
-        <TextBlock
-            x:Name="CursorTextBlock"
-            Style="{StaticResource CursorTextBlock}"
-            FontSize="12"
-            Foreground="#F9D648" 
-            VerticalAlignment="Bottom" HorizontalAlignment="Left" >
-        </TextBlock>
-
-        <TextBlock
-            x:Name="CurrentTextBlock"
-            Style="{StaticResource CurrentTextBlock}"
-            FontSize="12"
-            Foreground="LimeGreen" 
-            VerticalAlignment="Top" HorizontalAlignment="Left" >
-        </TextBlock>
 
     </Grid>
 </UserControl>

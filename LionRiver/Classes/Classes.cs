@@ -2635,16 +2635,21 @@ namespace LionRiver
         private Double _cursorValue;
         private Visibility _cursorVisible;
         private Visibility _selectionVisible;
-        private Double _minAxisValue;
-        private Double _maxAxisValue;
+        private Double _minXAxisValue;
+        private Double _maxXAxisValue;
         private Double _selectionFromValue;
         private Double _selectionToValue;
+
+        private string _y1AxisName;
+        private Double _minY1AxisValue;
+        private Double _maxY1AxisValue;
+
 
 
 
         public const int MaxData = 300;
         public SeriesCollection SeriesCollection { get; set; }
-        public Func<double, string> YFormatter { get; set; }
+        public Func<double, string> Y1Formatter { get; set; }
         public Func<double, string> XFormatter { get; set; }
         public int Resolution { get; set; }
 
@@ -2717,34 +2722,69 @@ namespace LionRiver
             }
         }
 
-        public Double MinAxisValue
+        public Double MinXAxisValue
         {
             get
-            { return _minAxisValue; }
+            { return _minXAxisValue; }
 
             set
             {
-                _minAxisValue = value;
-                OnPropertyChanged("MinAxisValue");
+                _minXAxisValue = value;
+                OnPropertyChanged("MinXAxisValue");
             }
         }
-        public Double MaxAxisValue
+        public Double MaxXAxisValue
         {
             get
-            { return _maxAxisValue; }
+            { return _maxXAxisValue; }
 
             set
             {
-                _maxAxisValue = value;
-                OnPropertyChanged("MaxAxisValue");
+                _maxXAxisValue = value;
+                OnPropertyChanged("MaxXAxisValue");
             }
         }
+
+        public Double MinY1AxisValue
+        {
+            get
+            { return _minY1AxisValue; }
+
+            set
+            {
+                _minY1AxisValue = value;
+                OnPropertyChanged("MinY1AxisValue");
+            }
+        }
+        public Double MaxY1AxisValue
+        {
+            get
+            { return _maxY1AxisValue; }
+
+            set
+            {
+                _maxY1AxisValue = value;
+                OnPropertyChanged("MaxY1AxisValue");
+            }
+        }
+        public string Y1AxisName
+        {
+            get
+            { return _y1AxisName; }
+
+            set
+            {
+                _y1AxisName = value;
+                OnPropertyChanged("Y1AxisName");
+            }
+        }
+
 
 
         public MyCommand<RangeChangedEventArgs> RangeChangedCommand { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged(string propertyName = null)
+        public virtual void OnPropertyChanged(string propertyName = null)
         {
             if (PropertyChanged != null)
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));

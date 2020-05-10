@@ -8,7 +8,6 @@ using System.Windows.Data;
 using System.Globalization;
 using MapControl;
 using LiveCharts;
-using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace LionRiver
 {
@@ -170,29 +169,15 @@ namespace LionRiver
             return Binding.DoNothing;
         }
     }
-
-    public class CursorPositionConverter : IMultiValueConverter
+    public class TopTextboxConverter : IMultiValueConverter
     {
         object IMultiValueConverter.Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             MainWindow mWndw = values[0] as MainWindow;
-            double? cValue = values[1] as double?;
+            double? maxV = values[1] as double?;
 
-            double x = 0;
 
-            if (mWndw != null)
-            {
-                var chartModel = mWndw.MainNavPlot.Chart.Model;
-
-                if (chartModel.AxisX != null)
-                    x = ChartFunctions.ToPlotArea((double)cValue, LiveCharts.AxisOrientation.X, chartModel, 0);
-
-                var aWidth = mWndw.MainNavPlot.CursorTextBlock.ActualWidth;
-             
-                x -= (double)aWidth / 2;
-            }
-
-            return new Thickness(x, 0, 0, 0);
+            return new Thickness(0, 0, 0, 0);
         }
 
         object[] IMultiValueConverter.ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -201,28 +186,14 @@ namespace LionRiver
         }
     }
 
-    public class CurrentPositionConverter : IMultiValueConverter
+    public class CenterTextboxConverter : IMultiValueConverter
     {
         object IMultiValueConverter.Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            MainWindow mWndw = values[0] as MainWindow;
-            double? cValue = values[1] as double?;
+            double? width = values[0] as double?;
+            double? height = values[1] as double?;
 
-            double x = 0;
-
-            if (mWndw != null)
-            {
-                var chartModel = mWndw.MainNavPlot.Chart.Model;
-
-                if (chartModel.AxisX != null)
-                    x = ChartFunctions.ToPlotArea((double)cValue, LiveCharts.AxisOrientation.X, chartModel, 0);
-
-                var aWidth = mWndw.MainNavPlot.CurrentTextBlock.ActualWidth;
-
-                x -= (double)aWidth / 2;
-            }
-
-            return new Thickness(x, -8, 0, 0);
+            return new Thickness(-(width ?? 0) / 2, -(height ?? 0) / 2, 0, 0);
         }
 
         object[] IMultiValueConverter.ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -233,7 +204,6 @@ namespace LionRiver
 
     public class XValuetoDateConverter : IValueConverter
     {
-
         public object Convert(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             double? ticks = value as double?;
