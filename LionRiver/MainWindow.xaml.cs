@@ -316,6 +316,8 @@ namespace LionRiver
 
         public  NavPlotModel MainNavPlotModel= new NavPlotModel();
         Binding CursorXBinding = new Binding();
+        Binding CurrentXBinding = new Binding();
+        Binding CurrentYBinding = new Binding();
 
         ChartValues<DateModel> MainPlotValues = new ChartValues<DateModel>();
         ChartValues<DateModel> AuxPlotValues = new ChartValues<DateModel>();
@@ -620,15 +622,23 @@ namespace LionRiver
             MainNavPlotModel.MinY1AxisValue = 0;
             MainNavPlotModel.MaxY1AxisValue = double.NaN;
 
-            MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
-            MainNavPlot.Current.Y= MainNavPlotModel.MaxY1AxisValue;
-
             CursorXBinding.Source = MainNavPlotModel;
             CursorXBinding.Path = new PropertyPath("CursorValue");
             CursorXBinding.Mode = BindingMode.OneWay;
             CursorXBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
             BindingOperations.SetBinding(MainNavPlot.Cursor, VisualElement.XProperty, CursorXBinding);
 
+            CurrentXBinding.Source = MainNavPlotModel;
+            CurrentXBinding.Path = new PropertyPath("CurrentValue");
+            CurrentXBinding.Mode = BindingMode.OneWay;
+            CurrentXBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.Current, VisualElement.XProperty, CurrentXBinding);
+
+            CurrentYBinding.Source = MainNavPlotModel;
+            CurrentYBinding.Path = new PropertyPath("MaxY1AxisValue");
+            CurrentYBinding.Mode = BindingMode.OneWay;
+            CurrentYBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.Current, VisualElement.YProperty, CurrentYBinding);
 
             MainNavPlot.DataContext = MainNavPlotModel;
 
@@ -3035,8 +3045,6 @@ namespace LionRiver
                 dt = DateTime.Now;
 
             MainNavPlotModel.CurrentValue = dt.Ticks;
-            MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
-            MainNavPlot.Current.Y = MainNavPlotModel.MaxY1AxisValue;
 
             double deltaT = MainNavPlotModel.MaxXAxisValue - MainNavPlotModel.MinXAxisValue;
             MainNavPlotModel.MinXAxisValue = (MainNavPlotModel.CurrentValue - 0.8 * deltaT);
@@ -3108,7 +3116,6 @@ namespace LionRiver
             var point = MainNavPlot.Chart.ConvertToChartValues(pos);
 
             MainNavPlotModel.CursorValue = point.X;
-            //MainNavPlot.Cursor.X = MainNavPlotModel.CursorValue;
 
 
             if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
@@ -3138,8 +3145,6 @@ namespace LionRiver
                 if (PlotCenterButton.IsChecked == true)
                 {
                     MainNavPlotModel.CurrentValue = (MainNavPlotModel.MinXAxisValue + MainNavPlotModel.MaxXAxisValue) / 2;
-                    MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
-                    MainNavPlot.Current.Y = MainNavPlotModel.MaxY1AxisValue;
 
                     if (PlotPanTimer.IsEnabled==false)
                         PlotPanTimer.Start();
@@ -3182,8 +3187,6 @@ namespace LionRiver
                     }
 
                     MainNavPlotModel.CurrentValue = point.X;
-                    MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
-                    MainNavPlot.Current.Y = MainNavPlotModel.MaxY1AxisValue;
 
                     if (PlotPanTimer.IsEnabled == false)
                         PlotPanTimer.Start();
@@ -3724,8 +3727,6 @@ namespace LionRiver
                     boat.Heading = heading;
 
                     MainNavPlotModel.CurrentValue = POS.GetLastVal(0).Time.Ticks;
-                    MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
-                    MainNavPlot.Current.Y = MainNavPlotModel.MaxY1AxisValue;
 
                     double deltaT = MainNavPlotModel.MaxXAxisValue - MainNavPlotModel.MinXAxisValue;
                     double lim = MainNavPlotModel.MinXAxisValue + 0.8 * deltaT;
