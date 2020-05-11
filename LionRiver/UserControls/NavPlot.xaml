@@ -71,7 +71,7 @@
             
             <lvc:CartesianChart.AxisY>
                 <lvc:Axis Title="{Binding Y1AxisName}"
-                          LabelFormatter="{Binding YFormatter}"
+                          LabelFormatter="{Binding Y1Formatter}"
                           Foreground="DodgerBlue" 
                           MinValue="{Binding MinY1AxisValue}" 
                           MaxValue="{Binding MaxY1AxisValue}"
@@ -87,6 +87,7 @@
             </lvc:CartesianChart.AxisY>
 
             <lvc:CartesianChart.VisualElements>
+                
                 <lvc:VisualElement  x:Name="Cursor"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top">
@@ -103,7 +104,7 @@
 
                 <lvc:VisualElement  x:Name="Current" 
                                     HorizontalAlignment="Center" 
-                                    VerticalAlignment="Bottom">
+                                    VerticalAlignment="Bottom" >
                     <lvc:VisualElement.UIElement>
                             <TextBlock
                                 Text="{Binding CurrentValue, Converter={StaticResource XValuetoDateConverter}}"

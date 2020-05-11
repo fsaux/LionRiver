@@ -27,6 +27,7 @@ using System.Xaml;
 using LiveCharts.Defaults;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using LiveCharts.Events;
+using System.Windows.Data;
 
 namespace LionRiver
 {
@@ -313,10 +314,11 @@ namespace LionRiver
 
         #region Plot
 
-        public NavPlotModel MainNavPlotModel= new NavPlotModel();
+        public  NavPlotModel MainNavPlotModel= new NavPlotModel();
+        Binding CursorXBinding = new Binding();
+
         ChartValues<DateModel> MainPlotValues = new ChartValues<DateModel>();
         ChartValues<DateModel> AuxPlotValues = new ChartValues<DateModel>();
-
 
         #endregion
 
@@ -621,6 +623,11 @@ namespace LionRiver
             MainNavPlot.Current.X = MainNavPlotModel.CurrentValue;
             MainNavPlot.Current.Y= MainNavPlotModel.MaxY1AxisValue;
 
+            CursorXBinding.Source = MainNavPlotModel;
+            CursorXBinding.Path = new PropertyPath("CursorValue");
+            CursorXBinding.Mode = BindingMode.OneWay;
+            CursorXBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.Cursor, VisualElement.XProperty, CursorXBinding);
 
 
             MainNavPlot.DataContext = MainNavPlotModel;
@@ -3101,7 +3108,7 @@ namespace LionRiver
             var point = MainNavPlot.Chart.ConvertToChartValues(pos);
 
             MainNavPlotModel.CursorValue = point.X;
-            MainNavPlot.Cursor.X = MainNavPlotModel.CursorValue;
+            //MainNavPlot.Cursor.X = MainNavPlotModel.CursorValue;
 
 
             if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
