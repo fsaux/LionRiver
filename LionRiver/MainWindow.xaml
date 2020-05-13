@@ -783,8 +783,6 @@
 
                 <Grid x:Name="TransportGrid" Grid.Row="2">
 
-                    <TextBlock Name="DebugText" Text="Hola" Foreground="White"/>
-
                     <mycontrols:NavPlot  x:Name="MainNavPlot"
                                          MouseEnter="MainNavPlot_MouseEnter"
                                          MouseLeave="MainNavPlot_MouseLeave"
@@ -793,15 +791,18 @@
                                          MouseUp="MainNavPlot_MouseUp" 
                                          MouseWheel="MainNavPlot_MouseWheel"/>
 
-                    <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                        
-                        <ToggleButton   Name="PlotCenterButton"  Style="{StaticResource MainToggleButton}" Margin="8" HorizontalAlignment="Center" Checked="PlotCenterButton_Checked" >
-                            <ToggleButton.Content>
-                                <Image  Source="Images/Image-Edition-Tools-Collapse-icon.png" Stretch="Fill" Margin="2" ToolTip="Center Plot" Width="20" Height="20"/>
-                            </ToggleButton.Content>
-                        </ToggleButton>
+                    <DockPanel HorizontalAlignment="Right" LastChildFill="False" Margin="0,0,30,0">
 
-                        <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="2,0" TickFrequency="10" Foreground="White"  SmallChange="1" Minimum="-10" Width="50"  ValueChanged="FwdBackSlider_ValueChanged" AutoToolTipPlacement="BottomRight" Delay="488" >
+                        <ComboBox x:Name="AuxPlotSelectionComboBox" Width="40" DockPanel.Dock="Top"
+                                  ItemsSource="{Binding}"
+                                  DisplayMemberPath="Name" Visibility="Visible" HorizontalAlignment="Center"
+                                  Template="{DynamicResource PlotSelectionComboTemplate}"/>       
+                        
+
+                        <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="0,2,0,2"
+                                DockPanel.Dock="Bottom" TickFrequency="10" 
+                                Foreground="White"  SmallChange="1" Minimum="-10" Width="50"  ValueChanged="FwdBackSlider_ValueChanged"
+                                AutoToolTipPlacement="BottomRight" Delay="488" >
                             <Slider.Triggers>
                                 <EventTrigger SourceName="FwdBackSlider" RoutedEvent="Thumb.DragCompleted">
                                     <BeginStoryboard>
@@ -813,8 +814,23 @@
                             </Slider.Triggers>
                         </Slider>
 
-                    </StackPanel>
-                 
+                        <ToggleButton   Name="PlotCenterButton"  Style="{StaticResource MainToggleButton}"
+                                        HorizontalAlignment="Center" DockPanel.Dock="Bottom" Margin="2"
+                                        Checked="PlotCenterButton_Checked" >
+                            <ToggleButton.Content>
+                                <Image  Source="Images/Image-Edition-Tools-Collapse-icon.png" Stretch="Fill" ToolTip="Center Plot" 
+                                        Width="25" Height="25"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+
+                    </DockPanel>
+
+                    <ComboBox x:Name="MainPlotSelectionComboBox" Width="40"
+                       ItemsSource="{Binding}"
+                       DisplayMemberPath="Name" Visibility="Visible" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,0,0,0"
+                              Template="{DynamicResource PlotSelectionComboTemplate}" />
+
+
                 </Grid>
 
             </Grid>

@@ -70,7 +70,7 @@
             </lvc:CartesianChart.AxisX>
             
             <lvc:CartesianChart.AxisY>
-                <lvc:Axis Title="{Binding Y1AxisName}"
+                <lvc:Axis 
                           LabelFormatter="{Binding Y1Formatter}"
                           Foreground="DodgerBlue" 
                           MinValue="{Binding MinY1AxisValue}" 
@@ -84,7 +84,18 @@
                         </lvc:Separator>
                     </lvc:Axis.Separator>
                 </lvc:Axis>
+                <lvc:Axis 
+                    LabelFormatter="{Binding Y2Formatter}"
+                    Foreground="#FFEA2FEB"
+                    Position="RightTop"
+                    MinValue="{Binding MinY2AxisValue}" 
+                    MaxValue="{Binding MaxY2AxisValue, Mode=TwoWay}"
+                    FontSize="12">
+                </lvc:Axis>
+                
             </lvc:CartesianChart.AxisY>
+            
+            
 
             <lvc:CartesianChart.VisualElements>
                 

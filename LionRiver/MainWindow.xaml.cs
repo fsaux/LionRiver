@@ -3797,8 +3797,6 @@ namespace LionRiver
                         MainPlotValues.Add(new DateModel { DateTime = cTime, Value = cVal });
                         if (MainPlotValues.Count > NavPlotModel.MaxData)
                             MainPlotValues.RemoveAt(0);
-
-                        DebugText.Text = level.ToString() + " - " + MainPlotValues.Count.ToString();
                     }
 
                 }
