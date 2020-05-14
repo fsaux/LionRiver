@@ -791,15 +791,26 @@
                                          MouseUp="MainNavPlot_MouseUp" 
                                          MouseWheel="MainNavPlot_MouseWheel"/>
 
-                    <DockPanel HorizontalAlignment="Right" LastChildFill="False" Margin="0,0,30,0">
+                    <DockPanel HorizontalAlignment="Right" LastChildFill="False" Margin="0,0,26,0">
 
-                        <ComboBox x:Name="AuxPlotSelectionComboBox" Width="40" DockPanel.Dock="Top"
-                                  ItemsSource="{Binding}"
-                                  DisplayMemberPath="Name" Visibility="Visible" HorizontalAlignment="Center"
-                                  Template="{DynamicResource PlotSelectionComboTemplate}"/>       
-                        
+                        <ComboBox x:Name="AuxPlotSelectionComboBox" Width="60"
+                              ItemsSource="{Binding}"
+                              DisplayMemberPath="Name"
+                              SelectedValue="{Binding Source={x:Static p:Settings.Default}, Path=AuxPlotSelector, Mode=TwoWay}"
+                              SelectedValuePath="Name"
+                              Visibility="Visible" HorizontalAlignment="Right" VerticalAlignment="Top"
+                              DockPanel.Dock="Top"
+                              Foreground="#FFEA2FEB"
+                              Background="Black"
+                              Style="{StaticResource ComboBoxStyle1}">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ComboBoxItem}">
+                                    <Setter Property="Foreground" Value="#FFEA2FEB"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                        </ComboBox>
 
-                        <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="0,2,0,2"
+                        <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="0,6,0,6"
                                 DockPanel.Dock="Bottom" TickFrequency="10" 
                                 Foreground="White"  SmallChange="1" Minimum="-10" Width="50"  ValueChanged="FwdBackSlider_ValueChanged"
                                 AutoToolTipPlacement="BottomRight" Delay="488" >
@@ -825,14 +836,23 @@
 
                     </DockPanel>
 
-                    <ComboBox x:Name="MainPlotSelectionComboBox" Width="40"
-                       ItemsSource="{Binding}"
-                       DisplayMemberPath="Name" Visibility="Visible" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,0,0,0"
-                              Template="{DynamicResource PlotSelectionComboTemplate}" />
-
-
+                    <ComboBox x:Name="MainPlotSelectionComboBox" Width="60"
+                              ItemsSource="{Binding}"
+                              DisplayMemberPath="Name"
+                              SelectedValue="{Binding Source={x:Static p:Settings.Default}, Path=MainPlotSelector, Mode=TwoWay}"
+                              SelectedValuePath="Name"
+                              Visibility="Visible" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="22,0,0,0"
+                              Foreground="DodgerBlue" 
+                              Background="Black"
+                              Style="{StaticResource ComboBoxStyle1}" SelectionChanged="MainPlotSelectionComboBox_SelectionChanged">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ComboBoxItem}">
+                                <Setter Property="Foreground" Value="DodgerBlue"/>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                    </ComboBox>
                 </Grid>
-
+                
             </Grid>
             
             <GridSplitter Grid.Column="1" Height="Auto" HorizontalAlignment="Left" Margin="0" x:Name="gridSplitter1" VerticalAlignment="Stretch" Width="6" ResizeBehavior="PreviousAndNext" Background="Black" ShowsPreview="False"/>

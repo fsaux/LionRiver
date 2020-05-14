@@ -2644,9 +2644,6 @@ namespace LionRiver
         private Double _minY1AxisValue;
         private Double _maxY1AxisValue;
 
-
-
-
         public const int MaxData = 300;
         public SeriesCollection SeriesCollection { get; set; }
         public Func<double, string> Y1Formatter { get; set; }
@@ -2792,6 +2789,14 @@ namespace LionRiver
 
     }
 
+    public class PlotSelector
+    {
+        public string Name { get; set; }
+        public double MinValue { get; set; }
+        public double MaxValue { get; set; }
+        public Func<double, string> Formatter { get; set; }
+
+    }
     #endregion
 
     #region Commands
