@@ -320,16 +320,20 @@ namespace LionRiver
 
         ChartValues<DateModel> MainPlotValues = new ChartValues<DateModel>();
         ChartValues<DateModel> AuxPlotValues = new ChartValues<DateModel>();
+        ChartValues<DateModel> FleetActivityValues = new ChartValues<DateModel>();
 
         ObservableCollection<PlotSelector> PlotSelectors = new ObservableCollection<PlotSelector>
         {
-            new PlotSelector {Name="SOG",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="SPD",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="TWD",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="TWS",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="DRIFT",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="PERF",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") }
+            new PlotSelector {Name="SOG",Description="Speed Over Ground", MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
+            new PlotSelector {Name="SPD",Description="Speed through Water",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
+            new PlotSelector {Name="TWD",Description="True Wind Direction",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="TWS",Description="True Wind Speed",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="DRIFT",Description="Drift",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
+            new PlotSelector {Name="PERF",Description="Performance",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="Fleet",Description="Fleet boats",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") }
         };
+
+
 
         #endregion
 
@@ -527,10 +531,10 @@ namespace LionRiver
         }
 
         private void MainWindow_Initialize()
-        {           
-            
+        {
+
             #region Nav Plots
-     
+
             NavPlotModel.CurrentValue = DateTime.Now.Ticks;
 
             DateTime minV = new DateTime((long)(NavPlotModel.CurrentValue - TimeSpan.FromDays(7).Ticks));
@@ -581,9 +585,10 @@ namespace LionRiver
                     }
                 };
 
-            // Insert Empty values on Timestamp = Last available data an Timestamp = Now. This avoids connecting plot points from previous Logs
             using (var context = new LionRiverDBContext())
             {
+                // Insert Empty values on Timestamp = Last available data an Timestamp = Now. This avoids connecting plot points from previous Logs
+
                 var logEntry = (from x in context.Logs
                                 select x).Take(1).ToList();
 
@@ -633,6 +638,17 @@ namespace LionRiver
                     }
                     context.SaveChanges();
                 }
+
+                // Get Fleet Activity over all available data, grouped by hour
+
+                var ftEntries = (from x in context.FleetTracks
+                                 group x by new { year = x.timestamp.Year, month = x.timestamp.Month, day = x.timestamp.Day, hour=x.timestamp.Hour } into grp
+                                 select new { k = grp.Key, cnt = grp.Count() }).ToList();
+
+                var ftList = (from x in ftEntries
+                              select new DateModel { DateTime = new DateTime(x.k.year, x.k.month, x.k.day, x.k.hour, 0, 0), Value = x.cnt }).ToList();
+
+                FleetActivityValues.AddRange(ftList);
 
             }
 
@@ -3276,11 +3292,13 @@ namespace LionRiver
 
         private void MainPlotSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            MainPlotValues.Clear();
             UpdatePlotResolutionTimer.Start();
         }
 
         private void AuxPlotSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            AuxPlotValues.Clear();
             UpdatePlotResolutionTimer.Start();
         }
 
@@ -4309,6 +4327,11 @@ namespace LionRiver
                         case "PERF":
                             result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList();
                             break;
+                        case "Fleet":
+                            result = (from x in FleetActivityValues
+                                      where x.DateTime > StartTime && x.DateTime < EndTime
+                                      select x).ToList();
+                            break;
                     }
                 }
 
@@ -4346,10 +4369,14 @@ namespace LionRiver
                             break;
                         case "DRIFT":
                             result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList();
-
                             break;
                         case "PERF":
                             result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList();
+                            break;
+                        case "Fleet":
+                            result = (from x in FleetActivityValues
+                                      where x.DateTime > StartTime && x.DateTime < EndTime
+                                      select x).ToList();
                             break;
                     }
                 }

@@ -22,4 +22,7 @@ namespace LionRiver
         public double SOG { get; set; }
         public Nullable<double> DMG { get; set; }
     }
+
+
+
 }
