@@ -2635,18 +2635,23 @@ namespace LionRiver
         private Double _cursorValue;
         private Visibility _cursorVisible;
         private Visibility _selectionVisible;
+
         private Double _minXAxisValue;
         private Double _maxXAxisValue;
+        private Double _xstep;  
         private Double _selectionFromValue;
         private Double _selectionToValue;
 
-        private string _y1AxisName;
         private Double _minY1AxisValue;
         private Double _maxY1AxisValue;
+
+        private Double _minY2AxisValue;
+        private Double _maxY2AxisValue;
 
         public const int MaxData = 300;
         public SeriesCollection SeriesCollection { get; set; }
         public Func<double, string> Y1Formatter { get; set; }
+        public Func<double, string> Y2Formatter { get; set; }
         public Func<double, string> XFormatter { get; set; }
         public int Resolution { get; set; }
 
@@ -2741,6 +2746,18 @@ namespace LionRiver
                 OnPropertyChanged("MaxXAxisValue");
             }
         }
+        public Double XStep
+        {
+            get
+            { return _xstep; }
+
+            set
+            {
+                _xstep = value;
+                OnPropertyChanged("XStep");
+            }
+        }
+
 
         public Double MinY1AxisValue
         {
@@ -2764,18 +2781,29 @@ namespace LionRiver
                 OnPropertyChanged("MaxY1AxisValue");
             }
         }
-        public string Y1AxisName
+
+        public Double MinY2AxisValue
         {
             get
-            { return _y1AxisName; }
+            { return _minY2AxisValue; }
 
             set
             {
-                _y1AxisName = value;
-                OnPropertyChanged("Y1AxisName");
+                _minY2AxisValue = value;
+                OnPropertyChanged("MinY2AxisValue");
             }
         }
+        public Double MaxY2AxisValue
+        {
+            get
+            { return _maxY2AxisValue; }
 
+            set
+            {
+                _maxY2AxisValue = value;
+                OnPropertyChanged("MaxY2AxisValue");
+            }
+        }
 
 
         public MyCommand<RangeChangedEventArgs> RangeChangedCommand { get; set; }

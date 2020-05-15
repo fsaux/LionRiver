@@ -800,12 +800,12 @@
                               SelectedValuePath="Name"
                               Visibility="Visible" HorizontalAlignment="Right" VerticalAlignment="Top"
                               DockPanel.Dock="Top"
-                              Foreground="#FFEA2FEB"
+                              Foreground="MediumVioletRed"
                               Background="Black"
-                              Style="{StaticResource ComboBoxStyle1}">
+                              Style="{StaticResource ComboBoxStyle1}" SelectionChanged="AuxPlotSelectionComboBox_SelectionChanged">
                             <ComboBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ComboBoxItem}">
-                                    <Setter Property="Foreground" Value="#FFEA2FEB"/>
+                                    <Setter Property="Foreground" Value="MediumVioletRed"/>
                                 </Style>
                             </ComboBox.ItemContainerStyle>
                         </ComboBox>

@@ -51,10 +51,20 @@
                             DataTooltip="{x:Null}"
                             Hoverable="False">
             <lvc:CartesianChart.AxisX>
+                
                 <lvc:Axis Name="myXaxis"
-                          LabelFormatter="{Binding XFormatter}"  ShowLabels="False"
+                          LabelFormatter="{Binding XFormatter}"
                           MinValue="{Binding MinXAxisValue}" 
                           MaxValue="{Binding MaxXAxisValue}">
+
+                    <!--<lvc:Axis.Separator>
+                        <lvc:Separator StrokeThickness="1" StrokeDashArray="4" Step="{Binding XStep}">
+                            <lvc:Separator.Stroke>
+                                <SolidColorBrush Color="#404F56" />
+                            </lvc:Separator.Stroke>
+                        </lvc:Separator>
+                    </lvc:Axis.Separator>-->
+
                     <lvc:Axis.Sections>
                         <lvc:AxisSection FromValue="{Binding SelectionFromValue}"
                                          ToValue="{Binding SelectionToValue}" 
@@ -63,9 +73,10 @@
                                 <SolidColorBrush Color="Gray" Opacity=".4"></SolidColorBrush>
                             </lvc:AxisSection.Fill>
                         </lvc:AxisSection>
-                        <lvc:AxisSection Name="CursorSection"  Value="{Binding CursorValue}" StrokeThickness="2" Stroke="#F9D648" Visibility="{Binding CursorVisible}"/>
-                        <lvc:AxisSection Value="{Binding CurrentValue}" StrokeThickness="2" Stroke="LimeGreen"/>
+                        <lvc:AxisSection Value="{Binding CursorValue}" StrokeThickness="2" Stroke="DarkGoldenrod" Visibility="{Binding CursorVisible}"/>
+                        <lvc:AxisSection Value="{Binding CurrentValue}" StrokeThickness="2" Stroke="Green"/>
                     </lvc:Axis.Sections>
+
                 </lvc:Axis>
             </lvc:CartesianChart.AxisX>
             
@@ -84,9 +95,10 @@
                         </lvc:Separator>
                     </lvc:Axis.Separator>
                 </lvc:Axis>
+                
                 <lvc:Axis 
                     LabelFormatter="{Binding Y2Formatter}"
-                    Foreground="#FFEA2FEB"
+                    Foreground="MediumVioletRed"
                     Position="RightTop"
                     MinValue="{Binding MinY2AxisValue}" 
                     MaxValue="{Binding MaxY2AxisValue, Mode=TwoWay}"
@@ -106,7 +118,7 @@
                         <TextBlock Text="{Binding CursorValue, Converter={StaticResource XValuetoDateConverter}}"
                                    Visibility="{Binding CursorVisible}"
                                    FontSize="12"
-                                   Foreground="#F9D648" 
+                                   Foreground="DarkGoldenrod" 
                                    Background="Black"
                                    Padding="2,0,2,0">
                         </TextBlock>
@@ -120,7 +132,7 @@
                             <TextBlock
                                 Text="{Binding CurrentValue, Converter={StaticResource XValuetoDateConverter}}"
                                 FontSize="12"
-                                Foreground="LimeGreen" 
+                                Foreground="Green" 
                                 Background="Black"
                                 Padding="2,0,2,0">
                             </TextBlock>
