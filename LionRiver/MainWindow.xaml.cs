@@ -23,11 +23,11 @@ using LiveCharts.Configurations;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
+
 using System.Xaml;
-using LiveCharts.Defaults;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using LiveCharts.Events;
 using System.Windows.Data;
+using System.Text;
+using System.Diagnostics;
 
 namespace LionRiver
 {
@@ -532,7 +532,7 @@ namespace LionRiver
 
         private void MainWindow_Initialize()
         {
-
+         
             #region Nav Plots
 
             NavPlotModel.CurrentValue = DateTime.Now.Ticks;
@@ -3120,11 +3120,9 @@ namespace LionRiver
             {
                 PanStartingPoint = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
 
-                NavPlotModel.SelectionFromValue = PanStartingPoint.X;
-                NavPlotModel.SelectionToValue = PanStartingPoint.X;
-
                 NavPlotModel.SelectionVisible = Visibility.Visible;
 
+                ClickTime = e.Timestamp;
                 mouseHandlingMode = MouseHandlingMode.SelectingPlotRange;
 
                 e.Handled = true;
@@ -3146,11 +3144,13 @@ namespace LionRiver
 
             NavPlotModel.CursorValue = point.X;
 
-
             if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
             {
-                NavPlotModel.SelectionToValue = point.X;
-
+                if ((e.Timestamp - ClickTime) > 250)
+                {
+                    NavPlotModel.SelectionFromValue = PanStartingPoint.X;
+                    NavPlotModel.SelectionToValue = point.X;
+                }
                 e.Handled = true;
             }
 
@@ -3187,16 +3187,29 @@ namespace LionRiver
 
             if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
             {
-                DateTime startTime = new DateTime((long)NavPlotModel.SelectionFromValue);
-                DateTime endTime = new DateTime((long)NavPlotModel.SelectionToValue);
+                if ((e.Timestamp - ClickTime) < 250)
+                {
+                    if (point.X > NavPlotModel.SelectionFromValue && point.X < NavPlotModel.SelectionToValue)
+                    {
+                        MainNavPlot.SelectionContextMenu.IsOpen = true;
+                    
+                    }
 
-                UpdateTracks(startTime, endTime);
+                    mouseHandlingMode = MouseHandlingMode.None;
+                }
+                else
+                {
+                    DateTime startTime = new DateTime((long)NavPlotModel.SelectionFromValue);
+                    DateTime endTime = new DateTime((long)NavPlotModel.SelectionToValue);
 
-                mouseHandlingMode = MouseHandlingMode.None;
+                    UpdateTracks(startTime, endTime);
 
-                PlayButton.IsChecked = false;
+                    mouseHandlingMode = MouseHandlingMode.None;
 
-                e.Handled = true;
+                    PlayButton.IsChecked = false;
+
+                    e.Handled = true;
+                }
             }
 
             if (mouseHandlingMode == MouseHandlingMode.PlotPanning)

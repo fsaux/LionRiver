@@ -487,6 +487,7 @@
 
     </Window.Resources>
 
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -497,7 +498,7 @@
         <!--</Grid>-->
         <ToolBarPanel Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="MainMenuPanel" VerticalAlignment="Stretch" Width="Auto">
             <Menu Height="23" x:Name="menu1" Width="Auto">
-                <MenuItem Header="File">
+                <MenuItem  Header="File">
                     <MenuItem Header="Load Waypoint/Route" Click="GPXLoadButton_Click" />
                     <MenuItem Header="Load Polar" Click="MenuItem_Polar_Click" />
                     <MenuItem Header="Load Wind Grib" Click="GribWindLoadButton_Click" />

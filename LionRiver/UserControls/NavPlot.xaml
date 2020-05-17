@@ -38,7 +38,6 @@
             </Setter>
         </Style>-->
 
-
     </UserControl.Resources>
     
     <Grid>
@@ -51,7 +50,7 @@
                             DataTooltip="{x:Null}"
                             Hoverable="False">
             <lvc:CartesianChart.AxisX>
-                
+
                 <lvc:Axis Name="myXaxis"
                           LabelFormatter="{Binding XFormatter}"
                           MinValue="{Binding MinXAxisValue}" 
@@ -69,6 +68,11 @@
                         <lvc:AxisSection FromValue="{Binding SelectionFromValue}"
                                          ToValue="{Binding SelectionToValue}" 
                                          Visibility="{Binding SelectionVisible}">
+                            <lvc:AxisSection.ContextMenu>
+                                <ContextMenu Name="SelectionContextMenu">
+                                    <MenuItem Header="Calc Fleet"/>
+                                </ContextMenu>
+                            </lvc:AxisSection.ContextMenu>
                             <lvc:AxisSection.Fill>
                                 <SolidColorBrush Color="Gray" Opacity=".4"></SolidColorBrush>
                             </lvc:AxisSection.Fill>
@@ -79,7 +83,7 @@
 
                 </lvc:Axis>
             </lvc:CartesianChart.AxisX>
-            
+
             <lvc:CartesianChart.AxisY>
                 <lvc:Axis 
                           LabelFormatter="{Binding Y1Formatter}"
@@ -95,7 +99,7 @@
                         </lvc:Separator>
                     </lvc:Axis.Separator>
                 </lvc:Axis>
-                
+
                 <lvc:Axis 
                     LabelFormatter="{Binding Y2Formatter}"
                     Foreground="MediumVioletRed"
@@ -104,13 +108,13 @@
                     MaxValue="{Binding MaxY2AxisValue, Mode=TwoWay}"
                     FontSize="12">
                 </lvc:Axis>
-                
+
             </lvc:CartesianChart.AxisY>
-            
-            
+
+
 
             <lvc:CartesianChart.VisualElements>
-                
+
                 <lvc:VisualElement  x:Name="Cursor"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top">
@@ -129,16 +133,16 @@
                                     HorizontalAlignment="Center" 
                                     VerticalAlignment="Bottom" >
                     <lvc:VisualElement.UIElement>
-                            <TextBlock
+                        <TextBlock
                                 Text="{Binding CurrentValue, Converter={StaticResource XValuetoDateConverter}}"
                                 FontSize="12"
                                 Foreground="Green" 
                                 Background="Black"
                                 Padding="2,0,2,0">
-                            </TextBlock>
+                        </TextBlock>
                     </lvc:VisualElement.UIElement>
                 </lvc:VisualElement>
-                
+
             </lvc:CartesianChart.VisualElements>
 
         </lvc:CartesianChart>
