@@ -6,7 +6,6 @@
         xmlns:p="clr-namespace:LionRiver.Properties"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:map="clr-namespace:MapControl;assembly=MapControl.WPF"
-        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"       
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:my="clr-namespace:LionRiver"
         xmlns:mycontrols="clr-namespace:LionRiver.UserControls"
@@ -19,6 +18,7 @@
         Top="{Binding Source={x:Static p:Settings.Default}, Path=Top, Mode=TwoWay}"
         WindowState="{Binding Source={x:Static p:Settings.Default}, Path=WindowState, Mode=TwoWay}"
         Foreground="{x:Null}" Background="{x:Null}"  ResizeMode="CanResize" ShowInTaskbar="True" WindowStyle="SingleBorderWindow" Icon="/LionRiver;component/Images/redhat_starthere.ico" 
+       
         Closing="Window_Closing" StateChanged="MainWnd_StateChanged"
         mc:Ignorable="d" 
         d:DesignHeight="450" d:DesignWidth="800">
@@ -532,8 +532,6 @@
                             <ColumnDefinition Width="17*" />
                             <ColumnDefinition Width="17*" />
                         </Grid.ColumnDefinitions>
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="0" x:Name="userControl11" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="1" x:Name="userControl12" VerticalAlignment="Stretch" />
                         <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="2" x:Name="userControl13" VerticalAlignment="Stretch" />
                         <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="4" x:Name="userControl15" VerticalAlignment="Stretch" />
                         <my:UserControl1 Grid.Column="3" HorizontalAlignment="Stretch" Margin="0" x:Name="userControl14" VerticalAlignment="Stretch" />
@@ -580,52 +578,6 @@
                 </TabItem>
 
             </TabControl>
-            <Grid Grid.Column="1" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="CommStatusGrid" VerticalAlignment="Stretch">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="17" />
-                    <RowDefinition Height="36*" />
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0" Grid.RowSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="grid6" VerticalAlignment="Stretch" Width="Auto">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
-                    <Border Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.ColumnSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="1,2,1,1" x:Name="borderPort1" VerticalAlignment="Stretch" Width="Auto" Padding="0">
-                        <Label Background="{x:Null}" Content="1" FontSize="7" Height="Auto" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Margin="0" />
-                    </Border>
-                    <Border Grid.Column="1" Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.ColumnSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="1,2,1,1" x:Name="borderPort2" VerticalAlignment="Stretch" Width="Auto" Padding="0">
-                        <Label Background="{x:Null}" Content="2" FontSize="7" Height="Auto" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" Padding="0" Margin="0" />
-                    </Border>
-                    <Border Grid.Column="2" Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.ColumnSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="1,2,1,1" x:Name="borderPort3" VerticalAlignment="Stretch" Width="Auto" Padding="0">
-                        <Label Background="{x:Null}" Content="3" FontSize="7" Height="Auto" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" Padding="0" Margin="0" />
-                    </Border>
-                    <Border Grid.Column="3" Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.ColumnSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="1,2,1,1" x:Name="borderPort4" VerticalAlignment="Stretch" Width="Auto" Padding="0">
-                        <Label Background="{x:Null}" Content="4" FontSize="7" Height="Auto" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" Padding="0" Margin="0" />
-                    </Border>
-
-                </Grid>
-                <Border Background="{x:Null}" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.Row="1"  Height="Auto" HorizontalAlignment="Stretch" Margin="0,0,1,2" x:Name="border4" VerticalAlignment="Stretch" Width="Auto">
-                    <Viewbox Height="Auto" Width="Auto" Margin="2">
-                        <Grid Height="Auto" x:Name="LatLonGrid" Width="Auto" MouseDown="LatLonGrid_MouseDown">
-                            <Grid.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem x:Name="ContextMenuMOBClear" Header="Clear MOB"  IsEnabled="False" Click="ContextMenuMOBClear_Click"/>
-                                </ContextMenu>
-                            </Grid.ContextMenu>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="TextBlock1" Foreground="White" Text="{Binding FormattedValue}"/>
-                            <TextBlock Grid.Row="1" x:Name="TextBlock2" Foreground="White" Text="{Binding FormattedValue}"/>
-                        </Grid>
-                    </Viewbox>
-                </Border>
-
-            </Grid>
         </Grid>
         
         <GridSplitter Grid.Row="2" Grid.RowSpan="1" Height="6" HorizontalAlignment="Stretch" Margin="0" x:Name="gridSplitter2" VerticalAlignment="Stretch" Width="Auto" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows" Background="Black" />
@@ -665,9 +617,6 @@
                          MouseMove="MapMouseMove"
 
                          ContextMenu="{StaticResource MapContextMenu_Standard}">
-
-                        <!--<map:MapGraticule Opacity="0.3"/>
-                    <map:MapScale Margin="4" Opacity="1"/>-->
 
                         <map:MapItemsControl ItemsSource="{StaticResource BoatsItemCollection}"
                                              ItemContainerStyle="{StaticResource BoatItemStyle}"
@@ -712,59 +661,102 @@
 
                     <DockPanel Height="Auto" HorizontalAlignment="Stretch" Margin="5,5,5,0" x:Name="MapToolbarPanel" VerticalAlignment="Top" Width="Auto" Panel.ZIndex="1" LastChildFill="False" Background="{x:Null}">
 
-                        <!--<Border  Margin="2" Background="#FF949792"  CornerRadius="3" Padding="2" >
-                            <Image Source="Images/Maps-and-Geolocation-Define-location-icon.png" Stretch="None"/>
-                    </Border>-->
-
-                        <ToggleButton  Name="CenterButton" Checked="CenterButton_Checked" Unchecked="CenterButton_Unchecked"  Style="{StaticResource MainToggleButton}" Margin="2">
+                        <ToggleButton  Name="CenterButton" Checked="CenterButton_Checked" Unchecked="CenterButton_Unchecked"  Style="{StaticResource MainToggleButton}" Margin="2" VerticalAlignment="Top">
                             <ToggleButton.Content>
                                 <Image Source="Images/Maps-and-Geolocation-Street-view-icon.png" Stretch="None" HorizontalAlignment="Center"  Margin="2" ToolTip="Center on boat"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
-                        <ToggleButton  Name="OrientationButton" Unchecked="OrientationButton_Unchecked" Checked="OrientationButton_Checked" Style="{StaticResource MainToggleButton}"  Margin="2" >
+                        <ToggleButton  Name="OrientationButton" Unchecked="OrientationButton_Unchecked" Checked="OrientationButton_Checked" Style="{StaticResource MainToggleButton}"  Margin="2" VerticalAlignment="Top" >
                             <ToggleButton.Content>
                                 <Image Source="Images/City-Gps-device-icon.png" Stretch="None" Margin="2" ToolTip="Course Up"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
-                        <ToggleButton  Name="MarkButton" Checked="MarkButton_Checked" Unchecked="MarkButton_Unchecked" Style="{StaticResource MainToggleButton}" Margin="2" >
+                        <ToggleButton  Name="MarkButton" Checked="MarkButton_Checked" Unchecked="MarkButton_Unchecked" Style="{StaticResource MainToggleButton}" Margin="2" VerticalAlignment="Top">
                             <ToggleButton.Content>
                                 <Image Source="Images/Maps-and-Geolocation-Marker-icon.png" Stretch="None" Margin="2" ToolTip="Marks"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
-                        <ToggleButton  Name="RouteButton" Checked="RouteButton_Checked" Unchecked="RouteButton_Unchecked" Style="{StaticResource MainToggleButton}" Margin="2" >
+                        <ToggleButton  Name="RouteButton" Checked="RouteButton_Checked" Unchecked="RouteButton_Unchecked" Style="{StaticResource MainToggleButton}" Margin="2" VerticalAlignment="Top">
                             <ToggleButton.Content>
                                 <Image Source="Images/Maps-and-Geolocation-Polyline-icon.png" Stretch="None" Margin="2" ToolTip="Routes"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
-                        <ToggleButton  Name="MeasureButton" Style="{StaticResource MainToggleButton}" Margin="2" Checked="MeasureButton_Checked" Unchecked="MeasureButton_Unchecked" >
+                        <ToggleButton  Name="MeasureButton" Style="{StaticResource MainToggleButton}" Margin="2" Checked="MeasureButton_Checked" Unchecked="MeasureButton_Unchecked" VerticalAlignment="Top">
                             <ToggleButton.Content>
                                 <Image Source="Images/Very-Basic-Ruler-icon.png" Stretch="None" Margin="2" ToolTip="Measure"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
-                        <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="PlayButton_Checked">
+                        <Grid DockPanel.Dock="Right" Height="Auto" Width="110" HorizontalAlignment="Stretch" Margin="5,0,0,0" x:Name="CommStatusGrid" VerticalAlignment="Stretch">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="17" />
+                                <RowDefinition Height="36*" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Grid.RowSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="grid6" VerticalAlignment="Stretch" Width="Auto">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+
+                                <Border Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.ColumnSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="1,2,1,1" x:Name="borderPort1" VerticalAlignment="Stretch" Width="Auto" Padding="0">
+                                    <Label Background="{x:Null}" Content="1" FontSize="7" Height="Auto" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Margin="0" />
+                                </Border>
+                                <Border Grid.Column="1" Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.ColumnSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="1,2,1,1" x:Name="borderPort2" VerticalAlignment="Stretch" Width="Auto" Padding="0">
+                                    <Label Background="{x:Null}" Content="2" FontSize="7" Height="Auto" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" Padding="0" Margin="0" />
+                                </Border>
+                                <Border Grid.Column="2" Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.ColumnSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="1,2,1,1" x:Name="borderPort3" VerticalAlignment="Stretch" Width="Auto" Padding="0">
+                                    <Label Background="{x:Null}" Content="3" FontSize="7" Height="Auto" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" Padding="0" Margin="0" />
+                                </Border>
+                                <Border Grid.Column="3" Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.ColumnSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="1,2,1,1" x:Name="borderPort4" VerticalAlignment="Stretch" Width="Auto" Padding="0">
+                                    <Label Background="{x:Null}" Content="4" FontSize="7" Height="Auto" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" Padding="0" Margin="0" />
+                                </Border>
+
+                            </Grid>
+                            <Border Background="{x:Null}" BorderBrush="DarkGray" BorderThickness="2" CornerRadius="4" Grid.Row="1"  Height="Auto" HorizontalAlignment="Stretch" Margin="0,0,1,2" x:Name="border4" VerticalAlignment="Stretch" Width="Auto">
+                                <Viewbox Height="Auto" Width="Auto" Margin="2">
+                                    <Grid Height="Auto" x:Name="LatLonGrid" Width="Auto" MouseDown="LatLonGrid_MouseDown">
+                                        <Grid.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem x:Name="ContextMenuMOBClear" Header="Clear MOB"  IsEnabled="False" Click="ContextMenuMOBClear_Click"/>
+                                            </ContextMenu>
+                                        </Grid.ContextMenu>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" x:Name="TextBlock1" Foreground="White" Text="{Binding FormattedValue}"/>
+                                        <TextBlock Grid.Row="1" x:Name="TextBlock2" Foreground="White" Text="{Binding FormattedValue}"/>
+                                    </Grid>
+                                </Viewbox>
+                            </Border>
+
+                        </Grid>
+
+                        <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="PlayButton_Checked" VerticalAlignment="Top">
                             <ToggleButton.Content>
                                 <Image  Source="Images/iconfinder_icon-play_211876.png" Stretch="Fill" Margin="2" ToolTip="Play" Width="28" Height="28"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
-                        <ToggleButton  Name="RouteCalcButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="RouteCalcButton_Checked" Unchecked="RouteCalcButton_Unchecked"  >
+                        <ToggleButton  Name="RouteCalcButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="RouteCalcButton_Checked" Unchecked="RouteCalcButton_Unchecked" VerticalAlignment="Top" >
                             <ToggleButton.Content>
                                 <Image Source="Images/Numbers-2-icon.png" Stretch="None" Margin="2" ToolTip="Route Calculation"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
-                        <ToggleButton  Name="GribButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="GribButton_Checked" Unchecked="GribButton_Unchecked"  >
+                        <ToggleButton  Name="GribButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="GribButton_Checked" Unchecked="GribButton_Unchecked" VerticalAlignment="Top" >
                             <ToggleButton.Content>
                                 <Image Source="Images/Weather-Partly-cloudy-day-icon.png" Stretch="None" Margin="2" ToolTip="Grib"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
-                        <ToggleButton  Name="LayersButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="LayersButton_Checked" Unchecked="LayersButton_Unchecked" >
+                        <ToggleButton  Name="LayersButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="LayersButton_Checked" Unchecked="LayersButton_Unchecked" VerticalAlignment="Top">
                             <ToggleButton.Content>
                                 <Image Source="Images/Maps-and-Geolocation-Layers-icon.png" Stretch="None" Margin="2" ToolTip="Layers"/>
                             </ToggleButton.Content>
@@ -859,20 +851,10 @@
             <GridSplitter Grid.Column="1" Height="Auto" HorizontalAlignment="Left" Margin="0" x:Name="gridSplitter1" VerticalAlignment="Stretch" Width="6" ResizeBehavior="PreviousAndNext" Background="Black" ShowsPreview="False"/>
           
             <Grid x:Name="AuxGrid"  Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid x:Name="AuxToolbarGrid" Grid.Row="0" >
-                    <DockPanel Height="Auto" HorizontalAlignment="Stretch" Margin="5,5,5,0" VerticalAlignment="Top" Width="Auto" Panel.ZIndex="3" LastChildFill="False" Background="{x:Null}">
-                        <DockPanel.Resources>
-                            <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource {x:Type ToggleButton}}"/>
-                        </DockPanel.Resources>
-
-                    </DockPanel>
-                </Grid>
-                <Grid  Grid.Row="1"  Height="Auto" HorizontalAlignment="Stretch" Margin="0" VerticalAlignment="Stretch" Width="Auto">
-                </Grid>
+                <StackPanel>
+                    <my:UserControl1 Width="80" HorizontalAlignment="Stretch" Margin="0"  x:Name="userControl11" VerticalAlignment="Stretch"/>
+                    <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" x:Name="userControl12" VerticalAlignment="Stretch" />
+                </StackPanel>
             </Grid>
             
 
