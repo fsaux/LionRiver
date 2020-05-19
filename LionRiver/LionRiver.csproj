@@ -431,6 +431,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CircularBuffer\CircularBuffer.csproj">
+      <Project>{21e08e11-09ab-4b87-92a4-4991d99c4988}</Project>
+      <Name>CircularBuffer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MapControl\MapControl.WPF.csproj">
       <Project>{226f3575-b683-446d-a2f0-181291dc8787}</Project>
       <Name>MapControl.WPF</Name>
