@@ -342,7 +342,7 @@ namespace LionRiver
             new PlotSelector {Name="TWS",Description="True Wind Speed",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
             new PlotSelector {Name="Drift",Description="Drift",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
             new PlotSelector {Name="Perf",Description="Performance",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="Depth",Description="Depth",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#.#") },
+            new PlotSelector {Name="Depth",Description="Depth",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("#.#") },
             new PlotSelector {Name="Fleet",Description="Fleet boats",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") }
         };
 
@@ -522,8 +522,11 @@ namespace LionRiver
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.DeleteRoute, DeleteRouteCommand_Executed, DeleteRouteCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SetLineBoat, SetLineBoatCommand_Executed, SetLineBoatCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SetLinePin, SetLinePinCommand_Executed, SetLinePinCommand_CanExecute));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.RemoveInstrument, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
+            
+            #endregion      
 
-            #endregion        }
+
 
             #region Load Logfile Worker
             LoadLogFileWorker = new BackgroundWorker();
@@ -878,6 +881,15 @@ namespace LionRiver
 
             this.LatTextBlock.DataContext = LAT;
             this.LonTextBlock.DataContext = LON;
+
+            string[] ikeys = Properties.Settings.Default.InstrumentDisplayList.Split(',');
+
+            foreach(string k in ikeys)
+            {
+                if (k != "")
+                    InstrumentStackPanel.Children.Add(InstrumentDisplays[k]);
+            }
+
 
             #endregion
 
@@ -2904,18 +2916,26 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        //private void RangeChanged(RangeChangedEventArgs e)
-        //{
-        //    var x = (Axis)e.Axis;
+        private void RemoveInstrumentCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var z = e.Source as UserControl;
 
-        //    if (PlotCenterButton.IsChecked == true)
-        //    {
-        //        MainNavPlotModel.CurrentValue = (x.MaxValue + x.MinValue) / 2;
-        //        DateTime dt = new DateTime((long)MainNavPlotModel.CurrentValue);
-        //        UpdateFleet(dt);
-        //    }
+            if (z != null)
+                if (InstrumentStackPanel.Children.Contains(z))
+                    InstrumentStackPanel.Children.Remove(z);
+            
+            Properties.Settings.Default.InstrumentDisplayList = GetCurrentInstrumentDisplayList();
+            Properties.Settings.Default.Save();
 
-        //}
+            e.Handled = true;
+        }
+
+        private void RemoveInstrumentCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+            e.Handled = true;
+
+        }
 
         #endregion
 
@@ -3312,14 +3332,30 @@ namespace LionRiver
 
         private void InstrumentStackContextMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var x = sender as MenuItem;
-            var y = (KeyValuePair<string, UserControl>)(x.DataContext);
-            var z = y.Value;
+            var mi = sender as MenuItem;
+            var kvp = (KeyValuePair<string, UserControl>)(mi.DataContext);
+            var uc = kvp.Value;
 
-            if(z!=null)
-                this.InstrumentStackPanel.Children.Add(z);
+            if (uc != null && !InstrumentStackPanel.Children.Contains(uc))
+                InstrumentStackPanel.Children.Add(uc);
 
+            Properties.Settings.Default.InstrumentDisplayList = GetCurrentInstrumentDisplayList();
+            Properties.Settings.Default.Save();
         }
+
+        private string GetCurrentInstrumentDisplayList()
+        {
+            string s = "";
+
+            foreach (UserControl x in InstrumentStackPanel.Children)
+            {
+                var key = InstrumentDisplays.FirstOrDefault(z => z.Value == x).Key;
+                if (key != null)
+                    s += key + ",";
+            }
+            return s;
+        }
+
         #endregion
 
         #region Routing
@@ -4347,7 +4383,7 @@ namespace LionRiver
                             break; 
 
                         case "Depth":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DPT }).ToList();
+                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = -x.DPT }).ToList();
                             break;
 
                         case "Fleet":
@@ -4399,7 +4435,7 @@ namespace LionRiver
                             break;
 
                         case "Depth":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DPT }).ToList();
+                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = -x.DPT }).ToList();
                             break;
 
                         case "Fleet":
@@ -4457,7 +4493,7 @@ namespace LionRiver
                         break;
 
                     case "Depth":
-                        mResult = DPT.GetLastVal(level).Val;
+                        mResult = -DPT.GetLastVal(level).Val;
                         break;
                 }
             }
@@ -4494,7 +4530,7 @@ namespace LionRiver
                         break;
 
                     case "Depth":
-                        aResult = DPT.GetLastVal(level).Val;
+                        aResult = -DPT.GetLastVal(level).Val;
                         break;
                 }
             }

@@ -2843,6 +2843,8 @@ namespace LionRiver
         private static RoutedUICommand deleteRoute = new RoutedUICommand("DeleteRoute", "DeleteRoute", typeof(CommandLibrary));
         private static RoutedUICommand setLineBoat = new RoutedUICommand("SetLineBoat", "SetLineBoat", typeof(CommandLibrary));
         private static RoutedUICommand setLinePin = new RoutedUICommand("SetLinePin", "SetLinePin", typeof(CommandLibrary));
+        private static RoutedUICommand removeInstrument = new RoutedUICommand("RemoveInstrument", "RemoveInstrument", typeof(CommandLibrary));
+
 
         public static RoutedUICommand AddMark
         {
@@ -2903,6 +2905,12 @@ namespace LionRiver
         {
             get { return setLinePin; }
         }
+
+        public static RoutedUICommand RemoveInstrument
+        {
+            get { return removeInstrument; }
+        }
+
     }
     public class MyCommand<T> : ICommand where T : class
     {

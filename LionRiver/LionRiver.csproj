@@ -346,6 +346,10 @@
     </Compile>
     <Resource Include="Images\iconfinder_icon-play_211876.png" />
     <Resource Include="Images\Mathematic-Multiply2-icon.png" />
+    <Resource Include="Images\menu.png" />
+    <Resource Include="Images\echo-dot.png" />
+    <Resource Include="Images\mark.png" />
+    <Resource Include="Images\interface.png" />
     <Content Include="X64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -514,71 +514,7 @@
                 </MenuItem>
             </Menu>
         </ToolBarPanel>
-        
-        <!--<Grid Height="Auto" x:Name="InstrumentsGrid" Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90*" />
-                <ColumnDefinition Width="10*" />
-            </Grid.ColumnDefinitions>
-            <TabControl Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="InstrumentTabControl" VerticalAlignment="Stretch" Width="Auto" TabStripPlacement="Left" Background="{x:Null}" BorderThickness="0">
-                <TabItem Header="Nav 1" x:Name="tabItem1" Margin="0" Padding="0" FontSize="10">
-                    <Grid Grid.Row="0" Grid.RowSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="gridA" VerticalAlignment="Stretch" Width="Auto">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="17*" />
-                            <ColumnDefinition Width="17*" />
-                            <ColumnDefinition Width="17*" />
-                            <ColumnDefinition Width="17*" />
-                            <ColumnDefinition Width="17*" />
-                            <ColumnDefinition Width="17*" />
-                        </Grid.ColumnDefinitions>
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="2" x:Name="userControl13" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="4" x:Name="userControl15" VerticalAlignment="Stretch" />
-                        <my:UserControl1 Grid.Column="3" HorizontalAlignment="Stretch" Margin="0" x:Name="userControl14" VerticalAlignment="Stretch" />
-                        <my:UserControl1 Grid.Column="5" HorizontalAlignment="Stretch" Margin="0" x:Name="userControl16" VerticalAlignment="Stretch" />
-                    </Grid>
-                </TabItem>
-
-                <TabItem Header="Nav 2" x:Name="tabItem2" Padding="0" FontSize="10">
-                    <Grid Grid.Row="0" Grid.RowSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="gridB" VerticalAlignment="Stretch" Width="Auto">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="0" x:Name="userControl17" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="1" x:Name="userControl18" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="2" x:Name="userControl19" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="3" x:Name="userControl20" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="4" x:Name="userControl21" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="5" x:Name="userControl22" VerticalAlignment="Stretch" />
-                    </Grid>
-                </TabItem>
-
-                <TabItem Header="Nav 3" x:Name="tabItem3" Padding="0" FontSize="10" Margin="0">
-                    <Grid Grid.Row="0" Grid.RowSpan="1" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="gridC" VerticalAlignment="Stretch" Width="Auto">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="0" x:Name="userControl23" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="1" x:Name="userControl24" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="2" x:Name="userControl25" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="3" x:Name="userControl26" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="4" x:Name="userControl27" VerticalAlignment="Stretch" />
-                        <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" Grid.Column="5" x:Name="userControl28" VerticalAlignment="Stretch" />
-                    </Grid>
-                </TabItem>
-
-            </TabControl>
-        </Grid>-->
-        
+                
         <Grid  Grid.Row="1" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="ChartingGrid" VerticalAlignment="Stretch" Width="Auto">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

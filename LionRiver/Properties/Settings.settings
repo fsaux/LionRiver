@@ -215,5 +215,8 @@
     <Setting Name="AuxPlotSelector" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="InstrumentDisplayList" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
