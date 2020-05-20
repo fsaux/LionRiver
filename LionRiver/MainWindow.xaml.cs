@@ -28,6 +28,7 @@ using System.Xaml;
 using System.Windows.Data;
 using System.Text;
 using System.Diagnostics;
+using LionRiver.UserControls;
 
 namespace LionRiver
 {
@@ -63,68 +64,79 @@ namespace LionRiver
         #region Instruments
 
         //Dictionary<string, object> InstrumentList = new Dictionary<string, object>
+        Dictionary<string, UserControl> InstrumentDisplayControls = new Dictionary<string, UserControl>
+        {
+            { "COG", new InstrumentDisplay1() },
+            { "SOG", new InstrumentDisplay1() },
+            { "HDT", new InstrumentDisplay1() },
+            { "SPD", new InstrumentDisplay1() },
+            { "TEMP", new InstrumentDisplay1() },
+            { "DPT", new InstrumentDisplay1() }
+        };
+
+
         public static List<Instrument> LoggedInstrumentList = new List<Instrument>();
 
-        static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T",10);
-        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn");
+        static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000", 10);
+        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn","0.0");
         static LatitudeInstrument LAT = new LatitudeInstrument("Lat", "");
         static LongitudeInstrument LON = new LongitudeInstrument("Lon", "");
         static PositionInstrument POS = new PositionInstrument("Position","");
-        static AngularInstrumentRel MVAR = new AngularInstrumentRel("MVar", "°",1,false);
-        static LinearInstrument SPD = new LinearInstrument("SPD", "Kn");
-        static LinearInstrument TEMP = new LinearInstrument("Temp", "°C");
-        static LinearInstrument DPT = new LinearInstrument("Depth", "m");
+        static AngularInstrumentRel MVAR = new AngularInstrumentRel("MVar", "°","#",1,false);
+        static LinearInstrument SPD = new LinearInstrument("SPD", "Kn","0.0");
+        static LinearInstrument TEMP = new LinearInstrument("Temp", "°C","#.#");
+        static LinearInstrument DPT = new LinearInstrument("Depth", "m","0.0");
         static LinearInstrument AWS = new LinearInstrument("AWS", "Kn");
         static AngularInstrumentRel AWA = new AngularInstrumentRel("AWA", "°");
-        static LinearInstrument TWS = new LinearInstrument("TWS", "Kn", 2);
-        static AngularInstrumentRel TWA = new AngularInstrumentRel("TWA", "°",2);
-        static AngularInstrumentAbs TWD = new AngularInstrumentAbs("TWD", "°",15);
+        static LinearInstrument TWS = new LinearInstrument("TWS", "Kn", "#.#",2);
+        static AngularInstrumentRel TWA = new AngularInstrumentRel("TWA", "°","#",2);
+        static AngularInstrumentAbs TWD = new AngularInstrumentAbs("TWD", "°","000",15);
         static AngularInstrumentAbs HDT = new AngularInstrumentAbs("HDG", "°T");
-        static AngularInstrumentAbs BRG = new AngularInstrumentAbs("BRG", "°T",1,false);
-        static LinearInstrument DST = new LinearInstrument("DST", "Nm",1,false);
-        static LinearInstrument XTE = new LinearInstrument("XTE", "Nm",1,false);
-        static LinearInstrument VMG = new LinearInstrument("WMG", "Kn",1,false);
-        static AngularInstrumentAbs HEEL = new AngularInstrumentAbs("HEEL", "°",15,false);
+        static AngularInstrumentAbs BRG = new AngularInstrumentAbs("BRG", "°T","000",1,false);
+        static LinearInstrument DST = new LinearInstrument("DST", "Nm","#.#",1,false);
+        static LinearInstrument XTE = new LinearInstrument("XTE", "Nm", "#.##", 1,false);
+        static LinearInstrument VMG = new LinearInstrument("WMG", "Kn","#.#",1,false);
+        static AngularInstrumentAbs HEEL = new AngularInstrumentAbs("HEEL", "°","#",15,false);
 
         // Destination Waypoint
-        static WaypointInstrument WPT = new WaypointInstrument("To:","",1,false);
-        static LatitudeInstrument WLAT = new LatitudeInstrument("Lat", "",1,false);
-        static LongitudeInstrument WLON = new LongitudeInstrument("Lon", "",1,false);
+        static WaypointInstrument WPT = new WaypointInstrument("To:","","",1,false);
+        static LatitudeInstrument WLAT = new LatitudeInstrument("Lat", "","",1,false);
+        static LongitudeInstrument WLON = new LongitudeInstrument("Lon", "","",1,false);
 
         // Last Waypoint
-        static WaypointInstrument LWPT = new WaypointInstrument("","",1,false);
-        static LatitudeInstrument LWLAT = new LatitudeInstrument("Lat", "",1,false);
-        static LongitudeInstrument LWLON = new LongitudeInstrument("Lon", "",1,false);
-        static AngularInstrumentAbs LEGBRG = new AngularInstrumentAbs("BRG", "",1,false);
-        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn",1,false);
+        static WaypointInstrument LWPT = new WaypointInstrument("","","",1,false);
+        static LatitudeInstrument LWLAT = new LatitudeInstrument("Lat", "","",1,false);
+        static LongitudeInstrument LWLON = new LongitudeInstrument("Lon", "","",1,false);
+        static AngularInstrumentAbs LEGBRG = new AngularInstrumentAbs("BRG", "","000",1,false);
+        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn","#.#",1,false);
 
         // Next Leg
-        static AngularInstrumentRel NTWA = new AngularInstrumentRel("Next TWA","°",1,false);
+        static AngularInstrumentRel NTWA = new AngularInstrumentRel("Next TWA","°","#",1,false);
 
         // Drift
-        static AngularInstrumentAbs SET = new AngularInstrumentAbs("Set", "°T",30);
-        static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn",30);
+        static AngularInstrumentAbs SET = new AngularInstrumentAbs("Set", "°T","000",30);
+        static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn","#.#",30);
 
         // Performance
-        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn",4,false);
-        static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T",4,false);
-        static PercentInstrument PERF = new PercentInstrument("Perf", "",15);
-        static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn",4,false);
-        static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T",4,false);
+        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn","#.##",4,false);
+        static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T","#",4,false);
+        static PercentInstrument PERF = new PercentInstrument("Perf", "","#%",15);
+        static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn","#.##",4,false);
+        static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T","000",4,false);
 
         // Starting Line
-        static LinearInstrument LINEDST = new LinearInstrument("Dst to line", "m", 1,false);
+        static LinearInstrument LINEDST = new LinearInstrument("Dst to line", "m", "#",1,false);
 
         // Laylines
-        static AngularInstrumentAbs TGTCOGp = new AngularInstrumentAbs("Tgt COG Stbd", "°T",1,false);
-        static AngularInstrumentAbs TGTCOGs = new AngularInstrumentAbs("Tgt COG Port", "°T",1,false);
-        static LinearInstrument TGTSOGp = new LinearInstrument("Tgt SOG Stbd", "Kn",1,false);
-        static LinearInstrument TGTSOGs = new LinearInstrument("Tgt SOG Port", "Kn",1,false);
-        static LinearInstrument DSTLYLp = new LinearInstrumentShort("Dst Lay Port", "m",1,false);
-        static LinearInstrument DSTLYLs = new LinearInstrumentShort("Dst Lay Stbd", "m",1,false);
+        static AngularInstrumentAbs TGTCOGp = new AngularInstrumentAbs("Tgt COG Stbd", "°T","",1,false);
+        static AngularInstrumentAbs TGTCOGs = new AngularInstrumentAbs("Tgt COG Port", "°T","",1,false);
+        static LinearInstrument TGTSOGp = new LinearInstrument("Tgt SOG Stbd", "Kn","",1,false);
+        static LinearInstrument TGTSOGs = new LinearInstrument("Tgt SOG Port", "Kn","",1,false);
+        static LinearInstrument DSTLYLp = new LinearInstrumentShort("Dst Lay Port", "m","",1,false);
+        static LinearInstrument DSTLYLs = new LinearInstrumentShort("Dst Lay Stbd", "m","",1,false);
 
-        static TimeSpanInstrument TTGLYLp = new TimeSpanInstrument("TTG Lay Port", "",1,false);
-        static TimeSpanInstrument TTGLYLs = new TimeSpanInstrument("TTG Lay Stbd", "",1,false);
+        static TimeSpanInstrument TTGLYLp = new TimeSpanInstrument("TTG Lay Port", "","",1,false);
+        static TimeSpanInstrument TTGLYLs = new TimeSpanInstrument("TTG Lay Stbd", "","",1,false);
 
         #endregion
 
@@ -328,12 +340,11 @@ namespace LionRiver
             new PlotSelector {Name="SPD",Description="Speed through Water",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
             new PlotSelector {Name="TWD",Description="True Wind Direction",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
             new PlotSelector {Name="TWS",Description="True Wind Speed",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="DRIFT",Description="Drift",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="PERF",Description="Performance",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="Drift",Description="Drift",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
+            new PlotSelector {Name="Perf",Description="Performance",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="Depth",Description="Depth",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#.#") },
             new PlotSelector {Name="Fleet",Description="Fleet boats",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") }
         };
-
-
 
         #endregion
 
@@ -855,34 +866,24 @@ namespace LionRiver
 
             #region Instrument display context binding
 
-            this.userControl11.DataContext = WPT;
-            this.userControl12.DataContext = COG;
 
-            //this.userControl11.DataContext = InstrumentList["WPT"];
-            //this.userControl12.DataContext = InstrumentList["COG"];
+            InstrumentDisplayControls["COG"].DataContext = COG;
+            InstrumentDisplayControls["SOG"].DataContext = SOG;
+            InstrumentDisplayControls["HDT"].DataContext = HDT;
+            InstrumentDisplayControls["SPD"].DataContext = SPD;
+            InstrumentDisplayControls["DPT"].DataContext = DPT;
+            InstrumentDisplayControls["TEMP"].DataContext = TEMP;
 
 
-            this.userControl13.DataContext = BRG;
-            this.userControl14.DataContext = SOG;
-            this.userControl15.DataContext = DST;
-            this.userControl16.DataContext = XTE;
+            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["COG"]);
+            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["SOG"]);
+            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["HDT"]);
+            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["SPD"]);
+            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["DPT"]);
+            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["TEMP"]);
 
-            this.userControl17.DataContext = COG;
-            this.userControl18.DataContext = HDT;
-            this.userControl19.DataContext = SOG;
-            this.userControl20.DataContext = SPD;
-            this.userControl21.DataContext = DRIFT;
-            this.userControl22.DataContext = SET;
-
-            this.userControl23.DataContext = TWA;
-            this.userControl24.DataContext = TGTTWA;
-            this.userControl25.DataContext = TGTSPD;
-            this.userControl26.DataContext = DSTLYLs;
-            this.userControl27.DataContext = DSTLYLp;
-            this.userControl28.DataContext = NTWA;
-
-            this.TextBlock1.DataContext = LAT;
-            this.TextBlock2.DataContext = LON;
+            this.LatTextBlock.DataContext = LAT;
+            this.LonTextBlock.DataContext = LON;
 
             #endregion
 
@@ -4333,13 +4334,18 @@ namespace LionRiver
                             result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList();
 
                             break;
-                        case "DRIFT":
+                        case "Drift":
                             result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList();
+                            break;
 
-                            break;
-                        case "PERF":
+                        case "Perf":
                             result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList();
+                            break; 
+
+                        case "Depth":
+                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DPT }).ToList();
                             break;
+
                         case "Fleet":
                             result = (from x in FleetActivityValues
                                       where x.DateTime > StartTime && x.DateTime < EndTime
@@ -4380,12 +4386,18 @@ namespace LionRiver
                             result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList();
 
                             break;
-                        case "DRIFT":
+                        case "Drift":
                             result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList();
                             break;
-                        case "PERF":
+
+                        case "Perf":
                             result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList();
                             break;
+
+                        case "Depth":
+                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DPT }).ToList();
+                            break;
+
                         case "Fleet":
                             result = (from x in FleetActivityValues
                                       where x.DateTime > StartTime && x.DateTime < EndTime
@@ -4422,22 +4434,26 @@ namespace LionRiver
 
                     case "SPD":
                         mResult = SOG.GetLastVal(level).Val;
-
                         break;
+
                     case "TWD":
                         mResult = (TWD.GetLastVal(level).Val + 360) % 360;
-
                         break;
+
                     case "TWS":
                         mResult = TWS.GetLastVal(level).Val;
-
                         break;
-                    case "DRIFT":
+
+                    case "Drift":
                         mResult = DRIFT.GetLastVal(level).Val;
-
                         break;
-                    case "PERF":
+
+                    case "Perf":
                         mResult = PERF.GetLastVal(level).Val * 100;
+                        break;
+
+                    case "Depth":
+                        mResult = DPT.GetLastVal(level).Val;
                         break;
                 }
             }
@@ -4455,22 +4471,26 @@ namespace LionRiver
 
                     case "SPD":
                         aResult = SOG.GetLastVal(level).Val;
-
                         break;
+
                     case "TWD":
                         aResult = (TWD.GetLastVal(level).Val + 360) % 360;
-
                         break;
+
                     case "TWS":
                         aResult = TWS.GetLastVal(level).Val;
-
                         break;
-                    case "DRIFT":
+
+                    case "Drift":
                         aResult = DRIFT.GetLastVal(level).Val;
-
                         break;
-                    case "PERF":
+
+                    case "Perf":
                         aResult = PERF.GetLastVal(level).Val * 100;
+                        break;
+
+                    case "Depth":
+                        aResult = DPT.GetLastVal(level).Val;
                         break;
                 }
             }

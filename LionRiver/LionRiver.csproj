@@ -197,6 +197,9 @@
       <DependentUpon>GribControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Instruments.cs" />
+    <Compile Include="UserControls\InstrumentDisplay1.xaml.cs">
+      <DependentUpon>InstrumentDisplay1.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\NavPlot.xaml.cs">
       <DependentUpon>NavPlot.xaml</DependentUpon>
     </Compile>
@@ -259,6 +262,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Images\Dictionary1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\InstrumentDisplay1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

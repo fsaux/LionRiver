@@ -50,12 +50,14 @@ namespace LionRiver
         public T Val { get; set; }
         public string DisplayName { get; set; }
         public string Units { get; set; }
+        public string FormatString { get; set; }
 
         #region Constructors
-        public Instrument(string dn = "dummy", string un = "dummy", int DampingWindow = 1,bool logged=true)
+        public Instrument(string dn = "dummy", string un = "dummy", string formatString = "#.#" ,int DampingWindow = 1,bool logged=true)
         {
             this.Val = new T();
             this.DisplayName = dn;
+            this.FormatString = formatString;
             this.Units = un;
             this.dampBuffer = new CircularBuffer<T>(DampingWindow, true);
             for (int i = 0; i < Inst.MaxBuffers; i++)
@@ -184,8 +186,8 @@ namespace LionRiver
 
     public class LinearInstrument : Instrument<double>
     {
-        public LinearInstrument(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public LinearInstrument(string dn = "dummy", string un = "dummy", string formatString = "#.#" ,int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 
@@ -199,7 +201,7 @@ namespace LionRiver
             get
             {
                 if (_valid)
-                    return Val.ToString("0.00");
+                    return Val.ToString(FormatString);
                 else
                     return "";
             }
@@ -209,8 +211,8 @@ namespace LionRiver
 
     public class LinearInstrumentShort : LinearInstrument
     {
-        public LinearInstrumentShort(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public LinearInstrumentShort(string dn = "dummy", string un = "dummy", string formatString = "#", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 
@@ -219,7 +221,7 @@ namespace LionRiver
             get
             {
                 if (_valid)
-                    return Val.ToString("#");
+                    return Val.ToString(FormatString);
                 else
                     return "";
             }
@@ -229,8 +231,8 @@ namespace LionRiver
 
     class AngularInstrument : Instrument<double>
     {
-        public AngularInstrument(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public AngularInstrument(string dn = "dummy", string un = "dummy", string formatString = "000", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 
@@ -252,7 +254,7 @@ namespace LionRiver
                 if (_valid)
                 {
                     double _val = (Val + 360) % 360;
-                    return _val.ToString("000");
+                    return _val.ToString(FormatString);
                 }
                 else
                     return "";
@@ -262,8 +264,8 @@ namespace LionRiver
 
     class AngularInstrumentAbs : AngularInstrument
     {
-        public AngularInstrumentAbs(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public AngularInstrumentAbs(string dn = "dummy", string un = "dummy", string formatString = "000", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 
@@ -274,7 +276,7 @@ namespace LionRiver
                 if (_valid)
                 {
                     double _val = (Val + 360) % 360;
-                    return _val.ToString("000");
+                    return _val.ToString(FormatString);
                 }
                 else
                     return "";
@@ -284,8 +286,8 @@ namespace LionRiver
 
     class AngularInstrumentRel : AngularInstrument
     {
-        public AngularInstrumentRel(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public AngularInstrumentRel(string dn = "dummy", string un = "dummy", string formatString = "#", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 
@@ -297,7 +299,7 @@ namespace LionRiver
                 {
                     double _val = (Val + 360) % 360;
                     if (_val > 180) _val = _val - 360;
-                    return _val.ToString("###");
+                    return _val.ToString(FormatString);
                 }
                 else
                     return "";
@@ -308,8 +310,8 @@ namespace LionRiver
 
     class LatitudeInstrument : AngularInstrument
     {
-        public LatitudeInstrument(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public LatitudeInstrument(string dn = "dummy", string un = "dummy", string formatString = "", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString,DampingWindow, logged)
         {
         }
 
@@ -342,8 +344,8 @@ namespace LionRiver
 
     class LongitudeInstrument : AngularInstrument
     {
-        public LongitudeInstrument(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public LongitudeInstrument(string dn = "dummy", string un = "dummy", string formatString = "", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 
@@ -376,8 +378,8 @@ namespace LionRiver
 
     class PercentInstrument : LinearInstrument
     {
-        public PercentInstrument(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public PercentInstrument(string dn = "dummy", string un = "dummy", string formatString = "#%", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 
@@ -386,7 +388,7 @@ namespace LionRiver
             get
             {
                 if (_valid)
-                    return Val.ToString("#%");
+                    return Val.ToString(FormatString);
                 else
                     return "";
             }
@@ -395,8 +397,8 @@ namespace LionRiver
 
     class TimeSpanInstrument : Instrument<TimeSpan>
     {
-        public TimeSpanInstrument(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public TimeSpanInstrument(string dn = "dummy", string un = "dummy", string formatString = "", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 
@@ -436,8 +438,8 @@ namespace LionRiver
 
     class WaypointInstrument : Instrument<String2>
     {
-        public WaypointInstrument(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public WaypointInstrument(string dn = "dummy", string un = "dummy", string formatString = "", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 
@@ -462,8 +464,8 @@ namespace LionRiver
 
     class PositionInstrument : Instrument<Location>
     {
-        public PositionInstrument(string dn = "dummy", string un = "dummy", int DampingWindow = 1, bool logged = true)
-            : base(dn, un, DampingWindow, logged)
+        public PositionInstrument(string dn = "dummy", string un = "dummy", string formatString = "", int DampingWindow = 1, bool logged = true)
+            : base(dn, un, formatString, DampingWindow, logged)
         {
         }
 

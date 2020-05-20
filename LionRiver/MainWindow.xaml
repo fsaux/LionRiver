@@ -486,17 +486,14 @@
         </ContextMenu>
 
     </Window.Resources>
-
     
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="{Binding Source={x:Static p:Settings.Default}, Path=RowWidth1, Mode=TwoWay}" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <!--</Grid>-->
-        <ToolBarPanel Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="MainMenuPanel" VerticalAlignment="Stretch" Width="Auto">
+
+        <ToolBarPanel Grid.Row="0" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="MainMenuPanel" VerticalAlignment="Stretch" Width="Auto">
             <Menu Height="23" x:Name="menu1" Width="Auto">
                 <MenuItem  Header="File">
                     <MenuItem Header="Load Waypoint/Route" Click="GPXLoadButton_Click" />
@@ -516,7 +513,7 @@
             </Menu>
         </ToolBarPanel>
         
-        <Grid Height="Auto" x:Name="InstrumentsGrid" Grid.Row="1">
+        <!--<Grid Height="Auto" x:Name="InstrumentsGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="90*" />
                 <ColumnDefinition Width="10*" />
@@ -578,11 +575,9 @@
                 </TabItem>
 
             </TabControl>
-        </Grid>
+        </Grid>-->
         
-        <GridSplitter Grid.Row="2" Grid.RowSpan="1" Height="6" HorizontalAlignment="Stretch" Margin="0" x:Name="gridSplitter2" VerticalAlignment="Stretch" Width="Auto" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows" Background="Black" />
-
-        <Grid  Grid.Row="3" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="ChartingGrid" VerticalAlignment="Stretch" Width="Auto">
+        <Grid  Grid.Row="1" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="ChartingGrid" VerticalAlignment="Stretch" Width="Auto">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto" />
@@ -730,8 +725,8 @@
                                             <RowDefinition />
                                             <RowDefinition />
                                         </Grid.RowDefinitions>
-                                        <TextBlock Grid.Row="0" x:Name="TextBlock1" Foreground="White" Text="{Binding FormattedValue}"/>
-                                        <TextBlock Grid.Row="1" x:Name="TextBlock2" Foreground="White" Text="{Binding FormattedValue}"/>
+                                        <TextBlock Grid.Row="0" x:Name="LatTextBlock" Foreground="White" Text="{Binding FormattedValue}"/>
+                                        <TextBlock Grid.Row="1" x:Name="LonTextBlock" Foreground="White" Text="{Binding FormattedValue}"/>
                                     </Grid>
                                 </Viewbox>
                             </Border>
@@ -784,27 +779,10 @@
                                          MouseUp="MainNavPlot_MouseUp" 
                                          MouseWheel="MainNavPlot_MouseWheel"/>
 
-                    <DockPanel HorizontalAlignment="Right" LastChildFill="False" Margin="0,0,26,0">
 
-                        <ComboBox x:Name="AuxPlotSelectionComboBox" Width="60"
-                              ItemsSource="{Binding}"
-                              DisplayMemberPath="Name"
-                              SelectedValue="{Binding Source={x:Static p:Settings.Default}, Path=AuxPlotSelector, Mode=TwoWay}"
-                              SelectedValuePath="Name"
-                              Visibility="Visible" HorizontalAlignment="Right" VerticalAlignment="Top"
-                              DockPanel.Dock="Top"
-                              Foreground="MediumVioletRed"
-                              Background="Black"
-                              Style="{StaticResource ComboBoxStyle1}" SelectionChanged="AuxPlotSelectionComboBox_SelectionChanged">
-                            <ComboBox.ItemContainerStyle>
-                                <Style TargetType="{x:Type ComboBoxItem}">
-                                    <Setter Property="Foreground" Value="MediumVioletRed"/>
-                                </Style>
-                            </ComboBox.ItemContainerStyle>
-                        </ComboBox>
 
-                        <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="0,6,0,6"
-                                DockPanel.Dock="Bottom" TickFrequency="10" 
+                        <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="22,0,0,2"
+                                TickFrequency="10"  HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                 Foreground="White"  SmallChange="1" Minimum="-10" Width="50"  ValueChanged="FwdBackSlider_ValueChanged"
                                 AutoToolTipPlacement="BottomRight" Delay="488" >
                             <Slider.Triggers>
@@ -819,7 +797,7 @@
                         </Slider>
 
                         <ToggleButton   Name="PlotCenterButton"  Style="{StaticResource MainToggleButton}"
-                                        HorizontalAlignment="Center" DockPanel.Dock="Bottom" Margin="2"
+                                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,25,2"
                                         Checked="PlotCenterButton_Checked" >
                             <ToggleButton.Content>
                                 <Image  Source="Images/Image-Edition-Tools-Collapse-icon.png" Stretch="Fill" ToolTip="Center Plot" 
@@ -827,7 +805,22 @@
                             </ToggleButton.Content>
                         </ToggleButton>
 
-                    </DockPanel>
+
+                    <ComboBox x:Name="AuxPlotSelectionComboBox" Width="60"  Margin="0,0,25,0"
+                              ItemsSource="{Binding}"
+                              DisplayMemberPath="Name"
+                              SelectedValue="{Binding Source={x:Static p:Settings.Default}, Path=AuxPlotSelector, Mode=TwoWay}"
+                              SelectedValuePath="Name"
+                              Visibility="Visible" HorizontalAlignment="Right" VerticalAlignment="Top"
+                              Foreground="MediumVioletRed"
+                              Background="Black"
+                              Style="{StaticResource ComboBoxStyle1}" SelectionChanged="AuxPlotSelectionComboBox_SelectionChanged">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ComboBoxItem}">
+                                <Setter Property="Foreground" Value="MediumVioletRed"/>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                    </ComboBox>
 
                     <ComboBox x:Name="MainPlotSelectionComboBox" Width="60"
                               ItemsSource="{Binding}"
@@ -850,10 +843,8 @@
             
             <GridSplitter Grid.Column="1" Height="Auto" HorizontalAlignment="Left" Margin="0" x:Name="gridSplitter1" VerticalAlignment="Stretch" Width="6" ResizeBehavior="PreviousAndNext" Background="Black" ShowsPreview="False"/>
           
-            <Grid x:Name="AuxGrid"  Grid.Column="2">
-                <StackPanel>
-                    <my:UserControl1 Width="80" HorizontalAlignment="Stretch" Margin="0"  x:Name="userControl11" VerticalAlignment="Stretch"/>
-                    <my:UserControl1 HorizontalAlignment="Stretch" Margin="0" x:Name="userControl12" VerticalAlignment="Stretch" />
+            <Grid Grid.Column="2">
+                <StackPanel Name="InstrumentStackPanel">
                 </StackPanel>
             </Grid>
             
