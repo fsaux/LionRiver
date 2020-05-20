@@ -485,6 +485,8 @@
                                       CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
         </ContextMenu>
 
+
+
     </Window.Resources>
     
     <Grid>
@@ -842,12 +844,23 @@
             </Grid>
             
             <GridSplitter Grid.Column="1" Height="Auto" HorizontalAlignment="Left" Margin="0" x:Name="gridSplitter1" VerticalAlignment="Stretch" Width="6" ResizeBehavior="PreviousAndNext" Background="Black" ShowsPreview="False"/>
-          
-            <Grid Grid.Column="2">
+
+            <Border  Grid.Column="2" Background="Black">
+                <Border.ContextMenu>
+                    <ContextMenu Name="InstrumentStackContextMenu">
+                        <ContextMenu.ItemTemplate>
+                            <DataTemplate>
+                                <MenuItem Name="InstrumentStackContextMenuItem" Header="{Binding Key}" Click="InstrumentStackContextMenuItem_Click" />
+                            </DataTemplate>
+                        </ContextMenu.ItemTemplate>
+                    </ContextMenu>
+                </Border.ContextMenu>
+                
                 <StackPanel Name="InstrumentStackPanel">
                 </StackPanel>
-            </Grid>
-            
+
+            </Border>
+
 
         </Grid>
     </Grid>

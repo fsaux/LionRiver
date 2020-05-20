@@ -64,7 +64,7 @@ namespace LionRiver
         #region Instruments
 
         //Dictionary<string, object> InstrumentList = new Dictionary<string, object>
-        Dictionary<string, UserControl> InstrumentDisplayControls = new Dictionary<string, UserControl>
+        Dictionary<string, UserControl> InstrumentDisplays = new Dictionary<string, UserControl>
         {
             { "COG", new InstrumentDisplay1() },
             { "SOG", new InstrumentDisplay1() },
@@ -867,20 +867,14 @@ namespace LionRiver
             #region Instrument display context binding
 
 
-            InstrumentDisplayControls["COG"].DataContext = COG;
-            InstrumentDisplayControls["SOG"].DataContext = SOG;
-            InstrumentDisplayControls["HDT"].DataContext = HDT;
-            InstrumentDisplayControls["SPD"].DataContext = SPD;
-            InstrumentDisplayControls["DPT"].DataContext = DPT;
-            InstrumentDisplayControls["TEMP"].DataContext = TEMP;
+            InstrumentDisplays["COG"].DataContext = COG;
+            InstrumentDisplays["SOG"].DataContext = SOG;
+            InstrumentDisplays["HDT"].DataContext = HDT;
+            InstrumentDisplays["SPD"].DataContext = SPD;
+            InstrumentDisplays["DPT"].DataContext = DPT;
+            InstrumentDisplays["TEMP"].DataContext = TEMP;
 
-
-            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["COG"]);
-            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["SOG"]);
-            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["HDT"]);
-            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["SPD"]);
-            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["DPT"]);
-            this.InstrumentStackPanel.Children.Add(InstrumentDisplayControls["TEMP"]);
+            InstrumentStackContextMenu.ItemsSource = InstrumentDisplays;
 
             this.LatTextBlock.DataContext = LAT;
             this.LonTextBlock.DataContext = LON;
@@ -3316,6 +3310,16 @@ namespace LionRiver
             UpdatePlotResolutionTimer.Start();
         }
 
+        private void InstrumentStackContextMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var x = sender as MenuItem;
+            var y = (KeyValuePair<string, UserControl>)(x.DataContext);
+            var z = y.Value;
+
+            if(z!=null)
+                this.InstrumentStackPanel.Children.Add(z);
+
+        }
         #endregion
 
         #region Routing
