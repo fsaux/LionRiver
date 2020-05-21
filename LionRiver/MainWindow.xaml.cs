@@ -77,6 +77,7 @@ namespace LionRiver
             { "TWS", new InstrumentDisplay1() },
             { "TWD", new InstrumentDisplay1() },
             { "BRG", new InstrumentDisplay1() },
+            { "WPT", new InstrumentDisplay2() },
             { "DST", new InstrumentDisplay1() },
             { "XTE", new InstrumentDisplay1() },
             { "VMG", new InstrumentDisplay1() },
@@ -134,7 +135,7 @@ namespace LionRiver
         static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn","0.0",30);
 
         // Performance
-        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn","0.00",4,false);
+        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn","0.0",4,false);
         static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T","#",4,false);
         static PercentInstrument PERF = new PercentInstrument("Perf", "%","#",15);
         static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn","#.##",4,false);
@@ -565,13 +566,13 @@ namespace LionRiver
 
             NavPlotModel.CurrentValue = DateTime.Now.Ticks;
 
-            DateTime minV = new DateTime((long)(NavPlotModel.CurrentValue - TimeSpan.FromDays(7).Ticks));
+            DateTime minV = new DateTime((long)(NavPlotModel.CurrentValue - TimeSpan.FromHours(2).Ticks));
             DateTime maxV = new DateTime((long)(NavPlotModel.CurrentValue));
 
             NavPlotModel.MinXAxisValue = minV.Ticks;
             NavPlotModel.MaxXAxisValue = NavPlotModel.CurrentValue +
                                             (NavPlotModel.CurrentValue - NavPlotModel.MinXAxisValue) * 0.2;
-            NavPlotModel.Resolution = 5;
+            NavPlotModel.Resolution = 2;
             NavPlotModel.XFormatter = value => new System.DateTime((long)(value)).ToString("dd MMM");
 
             //NavPlotModel.XStep = (double)TimeSpan.FromDays(7).Ticks;
@@ -896,6 +897,7 @@ namespace LionRiver
             InstrumentDisplays["TWD"].DataContext = TWD;
             InstrumentDisplays["BRG"].DataContext = BRG;
             InstrumentDisplays["DST"].DataContext = DST;
+            InstrumentDisplays["WPT"].DataContext = WPT;
             InstrumentDisplays["XTE"].DataContext = XTE;
             InstrumentDisplays["VMG"].DataContext = VMG;
             InstrumentDisplays["VMGWPT"].DataContext = VMGWPT;
