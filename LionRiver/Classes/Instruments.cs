@@ -388,7 +388,7 @@ namespace LionRiver
             get
             {
                 if (_valid)
-                    return Val.ToString(FormatString);
+                    return (Val * 100).ToString(FormatString);
                 else
                     return "";
             }

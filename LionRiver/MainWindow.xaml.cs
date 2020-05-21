@@ -71,9 +71,25 @@ namespace LionRiver
             { "HDT", new InstrumentDisplay1() },
             { "SPD", new InstrumentDisplay1() },
             { "TEMP", new InstrumentDisplay1() },
-            { "DPT", new InstrumentDisplay1() }
+            { "DPT", new InstrumentDisplay1() },
+            { "AWA", new InstrumentDisplay1() },
+            { "TWA", new InstrumentDisplay1() },
+            { "TWS", new InstrumentDisplay1() },
+            { "TWD", new InstrumentDisplay1() },
+            { "BRG", new InstrumentDisplay1() },
+            { "DST", new InstrumentDisplay1() },
+            { "XTE", new InstrumentDisplay1() },
+            { "VMG", new InstrumentDisplay1() },
+            { "VMGWPT", new InstrumentDisplay1() },
+            { "NTWA", new InstrumentDisplay1() },
+            { "DRIFT", new InstrumentDisplay1() },
+            { "SET", new InstrumentDisplay1() },
+            { "TGTSPD", new InstrumentDisplay1() },
+            { "TGTTWA", new InstrumentDisplay1() },
+            { "PERF", new InstrumentDisplay1() },
+            { "TGTVMC", new InstrumentDisplay1() },
+            { "TGTCTS", new InstrumentDisplay1() }
         };
-
 
         public static List<Instrument> LoggedInstrumentList = new List<Instrument>();
 
@@ -95,7 +111,7 @@ namespace LionRiver
         static AngularInstrumentAbs BRG = new AngularInstrumentAbs("BRG", "°T","000",1,false);
         static LinearInstrument DST = new LinearInstrument("DST", "Nm","#.#",1,false);
         static LinearInstrument XTE = new LinearInstrument("XTE", "Nm", "#.##", 1,false);
-        static LinearInstrument VMG = new LinearInstrument("WMG", "Kn","#.#",1,false);
+        static LinearInstrument VMG = new LinearInstrument("WMG", "Kn","0.0",1,false);
         static AngularInstrumentAbs HEEL = new AngularInstrumentAbs("HEEL", "°","#",15,false);
 
         // Destination Waypoint
@@ -108,19 +124,19 @@ namespace LionRiver
         static LatitudeInstrument LWLAT = new LatitudeInstrument("Lat", "","",1,false);
         static LongitudeInstrument LWLON = new LongitudeInstrument("Lon", "","",1,false);
         static AngularInstrumentAbs LEGBRG = new AngularInstrumentAbs("BRG", "","000",1,false);
-        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn","#.#",1,false);
+        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn","0.0",1,false);
 
         // Next Leg
         static AngularInstrumentRel NTWA = new AngularInstrumentRel("Next TWA","°","#",1,false);
 
         // Drift
         static AngularInstrumentAbs SET = new AngularInstrumentAbs("Set", "°T","000",30);
-        static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn","#.#",30);
+        static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn","0.0",30);
 
         // Performance
-        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn","#.##",4,false);
+        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn","0.00",4,false);
         static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T","#",4,false);
-        static PercentInstrument PERF = new PercentInstrument("Perf", "","#%",15);
+        static PercentInstrument PERF = new PercentInstrument("Perf", "%","#",15);
         static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn","#.##",4,false);
         static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T","000",4,false);
 
@@ -526,8 +542,6 @@ namespace LionRiver
             
             #endregion      
 
-
-
             #region Load Logfile Worker
             LoadLogFileWorker = new BackgroundWorker();
             LoadLogFileWorker.DoWork += LoadLogFilePartial;
@@ -876,6 +890,23 @@ namespace LionRiver
             InstrumentDisplays["SPD"].DataContext = SPD;
             InstrumentDisplays["DPT"].DataContext = DPT;
             InstrumentDisplays["TEMP"].DataContext = TEMP;
+            InstrumentDisplays["AWA"].DataContext = AWA;
+            InstrumentDisplays["TWA"].DataContext = TWA;
+            InstrumentDisplays["TWS"].DataContext = TWS;
+            InstrumentDisplays["TWD"].DataContext = TWD;
+            InstrumentDisplays["BRG"].DataContext = BRG;
+            InstrumentDisplays["DST"].DataContext = DST;
+            InstrumentDisplays["XTE"].DataContext = XTE;
+            InstrumentDisplays["VMG"].DataContext = VMG;
+            InstrumentDisplays["VMGWPT"].DataContext = VMGWPT;
+            InstrumentDisplays["NTWA"].DataContext = NTWA;
+            InstrumentDisplays["DRIFT"].DataContext = DRIFT;
+            InstrumentDisplays["SET"].DataContext = SET;
+            InstrumentDisplays["TGTTWA"].DataContext = TGTTWA;
+            InstrumentDisplays["TGTSPD"].DataContext = TGTSPD;
+            InstrumentDisplays["PERF"].DataContext = PERF;
+            InstrumentDisplays["TGTVMC"].DataContext = TGTVMC;
+            InstrumentDisplays["TGTCTS"].DataContext = TGTCTS;
 
             InstrumentStackContextMenu.ItemsSource = InstrumentDisplays;
 
