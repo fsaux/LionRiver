@@ -431,7 +431,7 @@ namespace LionRiver
 
             if (ActiveMark != null && DST.IsValid() && !ManOverBoard)
             {
-                if (DST.Val <= Properties.Settings.Default.WptProximity)
+                if (DST.Val <= Properties.Settings.Default.WptProximity && ActiveMark != MOB)
                 {
                     (new SoundPlayer(@".\Sounds\BELL7.WAV")).PlaySync();
                     if (ActiveLeg != null)

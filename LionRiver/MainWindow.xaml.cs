@@ -4635,9 +4635,12 @@ namespace LionRiver
             {
                 ManOverBoard = true;
 
-                MOB = new Mark();
-                MOB.Location = new Location(LAT.Val, LON.Val);
-                MOB.Name = "MOB";
+                MOB = new Mark()
+                {
+                    Location = new Location(LAT.Val, LON.Val),
+                    Name = "MOB"
+                };
+
                 marksItemCollection.Add(MOB);
 
                 ActiveRoute = null;
