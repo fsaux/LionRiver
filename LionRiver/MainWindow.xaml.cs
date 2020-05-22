@@ -3657,11 +3657,16 @@ namespace LionRiver
             }
         }
 
- 
-
         private void InstrumentStackPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var ictrl = e.Source as FrameworkElement;
+            PanStartingPoint = e.GetPosition(ictrl);
+
+            HitTestResult hitList;
+
+            VisualTreeHelper.HitTest(InstrumentStackPanel, null,
+        new HitTestResultCallback(hitList),
+        new PointHitTestParameters(PanStartingPoint));
 
             if (ictrl.GetType() != typeof(System.Windows.Controls.StackPanel))
             {
