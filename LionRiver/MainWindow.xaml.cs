@@ -3488,9 +3488,6 @@ namespace LionRiver
             else
             if(MovingInstrument!=hitTestUI)
             {
-                int pos;
-
-                int i = InstrumentStackPanel.Children.IndexOf(MovingInstrument);
                 int j = InstrumentStackPanel.Children.IndexOf(hitTestUI);
                 InstrumentStackPanel.Children.Remove(MovingInstrument);
                 InstrumentStackPanel.Children.Insert(j,MovingInstrument);
