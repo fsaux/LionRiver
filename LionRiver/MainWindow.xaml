@@ -781,22 +781,41 @@
             
             <GridSplitter Grid.Column="1" Height="Auto" HorizontalAlignment="Left" Margin="0" x:Name="gridSplitter1" VerticalAlignment="Stretch" Width="6" ResizeBehavior="PreviousAndNext" Background="Black" ShowsPreview="False"/>
 
-            <Border  Grid.Column="2" Background="Black">
-                <Border.ContextMenu>
-                    <ContextMenu Name="InstrumentStackContextMenu">
-                        <ContextMenu.ItemContainerStyle>
-                            <Style TargetType="MenuItem" BasedOn="{StaticResource ContexMenuItemStyle}">
-                                <Setter Property="Header" Value="{Binding Key}"></Setter>
-                                <EventSetter Event="Click" Handler="InstrumentStackContextMenuItem_Click"/>
-                            </Style>
-                        </ContextMenu.ItemContainerStyle>
-                    </ContextMenu>
-                </Border.ContextMenu>
+            <Grid Grid.Column="2"  
+                  MouseMove="Grid_MouseMove" 
+                  MouseLeftButtonDown="InstrumentStackPanel_MouseLeftButtonDown"
+                  MouseLeftButtonUp="InstrumentStackPanel_MouseLeftButtonUp"  >
 
-                <StackPanel Name="InstrumentStackPanel">
+                <StackPanel Name="InstrumentStackPanel" Background="Black" >
+                    <StackPanel.ContextMenu>
+                        <ContextMenu Name="InstrumentStackContextMenu">
+                            <ContextMenu.ItemContainerStyle>
+                                <Style TargetType="MenuItem" BasedOn="{StaticResource ContexMenuItemStyle}">
+                                    <Setter Property="Header" Value="{Binding Key}"></Setter>
+                                    <EventSetter Event="Click" Handler="InstrumentStackContextMenuItem_Click"/>
+                                </Style>
+                            </ContextMenu.ItemContainerStyle>
+                        </ContextMenu>
+                    </StackPanel.ContextMenu>
                 </StackPanel>
 
-            </Border>
+                <Canvas Name="InstrumentCanvas" 
+                        Width="{Binding ActualWidth, ElementName=InstrumentStackPanel}"
+                        Height="{Binding ActualHeight, ElementName=InstrumentStackPanel}">
+
+                    <Viewbox Name="DummyInstrument"  Visibility="Hidden">
+
+                        <Border Width="120" Height="70"  >
+                            <Border.Background>
+                                <SolidColorBrush Color="Gray" Opacity="0.5"/>
+                            </Border.Background>
+                            <TextBlock Name="DummyInstrumentText" Foreground="Black" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+
+                    </Viewbox>
+                </Canvas>
+
+            </Grid>
 
 
         </Grid>

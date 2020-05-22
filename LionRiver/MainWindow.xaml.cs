@@ -92,6 +92,8 @@ namespace LionRiver
             { "TGTCTS", new InstrumentDisplay1() }
         };
 
+        public FrameworkElement MovingInstrument;
+
         public static List<Instrument> LoggedInstrumentList = new List<Instrument>();
 
         static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000", 10);
@@ -3653,6 +3655,49 @@ namespace LionRiver
                     sourceRouteLocations.Add(lg.ToLocation);
                 CalcRouteWorker.RunWorkerAsync(sourceRouteLocations);
             }
+        }
+
+ 
+
+        private void InstrumentStackPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var ictrl = e.Source as FrameworkElement;
+
+            if (ictrl.GetType() != typeof(System.Windows.Controls.StackPanel))
+            {
+                MovingInstrument = ictrl;
+                PanStartingPoint = e.GetPosition(ictrl);
+                Point pcanvas = e.GetPosition(InstrumentCanvas);
+
+                DummyInstrument.Visibility = Visibility.Visible;
+                DummyInstrument.Width = ictrl.ActualWidth;
+                DummyInstrument.Height = ictrl.ActualHeight;
+                DummyInstrument.SetValue(Canvas.LeftProperty, pcanvas.X-PanStartingPoint.X);
+                DummyInstrument.SetValue(Canvas.TopProperty, pcanvas.Y - PanStartingPoint.Y);
+                var x = MovingInstrument.DataContext as Instrument;
+                DummyInstrumentText.Text = x.DisplayName;
+
+            }
+        }
+
+        private void Grid_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (MovingInstrument != null)
+            {
+                var newPos = e.GetPosition(InstrumentCanvas);
+                DummyInstrument.SetValue(Canvas.LeftProperty, newPos.X - PanStartingPoint.X);
+                DummyInstrument.SetValue(Canvas.TopProperty, newPos.Y - PanStartingPoint.Y);
+            }
+
+        }
+
+        private void InstrumentStackPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var x = VisualTreeHelper.HitTest(InstrumentStackPanel, e.GetPosition(InstrumentStackPanel));
+
+            DummyInstrument.Visibility = Visibility.Hidden;
+            MovingInstrument = null;
+
         }
 
         void CalcRouteWorker_DoWork(object sender, DoWorkEventArgs e)

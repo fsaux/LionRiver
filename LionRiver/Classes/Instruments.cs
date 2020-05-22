@@ -30,6 +30,8 @@ namespace LionRiver
 
     public abstract class Instrument
     {
+        public string DisplayName { get; set; }
+
     }
 
     public abstract class Instrument<T> : Instrument, INotifyPropertyChanged where T : new()
@@ -48,7 +50,6 @@ namespace LionRiver
         protected bool _valid;
  
         public T Val { get; set; }
-        public string DisplayName { get; set; }
         public string Units { get; set; }
         public string FormatString { get; set; }
 
