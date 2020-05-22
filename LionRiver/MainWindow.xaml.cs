@@ -93,6 +93,8 @@ namespace LionRiver
         };
 
         public FrameworkElement MovingInstrument;
+        public FrameworkElement hitTestUI;
+
 
         public static List<Instrument> LoggedInstrumentList = new List<Instrument>();
 
@@ -394,6 +396,7 @@ namespace LionRiver
         bool insideCourse;
 
         #endregion
+
         #endregion
 
         #region MainWindow Constructor (Initializers)
@@ -3391,6 +3394,116 @@ namespace LionRiver
             return s;
         }
 
+        private void InstrumentStackPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            PanStartingPoint = e.GetPosition(InstrumentStackPanel);
+
+            hitTestUI = null;
+
+            VisualTreeHelper.HitTest(InstrumentStackPanel, null,
+                new HitTestResultCallback(MyHitTestResult),
+                new PointHitTestParameters(PanStartingPoint));
+
+            if (hitTestUI != null)
+            {
+                MovingInstrument = hitTestUI;
+                PanStartingPoint = e.GetPosition(hitTestUI);
+                Point pcanvas = e.GetPosition(InstrumentCanvas);
+                DummyInstrument.Visibility = Visibility.Visible;
+                DummyInstrument.Width = hitTestUI.ActualWidth;
+                DummyInstrument.Height = hitTestUI.ActualHeight;
+                DummyInstrument.SetValue(Canvas.LeftProperty, pcanvas.X - PanStartingPoint.X);
+                DummyInstrument.SetValue(Canvas.TopProperty, pcanvas.Y - PanStartingPoint.Y);
+                var x = MovingInstrument.DataContext as Instrument;
+                DummyInstrumentText.Text = x.DisplayName;
+                hitTestUI = null;
+            }
+        }
+
+        public HitTestResultBehavior MyHitTestResult(HitTestResult result)
+        {
+            var hUI = result.VisualHit as FrameworkElement;
+
+            if (hUI.GetType() == typeof(System.Windows.Controls.Border))
+            {
+                hitTestUI = ((hUI.Parent as FrameworkElement).Parent as FrameworkElement).Parent as FrameworkElement;
+                return HitTestResultBehavior.Stop;
+            }
+            else
+            {
+                return HitTestResultBehavior.Continue;
+            }
+        }
+
+        public HitTestResultBehavior MyHitTestResult1(HitTestResult result)
+        {
+            var hUI = result.VisualHit as FrameworkElement;
+
+            if (hUI.GetType() == typeof(System.Windows.Controls.Border))
+            {
+                hitTestUI = ((hUI.Parent as FrameworkElement).Parent as FrameworkElement).Parent as FrameworkElement;
+                return HitTestResultBehavior.Stop;
+            }
+            else
+            if (hUI.GetType() == typeof(System.Windows.Controls.StackPanel))
+            {
+                hitTestUI = hUI;
+                return HitTestResultBehavior.Stop;
+            }
+            else
+            {
+                return HitTestResultBehavior.Continue;
+            }
+        }
+
+        private void InstrumentStackPanel_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (MovingInstrument != null)
+            {
+                var newPos = e.GetPosition(InstrumentCanvas);
+                DummyInstrument.SetValue(Canvas.LeftProperty, newPos.X - PanStartingPoint.X);
+                DummyInstrument.SetValue(Canvas.TopProperty, newPos.Y - PanStartingPoint.Y);
+            }
+
+        }
+
+        private void InstrumentStackPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            PanStartingPoint = e.GetPosition(InstrumentStackPanel);
+
+            hitTestUI = null;
+
+            VisualTreeHelper.HitTest(InstrumentStackPanel, null,
+                new HitTestResultCallback(MyHitTestResult1),
+                new PointHitTestParameters(PanStartingPoint));
+
+            if (hitTestUI == null)
+                InstrumentStackPanel.Children.Remove(MovingInstrument);
+            else
+            if(hitTestUI.GetType()==typeof(System.Windows.Controls.StackPanel))
+            {
+                InstrumentStackPanel.Children.Remove(MovingInstrument);
+                InstrumentStackPanel.Children.Add(MovingInstrument);
+            }
+            else
+            if(MovingInstrument!=hitTestUI)
+            {
+                int pos;
+
+                int i = InstrumentStackPanel.Children.IndexOf(MovingInstrument);
+                int j = InstrumentStackPanel.Children.IndexOf(hitTestUI);
+                InstrumentStackPanel.Children.Remove(MovingInstrument);
+                InstrumentStackPanel.Children.Insert(j,MovingInstrument);
+            }
+
+            DummyInstrument.Visibility = Visibility.Hidden;
+            MovingInstrument = null;
+
+            Properties.Settings.Default.InstrumentDisplayList = GetCurrentInstrumentDisplayList();
+            Properties.Settings.Default.Save();
+
+        }
+
         #endregion
 
         #region Routing
@@ -3655,54 +3768,6 @@ namespace LionRiver
                     sourceRouteLocations.Add(lg.ToLocation);
                 CalcRouteWorker.RunWorkerAsync(sourceRouteLocations);
             }
-        }
-
-        private void InstrumentStackPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var ictrl = e.Source as FrameworkElement;
-            PanStartingPoint = e.GetPosition(ictrl);
-
-            HitTestResult hitList;
-
-            VisualTreeHelper.HitTest(InstrumentStackPanel, null,
-        new HitTestResultCallback(hitList),
-        new PointHitTestParameters(PanStartingPoint));
-
-            if (ictrl.GetType() != typeof(System.Windows.Controls.StackPanel))
-            {
-                MovingInstrument = ictrl;
-                PanStartingPoint = e.GetPosition(ictrl);
-                Point pcanvas = e.GetPosition(InstrumentCanvas);
-
-                DummyInstrument.Visibility = Visibility.Visible;
-                DummyInstrument.Width = ictrl.ActualWidth;
-                DummyInstrument.Height = ictrl.ActualHeight;
-                DummyInstrument.SetValue(Canvas.LeftProperty, pcanvas.X-PanStartingPoint.X);
-                DummyInstrument.SetValue(Canvas.TopProperty, pcanvas.Y - PanStartingPoint.Y);
-                var x = MovingInstrument.DataContext as Instrument;
-                DummyInstrumentText.Text = x.DisplayName;
-
-            }
-        }
-
-        private void Grid_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (MovingInstrument != null)
-            {
-                var newPos = e.GetPosition(InstrumentCanvas);
-                DummyInstrument.SetValue(Canvas.LeftProperty, newPos.X - PanStartingPoint.X);
-                DummyInstrument.SetValue(Canvas.TopProperty, newPos.Y - PanStartingPoint.Y);
-            }
-
-        }
-
-        private void InstrumentStackPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            var x = VisualTreeHelper.HitTest(InstrumentStackPanel, e.GetPosition(InstrumentStackPanel));
-
-            DummyInstrument.Visibility = Visibility.Hidden;
-            MovingInstrument = null;
-
         }
 
         void CalcRouteWorker_DoWork(object sender, DoWorkEventArgs e)

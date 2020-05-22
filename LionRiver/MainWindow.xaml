@@ -782,7 +782,7 @@
             <GridSplitter Grid.Column="1" Height="Auto" HorizontalAlignment="Left" Margin="0" x:Name="gridSplitter1" VerticalAlignment="Stretch" Width="6" ResizeBehavior="PreviousAndNext" Background="Black" ShowsPreview="False"/>
 
             <Grid Grid.Column="2"  
-                  MouseMove="Grid_MouseMove" 
+                  MouseMove="InstrumentStackPanel_MouseMove" 
                   MouseLeftButtonDown="InstrumentStackPanel_MouseLeftButtonDown"
                   MouseLeftButtonUp="InstrumentStackPanel_MouseLeftButtonUp"  >
 
