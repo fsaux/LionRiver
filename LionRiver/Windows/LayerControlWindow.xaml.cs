@@ -164,33 +164,5 @@ namespace LionRiver
             OnLayerCtrl(ea);
         }
 
-        private void FleetBoatVisibleCheck_Checked(object sender, RoutedEventArgs e)
-        {
-            foreach(Boat b in MainWindow.fleetBoats)
-            {
-                b.BoatVisible = Visibility.Visible;
-            }
-        }
-
-        private void FleetBoatVisibleCheck_Unchecked(object sender, RoutedEventArgs e)
-        {
-            foreach (Boat b in MainWindow.fleetBoats)
-            {
-                b.BoatVisible = Visibility.Hidden;
-            }
-        }
-
-        private void FleetTrackVisibleCheck_Checked(object sender, RoutedEventArgs e)
-        {
-            foreach (Track t in MainWindow.fleetTracks)
-                t.Visibility = Visibility.Visible;
-        }
-
-        private void FleetTrackVisibleCheck_Unchecked(object sender, RoutedEventArgs e)
-        {
-            foreach (Track t in MainWindow.fleetTracks)
-                t.Visibility = Visibility.Hidden;
-        }
-
     }
 }

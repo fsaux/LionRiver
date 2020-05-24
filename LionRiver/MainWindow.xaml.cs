@@ -541,11 +541,9 @@ namespace LionRiver
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SetLinePin, SetLinePinCommand_Executed, SetLinePinCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.RemoveInstrument, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SelectFleetBoat, SelectFleetBoatCommand_Executed, SelectFleetBoatCommand_CanExecute));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnselectFleetBoat, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.HideUnselectedFleetBoats, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnhideAllFleetBoats, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
-
-
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnselectFleetBoat, UnselectFleetBoatCommand_Executed, UnselectFleetBoatCommand_CanExecute));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.HideUnselectedFleetBoats, HideUnselectedFleetBoatsCommand_Executed, HideUnselectedFleetBoatsCommand_CanExecute));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnhideAllFleetBoats, UnhideAllFleetBoatsCommand_Executed, UnhideAllFleetBoatsCommand_CanExecute));
 
             #endregion
 
@@ -2982,6 +2980,14 @@ namespace LionRiver
 
             fboat.IsSelected = true;
 
+            if (PlayButton.IsChecked == false)
+            {
+                DateTime startTime = new DateTime((long)NavPlotModel.SelectionFromValue);
+                DateTime endTime = new DateTime((long)NavPlotModel.SelectionToValue);
+
+                UpdateTracks(startTime, endTime);
+            }
+
             e.Handled = true;
         }
 
@@ -2996,6 +3002,67 @@ namespace LionRiver
 
             e.Handled = true;
 
+        }
+
+        private void UnselectFleetBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var fboat = (e.Source as MapItem).DataContext as Boat;
+
+            fboat.IsSelected = false;
+
+            if (PlayButton.IsChecked == false)
+            {
+                DateTime startTime = new DateTime((long)NavPlotModel.SelectionFromValue);
+                DateTime endTime = new DateTime((long)NavPlotModel.SelectionToValue);
+
+                UpdateTracks(startTime, endTime);
+            }
+
+            e.Handled = true;
+        }
+
+        private void UnselectFleetBoatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            var fboat = (e.Source as MapItem).DataContext as Boat;
+
+            if (fboat.IsSelected == false)
+                e.CanExecute = false;
+            else
+                e.CanExecute = true;
+
+            e.Handled = true;
+
+        }
+
+        private void HideUnselectedFleetBoatsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            foreach(Boat b in fleetBoats)
+            {
+                if (b.IsSelected == false)
+                    b.BoatVisible = Visibility.Hidden;
+            }
+
+            e.Handled = true;
+        }
+
+        private void HideUnselectedFleetBoatsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+            e.Handled = true;
+        }
+
+        private void UnhideAllFleetBoatsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            foreach (Boat b in fleetBoats)
+                b.BoatVisible = Visibility.Visible;
+
+            e.Handled = true;
+        }
+
+        private void UnhideAllFleetBoatsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+            e.Handled = true;
         }
 
         private void Generic_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -4421,14 +4488,8 @@ namespace LionRiver
                         b.Location = new Location(lastTrackEntry.Latitude, lastTrackEntry.Longitude);
                         b.Heading = lastTrackEntry.COG; ;
 
-                        if (Properties.Settings.Default.FleetBoatsVisible)
-                            b.BoatVisible = Visibility.Visible;
+                    }
 
-                    }
-                    else
-                    {
-                        b.BoatVisible = Visibility.Hidden;
-                    }
                 }
 
                 if (mapCenterMode == MapCenterMode.Centered)

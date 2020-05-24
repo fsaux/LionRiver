@@ -208,12 +208,18 @@
                                   Command="local:CommandLibrary.SelectFleetBoat"
                                   CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                   CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
-                <MenuItem Header="UnSelect"/>
-                <MenuItem Header="Hide unselected"/>
-                <MenuItem Header="Unhide all"/>
-                <!--<MenuItem Header="Navigate To" Command="local:CommandLibrary.NavigateTo" CommandParameter="{Binding Parent.PlacementTarget.SelectedItem, RelativeSource={RelativeSource Self}}"/>
-                <MenuItem Header="Move" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}" Click="MoveMark"/>
-                <MenuItem Header="Delete" Command="local:CommandLibrary.DeleteMark" CommandParameter="{Binding Parent.PlacementTarget.SelectedItem, RelativeSource={RelativeSource Self}}"/>-->
+                <MenuItem Header="UnSelect"
+                                  Command="local:CommandLibrary.UnselectFleetBoat"
+                                  CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                  CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
+                <MenuItem Header="Hide unselected"
+                                  Command="local:CommandLibrary.HideUnselectedFleetBoats"
+                                  CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                  CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
+                <MenuItem Header="Unhide all"
+                                  Command="local:CommandLibrary.UnhideAllFleetBoats"
+                                  CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                  CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
             </ContextMenu>
 
             <Style x:Key="FleetBoatItemStyle" TargetType="{x:Type map:MapItem}">

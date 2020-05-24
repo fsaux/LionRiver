@@ -133,28 +133,6 @@
                     </Grid>
                 </WrapPanel>
 
-                <TextBlock Text="Fleet" Margin="5,2,0,0" HorizontalAlignment="Left" Foreground="White"/>
-                <WrapPanel>
-                    <Grid  Margin="30,0,0,0" Width="120">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Column="0"  Name="FleetBoatVisibleCheck" VerticalAlignment="Center" IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=FleetBoatsVisible}" Checked="FleetBoatVisibleCheck_Checked" Unchecked="FleetBoatVisibleCheck_Unchecked"/>
-                        <TextBlock Grid.Column="1" Text="Boats" Margin="5,2" HorizontalAlignment="Left" Foreground="LightGray"/>
-                    </Grid>
-                    <Grid  Margin="30,0,0,0" Width="120">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Name="FleetTrackVisibleCheck" Grid.Column="0" VerticalAlignment="Center" IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=FleetTracksVisible}" Checked="FleetTrackVisibleCheck_Checked" Unchecked="FleetTrackVisibleCheck_Unchecked"/>
-                        <TextBlock Grid.Column="1" Text="Tracks" Margin="5,2" HorizontalAlignment="Left" Foreground="LightGray"/>
-                        <Slider Grid.Column="2" Name="FleetTrackLenghtSlider" Value="{Binding Source={x:Static p:Settings.Default}, Path=FleetBoatTrackLength}" Maximum="4" Minimum="1" SmallChange="1" TickPlacement="BottomRight" IsSnapToTickEnabled="True"/>
-                    </Grid>
-
-                </WrapPanel>
 
             </StackPanel>
 
