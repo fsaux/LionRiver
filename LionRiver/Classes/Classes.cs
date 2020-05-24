@@ -2844,7 +2844,10 @@ namespace LionRiver
         private static RoutedUICommand setLineBoat = new RoutedUICommand("SetLineBoat", "SetLineBoat", typeof(CommandLibrary));
         private static RoutedUICommand setLinePin = new RoutedUICommand("SetLinePin", "SetLinePin", typeof(CommandLibrary));
         private static RoutedUICommand removeInstrument = new RoutedUICommand("RemoveInstrument", "RemoveInstrument", typeof(CommandLibrary));
-
+        private static RoutedUICommand selectFleetBoat = new RoutedUICommand("SelectFleetBoat", "SelectFleetBoat", typeof(CommandLibrary));
+        private static RoutedUICommand unselectFleetBoat = new RoutedUICommand("UnselectFleetBoat", "UnselectFleetBoat", typeof(CommandLibrary));
+        private static RoutedUICommand hideUnselectedFleetBoats = new RoutedUICommand("HideUnselectedFleetBoats", "HideUnselectedFleetBoats", typeof(CommandLibrary));
+        private static RoutedUICommand unhideAllFleetBoats = new RoutedUICommand("UnhideAllFleetBoats", "UnhideAllFleetBoats", typeof(CommandLibrary));
 
         public static RoutedUICommand AddMark
         {
@@ -2910,6 +2913,24 @@ namespace LionRiver
         {
             get { return removeInstrument; }
         }
+
+        public static RoutedUICommand SelectFleetBoat
+        {
+            get { return selectFleetBoat; }
+        }
+        public static RoutedUICommand UnselectFleetBoat
+        {
+            get { return unselectFleetBoat; }
+        }
+        public static RoutedUICommand HideUnselectedFleetBoats
+        {
+            get { return hideUnselectedFleetBoats; }
+        }
+        public static RoutedUICommand UnhideAllFleetBoats
+        {
+            get { return unhideAllFleetBoats; }
+        }
+
 
     }
     public class MyCommand<T> : ICommand where T : class

@@ -1,34 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.IO.Ports;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
-using MapControl;
-using System.ComponentModel;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
+﻿using LionRiver.UserControls;
 using LiveCharts;
-using LiveCharts.Wpf;
 using LiveCharts.Configurations;
-
+using LiveCharts.Wpf;
+using MapControl;
+using Newtonsoft.Json;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
-
-using System.Xaml;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.IO.Ports;
+using System.Linq;
+using System.Net.Http;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
-using System.Text;
-using System.Diagnostics;
-using LionRiver.UserControls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace LionRiver
 {
@@ -545,8 +540,14 @@ namespace LionRiver
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SetLineBoat, SetLineBoatCommand_Executed, SetLineBoatCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SetLinePin, SetLinePinCommand_Executed, SetLinePinCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.RemoveInstrument, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
-            
-            #endregion      
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SelectFleetBoat, SelectFleetBoatCommand_Executed, SelectFleetBoatCommand_CanExecute));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnselectFleetBoat, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.HideUnselectedFleetBoats, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnhideAllFleetBoats, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
+
+
+
+            #endregion
 
             #region Load Logfile Worker
             LoadLogFileWorker = new BackgroundWorker();
@@ -2969,6 +2970,35 @@ namespace LionRiver
         }
 
         private void RemoveInstrumentCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+            e.Handled = true;
+
+        }
+
+        private void SelectFleetBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var fboat = (e.Source as MapItem).DataContext as Boat;
+
+            fboat.IsSelected = true;
+
+            e.Handled = true;
+        }
+
+        private void SelectFleetBoatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            var fboat = (e.Source as MapItem).DataContext as Boat;
+
+            if (fboat.IsSelected)
+                e.CanExecute = false;
+            else
+                e.CanExecute = true;
+
+            e.Handled = true;
+
+        }
+
+        private void Generic_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
             e.Handled = true;

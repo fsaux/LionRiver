@@ -12,5 +12,6 @@ namespace LionRiver
     /// </summary>
     public partial class App : Application
     {
+
     }
 }

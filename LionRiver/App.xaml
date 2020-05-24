@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:map="clr-namespace:MapControl;assembly=MapControl.WPF"
+             xmlns:local="clr-namespace:LionRiver"
              xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"  x:Class="LionRiver.App"
              StartupUri="MainWindow.xaml">
 
@@ -11,39 +12,10 @@
 
             <ResourceDictionary.MergedDictionaries>
 
-                <!--Select colors set, options are material, metro, blue, white and black-->
-
-                <!--Material design colors-->
                 <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/material.xaml" />
-                <!--Metro colors-->
-                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/metro.xaml" />-->
-                <!--Blue gradient-->
-                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/blue.xaml" />-->
-                <!--white gradient-->
-                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/white.xaml" />-->
-                <!--black gradient-->
-                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Colors/black.xaml" />-->
-
-                <!--Select size, options are small, medium and large-->
-
-                <!--small-->
                 <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Size/s.xaml" />
-                <!--medium-->
-                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Size/m.xaml" />-->
-                <!--large-->
-                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Size/l.xaml" />-->
-
-                <!--Select weight, options are light, normal and bold-->
-                <!--light-->
-                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Weight/light.xaml" />-->
-                <!--normal-->
                 <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Weight/normal.xaml" />
-                <!--bold-->
-                <!--<ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/Weight/bold.xaml" />-->
-
-                <!--Also add the base theme, this is required always-->
                 <ResourceDictionary Source="pack://application:,,,/LiveCharts.Wpf;component/Themes/base.xaml" />
-
 
             </ResourceDictionary.MergedDictionaries>
 
@@ -231,56 +203,61 @@
                 </Style.Triggers>
             </Style>
 
+            <ContextMenu  x:Key="FleetBoatContextMenu">
+                <MenuItem Header="Select" 
+                                  Command="local:CommandLibrary.SelectFleetBoat"
+                                  CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                  CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
+                <MenuItem Header="UnSelect"/>
+                <MenuItem Header="Hide unselected"/>
+                <MenuItem Header="Unhide all"/>
+                <!--<MenuItem Header="Navigate To" Command="local:CommandLibrary.NavigateTo" CommandParameter="{Binding Parent.PlacementTarget.SelectedItem, RelativeSource={RelativeSource Self}}"/>
+                <MenuItem Header="Move" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}" Click="MoveMark"/>
+                <MenuItem Header="Delete" Command="local:CommandLibrary.DeleteMark" CommandParameter="{Binding Parent.PlacementTarget.SelectedItem, RelativeSource={RelativeSource Self}}"/>-->
+            </ContextMenu>
+
             <Style x:Key="FleetBoatItemStyle" TargetType="{x:Type map:MapItem}">
                 <Setter Property="map:MapPanel.Location" Value="{Binding Location}"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="VerticalAlignment" Value="Bottom"/>
                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-                <Setter Property="Padding" Value="3"/>
-                <Setter Property="Background" Value="White"/>
-                <!--<EventSetter Event="MouseEnter" Handler="BoatItem_OnMouseEnter"></EventSetter>
-            <EventSetter Event="MouseLeave" Handler="BoatItem_OnMouseLeave"></EventSetter>-->
+                <Setter Property="ContextMenu" Value="{StaticResource FleetBoatContextMenu}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type map:MapItem}">
-                            <Canvas Visibility="{Binding BoatVisible}">
-                                <!--<VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal"/>
-                                    <VisualState x:Name="Disabled"/>
-                                    <VisualState x:Name="MouseOver">
-                                        <Storyboard>
-                                            <ColorAnimation Storyboard.TargetName="BoatColor" Storyboard.TargetProperty="Color" To="LimeGreen" Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </VisualState>
-                                </VisualStateGroup>
-                                <VisualStateGroup x:Name="SelectionStates">
-                                    <VisualState x:Name="Unselected"/>
-                                    <VisualState x:Name="Selected"/>
-                                </VisualStateGroup>
-                                <VisualStateGroup x:Name="CurrentStates">
-                                    <VisualState x:Name="NotCurrent"/>
-                                    <VisualState x:Name="Current"/>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>-->
-                                <!-- Boat-->
-
+                            <Canvas Visibility="{Binding BoatVisible}" x:Name="boatCanvas">
                                 <Polyline 
                                       Points="-4,0 -3,-6 0,-11 3,-6 4,0 4,6 3,9 -3,9 -4,6 -4,0">
                                     <Polyline.Fill>
-                                        <SolidColorBrush Color="{Binding BoatColor}"/>
+                                        <SolidColorBrush x:Name="btColor"   Color="{Binding BoatColor}"/>
                                     </Polyline.Fill>
                                     <Polyline.RenderTransform>
-                                        <RotateTransform Angle="{Binding Heading}" />
+                                            <RotateTransform Angle="{Binding Heading}" />
                                     </Polyline.RenderTransform>
                                 </Polyline>
 
-                                <Grid Canvas.Top="5">
-                                    <TextBlock Text="{Binding Name}" FontSize="9" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="DimGray"/>
+                                <Grid Canvas.Top="6">
+                                    <TextBlock x:Name="boatName" Text="{Binding Name}" FontSize="9" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="DimGray"/>
                                 </Grid>
-
                             </Canvas>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+
+                                    <Setter Property="Foreground" TargetName="boatName" Value="Black"/>
+                                    <Setter Property="Background" TargetName="boatName" Value="Gray"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="Foreground" TargetName="boatName" Value="White"/>
+                                    <Setter Property="Canvas.RenderTransform" TargetName="boatCanvas">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+                            
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
@@ -462,7 +439,6 @@
                 </Setter>
             </Style>
 
-
             <Style x:Key="ContexMenuItemStyle" TargetType="MenuItem">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -530,7 +506,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-
 
             <Style  TargetType="ContextMenu">
                 <Style.Resources>
