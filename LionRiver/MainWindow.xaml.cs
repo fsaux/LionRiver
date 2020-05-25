@@ -178,7 +178,7 @@ namespace LionRiver
         bool replayLog = false;
         string Comment="";
         private readonly BackgroundWorker LoadLogFileWorker;
-        StartUpWindow LoadLogFileWindow;
+        StartUpWindow StartupWdw;
         #endregion
 
         #region Polar
@@ -400,15 +400,6 @@ namespace LionRiver
         {
             InitializeComponent();
 
-            #region Upgrade settings?
-            //if (Properties.Settings.Default.UpgradeRequired)
-            //{
-            //    Properties.Settings.Default.Upgrade();
-            //    Properties.Settings.Default.UpgradeRequired = false;
-            //    Properties.Settings.Default.Save();
-            //} 
-            #endregion
-
             #region Polars
             NavPolar = new Polar();
 
@@ -421,6 +412,7 @@ namespace LionRiver
                     StreamReader sr = new StreamReader(pfilename);
                     NavPolar.Load(sr);
                     sr.Close();
+                    NavPolar.IsLoaded = true;
                     SendPTAKheaders();
                 }
                 catch
@@ -547,25 +539,29 @@ namespace LionRiver
 
             #endregion
 
-            #region Load Logfile Worker
-            LoadLogFileWorker = new BackgroundWorker();
-            LoadLogFileWorker.DoWork += LoadLogFilePartial;
-            LoadLogFileWorker.RunWorkerCompleted += LoadLogFile_Completed;
-            LoadLogFileWorker.ProgressChanged += LoadLogFile_ProgressChanged;
-            LoadLogFileWorker.WorkerReportsProgress = true;
+            //LoadLogFileWorker = new BackgroundWorker();
+            //LoadLogFileWorker.DoWork += LoadLogFilePartial;
+            //LoadLogFileWorker.RunWorkerCompleted += LoadLogFile_Completed;
+            //LoadLogFileWorker.ProgressChanged += LoadLogFile_ProgressChanged;
+            //LoadLogFileWorker.WorkerReportsProgress = true;
 
-            LoadLogFileWindow = new StartUpWindow();
-            LoadLogFileWindow.Show();
 
-            LoadLogFileWorker.RunWorkerAsync();
-            #endregion
+            //LoadLogFileWorker.RunWorkerAsync();
+
 
             this.Title = "LionRiver " + GetRunningVersion().ToString();
+
+            MainWindow_Initialize();
+
         }
 
         private void MainWindow_Initialize()
         {
-         
+
+            StartupWdw = new StartUpWindow();
+            StartupWdw.Show();
+
+
             #region Nav Plots
 
             NavPlotModel.CurrentValue = DateTime.Now.Ticks;
@@ -822,6 +818,7 @@ namespace LionRiver
 
             FleetUpdateTimer.Tick += new EventHandler(FleetUpdateTimer_Tick);
             FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
+            //FleetUpdateTimer.Interval = new TimeSpan(0, 0, 20);  // For testing
 
             ReplayTimer.Tick += new EventHandler(ReplayTimer_Tick);
             ReplayTimer.Interval = new TimeSpan(0, 0, 0, 0,150);
@@ -929,6 +926,8 @@ namespace LionRiver
 
 
             #endregion
+
+            StartupWdw.Close();
 
         }
 
@@ -1129,7 +1128,6 @@ namespace LionRiver
 
                     var z = fb.FirstOrDefault(); // Get last entry if available
 
-
                     if (z == null) //new Boat available
                     {
                         Boat b = new Boat()
@@ -1140,6 +1138,7 @@ namespace LionRiver
                                 Latitude = bp.latitud,
                                 Longitude = bp.longitud
                             },
+                            Time=newUpdateTime,
                             BoatVisible = Visibility.Hidden,
                             Heading = Convert.ToDouble(bp.rumbo.TrimEnd('°')),
                             IsSelected = false
@@ -1157,6 +1156,15 @@ namespace LionRiver
                         fleetBoats.Add(b);
                         boatMapItem.DataContext = b;
                         map.Children.Add(boatMapItem);
+                    }
+                    else //Update Time for existing fleet boat
+                    {
+                        var bx = (from x in fleetBoats
+                                 where x.Name == z.Name
+                                 select x).FirstOrDefault();
+
+                        if (bx != null)
+                            bx.Time = newUpdateTime;
                     }
 
                     DateTime lastUpdateTime;
@@ -1291,6 +1299,7 @@ namespace LionRiver
                                 }
                             }
                         }
+
                     }
                 }
 
@@ -1399,7 +1408,6 @@ namespace LionRiver
             }
 
         }
-
 
         #endregion
 
@@ -1737,107 +1745,6 @@ namespace LionRiver
             gribControl.textblock.Text = dt.ToLocalTime().ToString();
 
         }
-
-        #endregion
-
-        #region LogFile // Initialization
-
-        private void LoadLogFilePartial(object sender, DoWorkEventArgs e)
-        {
-            string Logfilename = Properties.Settings.Default.LogFile;
-            ReadLogFile(Logfilename, DateTime.Now.AddHours(-12));
-        }
-
-        private void LoadLogFileAll(object sender, DoWorkEventArgs e)
-        {
-            string Logfilename = Properties.Settings.Default.LogFile;
-            ReadLogFile(Logfilename, DateTime.MinValue);
-        }
-
-        private void LoadLogFile_Completed(object sender, RunWorkerCompletedEventArgs e)
-        {
-            LoadLogFileWindow.Close();
-
-            MainWindow_Initialize();
-        }
-
-        private void LoadLogFile_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            LoadLogFileWindow.LogFileProgress.Value = e.ProgressPercentage;
-        }
-
-        private void ReadLogFile(string Logfilename,DateTime StartTime)
-        {
-            double totalLines = 1, currentLine = 0;
-
-            if (File.Exists(Logfilename))
-            {
-
-                StreamReader TempFile = new StreamReader(Logfilename);
-
-                while (!TempFile.EndOfStream)
-                {
-                    TempFile.ReadLine();
-                    totalLines++;
-                }
-
-                TempFile.DiscardBufferedData();
-                TempFile.BaseStream.Seek(0, SeekOrigin.Begin);
-                TempFile.BaseStream.Position = 0;
-
-                while (!TempFile.EndOfStream)
-                {
-                    currentLine++;
-                    LoadLogFileWorker.ReportProgress((int)(currentLine / totalLines * 100));
-
-                    CalcNavFromFile(TempFile,StartTime);
-                }
-
-                TempFile.Close();
-
-                LogFile = new StreamWriter(Logfilename, true);   // Append to existing LogFile
-                LogFile.AutoFlush = true;
-                LogFile.WriteLine("");
-                logging = false;
-            }
-
-            logging = false;
-
-        }
-
-        private void CalcNavFromFile(StreamReader tempfile,DateTime starttime)
-        {
-            string rl = tempfile.ReadLine();
-            string[] str = null;
-
-            if (rl != null)
-                str = rl.Split(',');
-
-            DateTime dt;
-
-            try
-            {
-                if (DateTime.TryParse(str[0], out dt))
-                {
-                    lat = double.Parse(str[1]);
-                    lon = double.Parse(str[2]);
-                    cog = double.Parse(str[3]);
-                    hdg = double.Parse(str[4]);
-                    sog = double.Parse(str[5]);
-                    spd = double.Parse(str[6]);
-                    awa = double.Parse(str[7]);
-                    aws = double.Parse(str[8]);
-                    dpt = double.Parse(str[9]);
-                    temp = double.Parse(str[10]);
-
-                    if (dt.ToLocalTime() > starttime)
-                        CalcNav(dt.ToLocalTime(), true);
-                }
-
-        }
-            catch
-            { }
-        }       
 
         #endregion
 
@@ -4486,8 +4393,13 @@ namespace LionRiver
                         var lastTrackEntry = fTrackEntries.Last();
 
                         b.Location = new Location(lastTrackEntry.Latitude, lastTrackEntry.Longitude);
-                        b.Heading = lastTrackEntry.COG; ;
+                        b.Heading = lastTrackEntry.COG;
+                        b.BoatVisible = Visibility.Visible;
 
+                    }
+                    else 
+                    {
+                        b.BoatVisible = Visibility.Hidden;
                     }
 
                 }

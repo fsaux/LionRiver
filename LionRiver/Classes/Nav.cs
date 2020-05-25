@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Media;
+using System.IO;
 
 namespace LionRiver
 {
@@ -591,6 +592,40 @@ namespace LionRiver
             }
 
             PushToLogDB(now);
+        }
+
+        private void CalcNavFromFile(StreamReader tempfile, DateTime starttime)
+        {
+            string rl = tempfile.ReadLine();
+            string[] str = null;
+
+            if (rl != null)
+                str = rl.Split(',');
+
+            DateTime dt;
+
+            try
+            {
+                if (DateTime.TryParse(str[0], out dt))
+                {
+                    lat = double.Parse(str[1]);
+                    lon = double.Parse(str[2]);
+                    cog = double.Parse(str[3]);
+                    hdg = double.Parse(str[4]);
+                    sog = double.Parse(str[5]);
+                    spd = double.Parse(str[6]);
+                    awa = double.Parse(str[7]);
+                    aws = double.Parse(str[8]);
+                    dpt = double.Parse(str[9]);
+                    temp = double.Parse(str[10]);
+
+                    if (dt.ToLocalTime() > starttime)
+                        CalcNav(dt.ToLocalTime(), true);
+                }
+
+            }
+            catch
+            { }
         }
 
         public void CalcMeasure()
