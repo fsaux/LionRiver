@@ -817,8 +817,8 @@ namespace LionRiver
             XLNavTimer.Interval = new TimeSpan(0, 15, 0);
 
             FleetUpdateTimer.Tick += new EventHandler(FleetUpdateTimer_Tick);
-            FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
-            //FleetUpdateTimer.Interval = new TimeSpan(0, 0, 20);  // For testing
+            //FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
+            FleetUpdateTimer.Interval = new TimeSpan(0, 0, 20);  // For testing
 
             ReplayTimer.Tick += new EventHandler(ReplayTimer_Tick);
             ReplayTimer.Interval = new TimeSpan(0, 0, 0, 0,150);
@@ -1400,8 +1400,6 @@ namespace LionRiver
                 NavPlotModel.Resolution = (int)n;
 
                 UpdatePlot(n, newDataWStart, newDataWEnd);
-
-
 
                 if (PlayButton.IsChecked == true)
                     UpdateTracks(newDataWStart, new DateTime((long)NavPlotModel.MaxXAxisValue),Track.MaxLength);
@@ -4377,7 +4375,7 @@ namespace LionRiver
 
                 }
 
-                minDt = dt.AddHours(-Properties.Settings.Default.FleetBoatTrackLength); // Fleet track range
+                minDt = dt.AddHours(-1); // Fleet track range
 
                 foreach (Boat b in fleetBoats)
                 {
