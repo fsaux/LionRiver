@@ -748,7 +748,7 @@ namespace LionRiver
                 TWS.PushToBuffer(TWS.Val, dt, 0);
                 DRIFT.PushToBuffer(DRIFT.Val, dt, 0);
                 SET.PushToBuffer(SET.Val, dt, 0);
-                SPD.PushToBuffer(SET.Val, dt, 0);
+                SPD.PushToBuffer(SPD.Val, dt, 0);
 
 
                 using (var context = new LionRiverDBContext())
