@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="ce6c389dde8542f08063828ffe8053eb" Name="Diagram1" ZoomLevel="90">
+      <Diagram DiagramId="ce6c389dde8542f08063828ffe8053eb" Name="Diagram1" ZoomLevel="82">
         <EntityTypeShape EntityType="mainModel.Log" Width="1.5" PointX="0.5" PointY="0.5" IsExpanded="true" />
         <EntityTypeShape EntityType="mainModel.FleetTrack" Width="1.5" PointX="3.375" PointY="0.75" />
       </Diagram>

@@ -641,7 +641,8 @@ namespace LionRiver
                             DPT = double.NaN,
                             TWS = double.NaN,
                             DRIFT = double.NaN,
-                            SET = double.NaN
+                            SET = double.NaN,
+                            SPD = double.NaN
                         };
 
                         var logFirst = new Log()
@@ -658,7 +659,8 @@ namespace LionRiver
                             DPT = double.NaN,
                             TWS = double.NaN,
                             DRIFT = double.NaN,
-                            SET = double.NaN
+                            SET = double.NaN,
+                            SPD = double.NaN
                         };
 
                         context.Logs.Add(logLast);
@@ -4509,7 +4511,7 @@ namespace LionRiver
                             break;
 
                         case "SPD":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SOG }).ToList();
+                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList();
 
                             break;
                         case "TWD":
@@ -4561,7 +4563,7 @@ namespace LionRiver
                             break;
 
                         case "SPD":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SOG }).ToList();
+                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList();
 
                             break;
                         case "TWD":
@@ -4619,7 +4621,7 @@ namespace LionRiver
                         break;
 
                     case "SPD":
-                        mResult = SOG.GetLastVal(level).Val;
+                        mResult = SPD.GetLastVal(level).Val;
                         break;
 
                     case "TWD":
@@ -4656,7 +4658,7 @@ namespace LionRiver
                         break;
 
                     case "SPD":
-                        aResult = SOG.GetLastVal(level).Val;
+                        aResult = SPD.GetLastVal(level).Val;
                         break;
 
                     case "TWD":

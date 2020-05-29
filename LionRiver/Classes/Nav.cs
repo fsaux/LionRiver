@@ -748,6 +748,7 @@ namespace LionRiver
                 TWS.PushToBuffer(TWS.Val, dt, 0);
                 DRIFT.PushToBuffer(DRIFT.Val, dt, 0);
                 SET.PushToBuffer(SET.Val, dt, 0);
+                SPD.PushToBuffer(SET.Val, dt, 0);
 
 
                 using (var context = new LionRiverDBContext())
@@ -773,7 +774,8 @@ namespace LionRiver
                                     DPT = DPT.GetLastVal(i).Val,
                                     TWS = TWS.GetLastVal(i).Val,
                                     DRIFT = DRIFT.GetLastVal(i).Val,
-                                    SET = SET.GetLastVal(i).Val
+                                    SET = SET.GetLastVal(i).Val,
+                                    SPD = SPD.GetLastVal(i).Val
                                 };
                                 context.Logs.Add(log);
 
@@ -790,6 +792,7 @@ namespace LionRiver
                                 TWS.ClearAvgBufferDataAvailable(i);
                                 DRIFT.ClearAvgBufferDataAvailable(i);
                                 SET.ClearAvgBufferDataAvailable(i);
+                                SPD.ClearAvgBufferDataAvailable(i);
                             }
                         }
                     }
