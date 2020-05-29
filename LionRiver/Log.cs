@@ -29,6 +29,5 @@ namespace LionRiver
         public Nullable<double> DRIFT { get; set; }
         public Nullable<double> SET { get; set; }
         public Nullable<double> SPD { get; set; }
-
     }
 }

@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="mainModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=C:\Users\fsu\source\repos\fsaux\LionRiver\LionRiver\Databases\LionRiver.sqlite" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="mainModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="Data Source=C:\Users\fsaux\Source\Repos\LionRiver\LionRiver\Databases\LionRiver.sqlite" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="FleetTrack">
           <Key>
             <PropertyRef Name="Name" />
@@ -36,6 +36,7 @@
           <Property Name="TWS" Type="real" />
           <Property Name="DRIFT" Type="real" />
           <Property Name="SET" Type="real" />
+          <Property Name="SPD" Type="real" />
         </EntityType>
         <EntityContainer Name="mainModelStoreContainer">
           <EntitySet Name="FleetTrack" EntityType="Self.FleetTrack" store:Type="Tables" />
@@ -63,6 +64,7 @@
           <Property Name="TWS" Type="Double" />
           <Property Name="DRIFT" Type="Double" />
           <Property Name="SET" Type="Double" />
+          <Property Name="SPD" Type="Double" />
         </EntityType>
         <EntityContainer Name="LionRiverDBContext" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Logs" EntityType="Self.Log" />
@@ -90,6 +92,7 @@
           <EntitySetMapping Name="Logs">
             <EntityTypeMapping TypeName="mainModel.Log">
               <MappingFragment StoreEntitySet="Log">
+                <ScalarProperty Name="SPD" ColumnName="SPD" />
                 <ScalarProperty Name="SET" ColumnName="SET" />
                 <ScalarProperty Name="DRIFT" ColumnName="DRIFT" />
                 <ScalarProperty Name="TWS" ColumnName="TWS" />
