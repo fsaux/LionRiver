@@ -4373,15 +4373,12 @@ namespace LionRiver
                 else
                 {
                     boat.BoatVisible = Visibility.Hidden;
-
-
                 }
 
                 minDt = dt.AddHours(-1); // Fleet track range
 
                 foreach (Boat b in fleetBoats)
                 {
-
                     var fTrackEntries =
                         (from x in context.FleetTracks
                          where x.Name == b.Name && x.timestamp <= dt && x.timestamp > minDt
@@ -4394,12 +4391,11 @@ namespace LionRiver
 
                         b.Location = new Location(lastTrackEntry.Latitude, lastTrackEntry.Longitude);
                         b.Heading = lastTrackEntry.COG;
-                        b.BoatVisible = Visibility.Visible;
-
+                        b.IsAvailable = true;
                     }
                     else 
                     {
-                        b.BoatVisible = Visibility.Hidden;
+                        b.IsAvailable = false;
                     }
 
                 }

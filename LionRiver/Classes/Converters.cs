@@ -169,6 +169,7 @@ namespace LionRiver
             return Binding.DoNothing;
         }
     }
+
     public class TopTextboxConverter : IMultiValueConverter
     {
         object IMultiValueConverter.Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -253,6 +254,25 @@ namespace LionRiver
                 return ns.Name + "," + ns.InPort.ToString() + "," + ns.OutPort1.ToString() + "," + ns.OutPort2.ToString() + "," + ns.OutPort3.ToString() + "," + ns.OutPort4.ToString();
             }
             return base.ConvertTo(context, culture, value, destinationType);
+        }
+    }
+
+    public class BooleanToVisibilityMultiConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            Visibility vis = (values[0] != null && values[0] != DependencyProperty.UnsetValue) ? (Visibility)(values[0]) : Visibility.Hidden;
+            bool available = (values[1] != null && values[1] != DependencyProperty.UnsetValue) ? (bool)(values[1]) : false;
+
+            if (available == true)
+                return vis;
+            else
+                return Visibility.Hidden;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

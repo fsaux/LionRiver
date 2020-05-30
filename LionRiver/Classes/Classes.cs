@@ -889,7 +889,6 @@ namespace LionRiver
         private double boatPerf;
         private DateTime time;
 
-        private Visibility boatVisible;
         private Color boatColor;
 
         private double windDirection;
@@ -906,6 +905,8 @@ namespace LionRiver
         private double predictedCurrentSpeed;
         private Visibility predictedCurrentVisible;
 
+        private Visibility boatVisible;
+        private bool isAvailable;
         private bool isSelected;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -1107,6 +1108,16 @@ namespace LionRiver
             {
                 isSelected = value;
                 OnPropertyChanged("IsSelected");
+            }
+        }
+
+        public bool IsAvailable
+        {
+            get { return isAvailable; }
+            set
+            {
+                isAvailable = value;
+                OnPropertyChanged("IsAvailable");
             }
         }
 
