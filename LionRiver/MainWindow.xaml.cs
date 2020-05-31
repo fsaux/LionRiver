@@ -3519,35 +3519,38 @@ namespace LionRiver
 
         private void InstrumentStackPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            PanStartingPoint = e.GetPosition(InstrumentStackPanel);
-
-            hitTestUI = null;
-
-            VisualTreeHelper.HitTest(InstrumentStackPanel, null,
-                new HitTestResultCallback(MyHitTestResult1),
-                new PointHitTestParameters(PanStartingPoint));
-
-            if (hitTestUI == null)
-                InstrumentStackPanel.Children.Remove(MovingInstrument);
-            else
-            if (hitTestUI.GetType() == typeof(System.Windows.Controls.StackPanel))
+            if (MovingInstrument!=null)
             {
-                InstrumentStackPanel.Children.Remove(MovingInstrument);
-                InstrumentStackPanel.Children.Add(MovingInstrument);
-            }
-            else
-            if (MovingInstrument != hitTestUI)
-            {
-                int j = InstrumentStackPanel.Children.IndexOf(hitTestUI);
-                InstrumentStackPanel.Children.Remove(MovingInstrument);
-                InstrumentStackPanel.Children.Insert(j, MovingInstrument);
-            }
+                PanStartingPoint = e.GetPosition(InstrumentStackPanel);
 
-            DummyInstrument.Visibility = Visibility.Hidden;
-            MovingInstrument = null;
+                hitTestUI = null;
 
-            Properties.Settings.Default.InstrumentDisplayList = GetCurrentInstrumentDisplayList();
-            Properties.Settings.Default.Save();
+                VisualTreeHelper.HitTest(InstrumentStackPanel, null,
+                    new HitTestResultCallback(MyHitTestResult1),
+                    new PointHitTestParameters(PanStartingPoint));
+
+                if (hitTestUI == null)
+                    InstrumentStackPanel.Children.Remove(MovingInstrument);
+                else
+                if (hitTestUI.GetType() == typeof(System.Windows.Controls.StackPanel))
+                {
+                    InstrumentStackPanel.Children.Remove(MovingInstrument);
+                    InstrumentStackPanel.Children.Add(MovingInstrument);
+                }
+                else
+                if (MovingInstrument != hitTestUI)
+                {
+                    int j = InstrumentStackPanel.Children.IndexOf(hitTestUI);
+                    InstrumentStackPanel.Children.Remove(MovingInstrument);
+                    InstrumentStackPanel.Children.Insert(j, MovingInstrument);
+                }
+
+                DummyInstrument.Visibility = Visibility.Hidden;
+                MovingInstrument = null;
+
+                Properties.Settings.Default.InstrumentDisplayList = GetCurrentInstrumentDisplayList();
+                Properties.Settings.Default.Save(); 
+            }
 
         }
 
@@ -4352,13 +4355,14 @@ namespace LionRiver
 
         private void UpdateFleet(DateTime dt)
         {
-            DateTime minDt = dt.AddSeconds(-4 * Math.Pow(Inst.ZoomFactor, NavPlotModel.Resolution)); // Short lookup range for position = 4 x Resolution
+            DateTime minDt = dt.AddSeconds(-60); // Short lookup range for position = t - 60 seg
 
             using (var context = new LionRiverDBContext())
             {
+                // UPDATE TO LEVEL=0 FOR BETTER RESOLUTION !!!!
 
                 var logEntry = (from x in context.Logs
-                                where (x.level == NavPlotModel.Resolution && (x.timestamp <= dt) && (x.timestamp > minDt))
+                                where (x.level == 1 && (x.timestamp <= dt) && (x.timestamp > minDt))
                                 orderby x.timestamp descending
                                 select x).FirstOrDefault();
 
@@ -4421,21 +4425,32 @@ namespace LionRiver
                     boat.BoatVisible = Visibility.Hidden;
                 }
 
-                minDt = dt.AddHours(-1); // Fleet track range
-
                 foreach (Boat b in fleetBoats)
                 {
-                    var fTrackEntries =
+                    var fTrackEntry =
                         (from x in context.FleetTracks
-                         where x.Name == b.Name && x.timestamp <= dt && x.timestamp > minDt
-                         orderby x.timestamp ascending
-                         select x).ToList();
+                         where x.Name == b.Name && x.timestamp <= dt
+                         orderby x.timestamp descending
+                         select x).Take(1).ToList();
 
-                    if (fTrackEntries != null && fTrackEntries.Count() > 0)
+                    if (fTrackEntry != null && fTrackEntry.Count() > 0)
                     {
-                        var lastTrackEntry = fTrackEntries.Last();
+                        var lastTrackEntry = fTrackEntry[0];
 
-                        b.Location = new Location(lastTrackEntry.Latitude, lastTrackEntry.Longitude);
+                        TimeSpan deltaT = dt - lastTrackEntry.timestamp;
+
+                        if (deltaT > TimeSpan.FromMinutes(15)) 
+                            deltaT = TimeSpan.FromMinutes(15);
+
+                        // extrapolate Meters since last position up to 15min
+
+                        var distance = lastTrackEntry.SOG * deltaT.TotalHours * 1852;
+
+                        double lat = 0, lon = 0;
+
+                        CalcPosition(lastTrackEntry.Latitude, lastTrackEntry.Longitude, distance, lastTrackEntry.COG, ref lat, ref lon);
+
+                        b.Location = new Location(lat,lon);
                         b.Heading = lastTrackEntry.COG;
                         b.IsAvailable = true;
                     }
@@ -4521,7 +4536,7 @@ namespace LionRiver
                                  select x).ToList();
                         }
                         else
-                        { // Make sure endtime is included, begginng could be trimmed
+                        { // Make sure endtime is included, begining could be trimmed off
                             fTrackEntries =
                                 (from x in context.FleetTracks
                                  where x.Name == b.Name && x.timestamp <= endTime && x.timestamp > startTime
@@ -4542,7 +4557,7 @@ namespace LionRiver
 
                     List<FleetTrack> rfTe= new List<FleetTrack>();
 
-                    if (n == 0 && decimator >= 1) // Deciimate list
+                    if (n == 0 && decimator >= 1) // Decimate list
                     {
                         for (int j = 0; j < fTe.Count(); j++)
                         {

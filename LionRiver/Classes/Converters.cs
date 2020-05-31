@@ -140,6 +140,7 @@ namespace LionRiver
         }
     }
 
+
     public class LabelConverterTop : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
