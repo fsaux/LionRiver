@@ -2859,6 +2859,7 @@ namespace LionRiver
         private static RoutedUICommand unselectFleetBoat = new RoutedUICommand("UnselectFleetBoat", "UnselectFleetBoat", typeof(CommandLibrary));
         private static RoutedUICommand hideUnselectedFleetBoats = new RoutedUICommand("HideUnselectedFleetBoats", "HideUnselectedFleetBoats", typeof(CommandLibrary));
         private static RoutedUICommand unhideAllFleetBoats = new RoutedUICommand("UnhideAllFleetBoats", "UnhideAllFleetBoats", typeof(CommandLibrary));
+        private static RoutedUICommand unselectAllFleetBoats = new RoutedUICommand("UnselectAllFleetBoats", "UnselectAllFleetBoats", typeof(CommandLibrary));
 
         public static RoutedUICommand AddMark
         {
@@ -2941,8 +2942,11 @@ namespace LionRiver
         {
             get { return unhideAllFleetBoats; }
         }
-
-
+        public static RoutedUICommand UnselectAllFleetBoats
+        {
+            get { return unselectAllFleetBoats; }
+        }
+        
     }
     public class MyCommand<T> : ICommand where T : class
     {

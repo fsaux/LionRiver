@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.Entity;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -94,65 +95,65 @@ namespace LionRiver
         public static List<Instrument> LoggedInstrumentList = new List<Instrument>();
 
         static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000", 10);
-        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn","0.0");
+        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn", "0.0");
         static LatitudeInstrument LAT = new LatitudeInstrument("Lat", "");
         static LongitudeInstrument LON = new LongitudeInstrument("Lon", "");
-        static PositionInstrument POS = new PositionInstrument("Position","");
-        static AngularInstrumentRel MVAR = new AngularInstrumentRel("MVar", "°","#",1,false);
-        static LinearInstrument SPD = new LinearInstrument("SPD", "Kn","0.0");
-        static LinearInstrument TEMP = new LinearInstrument("Temp", "°C","#.#");
-        static LinearInstrument DPT = new LinearInstrument("Depth", "m","0.0");
+        static PositionInstrument POS = new PositionInstrument("Position", "");
+        static AngularInstrumentRel MVAR = new AngularInstrumentRel("MVar", "°", "#", 1, false);
+        static LinearInstrument SPD = new LinearInstrument("SPD", "Kn", "0.0");
+        static LinearInstrument TEMP = new LinearInstrument("Temp", "°C", "#.#");
+        static LinearInstrument DPT = new LinearInstrument("Depth", "m", "0.0");
         static LinearInstrument AWS = new LinearInstrument("AWS", "Kn");
         static AngularInstrumentRel AWA = new AngularInstrumentRel("AWA", "°");
-        static LinearInstrument TWS = new LinearInstrument("TWS", "Kn", "#.#",2);
-        static AngularInstrumentRel TWA = new AngularInstrumentRel("TWA", "°","#",2);
-        static AngularInstrumentAbs TWD = new AngularInstrumentAbs("TWD", "°","000",15);
+        static LinearInstrument TWS = new LinearInstrument("TWS", "Kn", "#.#", 2);
+        static AngularInstrumentRel TWA = new AngularInstrumentRel("TWA", "°", "#", 2);
+        static AngularInstrumentAbs TWD = new AngularInstrumentAbs("TWD", "°", "000", 15);
         static AngularInstrumentAbs HDT = new AngularInstrumentAbs("HDG", "°T");
-        static AngularInstrumentAbs BRG = new AngularInstrumentAbs("BRG", "°T","000",1,false);
-        static LinearInstrument DST = new LinearInstrument("DST", "Nm","#.#",1,false);
-        static LinearInstrument XTE = new LinearInstrument("XTE", "Nm", "#.##", 1,false);
-        static LinearInstrument VMG = new LinearInstrument("WMG", "Kn","0.0",1,false);
-        static AngularInstrumentAbs HEEL = new AngularInstrumentAbs("HEEL", "°","#",15,false);
+        static AngularInstrumentAbs BRG = new AngularInstrumentAbs("BRG", "°T", "000", 1, false);
+        static LinearInstrument DST = new LinearInstrument("DST", "Nm", "#.#", 1, false);
+        static LinearInstrument XTE = new LinearInstrument("XTE", "Nm", "#.##", 1, false);
+        static LinearInstrument VMG = new LinearInstrument("WMG", "Kn", "0.0", 1, false);
+        static AngularInstrumentAbs HEEL = new AngularInstrumentAbs("HEEL", "°", "#", 15, false);
 
         // Destination Waypoint
-        static WaypointInstrument WPT = new WaypointInstrument("To:","","",1,false);
-        static LatitudeInstrument WLAT = new LatitudeInstrument("Lat", "","",1,false);
-        static LongitudeInstrument WLON = new LongitudeInstrument("Lon", "","",1,false);
+        static WaypointInstrument WPT = new WaypointInstrument("To:", "", "", 1, false);
+        static LatitudeInstrument WLAT = new LatitudeInstrument("Lat", "", "", 1, false);
+        static LongitudeInstrument WLON = new LongitudeInstrument("Lon", "", "", 1, false);
 
         // Last Waypoint
-        static WaypointInstrument LWPT = new WaypointInstrument("","","",1,false);
-        static LatitudeInstrument LWLAT = new LatitudeInstrument("Lat", "","",1,false);
-        static LongitudeInstrument LWLON = new LongitudeInstrument("Lon", "","",1,false);
-        static AngularInstrumentAbs LEGBRG = new AngularInstrumentAbs("BRG", "","000",1,false);
-        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn","0.0",1,false);
+        static WaypointInstrument LWPT = new WaypointInstrument("", "", "", 1, false);
+        static LatitudeInstrument LWLAT = new LatitudeInstrument("Lat", "", "", 1, false);
+        static LongitudeInstrument LWLON = new LongitudeInstrument("Lon", "", "", 1, false);
+        static AngularInstrumentAbs LEGBRG = new AngularInstrumentAbs("BRG", "", "000", 1, false);
+        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn", "0.0", 1, false);
 
         // Next Leg
-        static AngularInstrumentRel NTWA = new AngularInstrumentRel("Next TWA","°","#",1,false);
+        static AngularInstrumentRel NTWA = new AngularInstrumentRel("Next TWA", "°", "#", 1, false);
 
         // Drift
-        static AngularInstrumentAbs SET = new AngularInstrumentAbs("Set", "°T","000",30);
-        static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn","0.0",30);
+        static AngularInstrumentAbs SET = new AngularInstrumentAbs("Set", "°T", "000", 30);
+        static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn", "0.0", 30);
 
         // Performance
-        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn","0.0",4,false);
-        static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T","#",4,false);
-        static PercentInstrument PERF = new PercentInstrument("Perf", "%","#",15);
-        static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn","#.##",4,false);
-        static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T","000",4,false);
+        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn", "0.0", 4, false);
+        static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T", "#", 4, false);
+        static PercentInstrument PERF = new PercentInstrument("Perf", "%", "#", 15);
+        static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn", "#.##", 4, false);
+        static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T", "000", 4, false);
 
         // Starting Line
-        static LinearInstrument LINEDST = new LinearInstrument("Dst to line", "m", "#",1,false);
+        static LinearInstrument LINEDST = new LinearInstrument("Dst to line", "m", "#", 1, false);
 
         // Laylines
-        static AngularInstrumentAbs TGTCOGp = new AngularInstrumentAbs("Tgt COG Stbd", "°T","",1,false);
-        static AngularInstrumentAbs TGTCOGs = new AngularInstrumentAbs("Tgt COG Port", "°T","",1,false);
-        static LinearInstrument TGTSOGp = new LinearInstrument("Tgt SOG Stbd", "Kn","",1,false);
-        static LinearInstrument TGTSOGs = new LinearInstrument("Tgt SOG Port", "Kn","",1,false);
-        static LinearInstrument DSTLYLp = new LinearInstrumentShort("Dst Lay Port", "m","",1,false);
-        static LinearInstrument DSTLYLs = new LinearInstrumentShort("Dst Lay Stbd", "m","",1,false);
+        static AngularInstrumentAbs TGTCOGp = new AngularInstrumentAbs("Tgt COG Stbd", "°T", "", 1, false);
+        static AngularInstrumentAbs TGTCOGs = new AngularInstrumentAbs("Tgt COG Port", "°T", "", 1, false);
+        static LinearInstrument TGTSOGp = new LinearInstrument("Tgt SOG Stbd", "Kn", "", 1, false);
+        static LinearInstrument TGTSOGs = new LinearInstrument("Tgt SOG Port", "Kn", "", 1, false);
+        static LinearInstrument DSTLYLp = new LinearInstrumentShort("Dst Lay Port", "m", "", 1, false);
+        static LinearInstrument DSTLYLs = new LinearInstrumentShort("Dst Lay Stbd", "m", "", 1, false);
 
-        static TimeSpanInstrument TTGLYLp = new TimeSpanInstrument("TTG Lay Port", "","",1,false);
-        static TimeSpanInstrument TTGLYLs = new TimeSpanInstrument("TTG Lay Stbd", "","",1,false);
+        static TimeSpanInstrument TTGLYLp = new TimeSpanInstrument("TTG Lay Port", "", "", 1, false);
+        static TimeSpanInstrument TTGLYLs = new TimeSpanInstrument("TTG Lay Stbd", "", "", 1, false);
 
         #endregion
 
@@ -176,7 +177,7 @@ namespace LionRiver
         bool logging = false;
         bool commentLogged = false;
         bool replayLog = false;
-        string Comment="";
+        string Comment = "";
         private readonly BackgroundWorker LoadLogFileWorker;
         StartUpWindow StartupWdw;
         #endregion
@@ -191,8 +192,8 @@ namespace LionRiver
         static double linebrg;
         static bool p1_set = false;
         static bool p2_set = false;
-        static Mark lineBoatMark=new Mark(),
-                    linePinMark=new Mark();
+        static Mark lineBoatMark = new Mark(),
+                    linePinMark = new Mark();
         MapSegment staringLineMapSegment = new MapSegment();
 
         WLCourseSetupWindow wlCourseSetupWindow = new WLCourseSetupWindow();
@@ -229,8 +230,8 @@ namespace LionRiver
         private MapOrientationMode mapOrientationMode = MapOrientationMode.NorthUp;
         private MapCenterMode mapCenterMode = MapCenterMode.NotCentered;
 
-        public TileLayer MapLayer1=new TileLayer();
-        public TileLayer MapLayer2=new TileLayer();
+        public TileLayer MapLayer1 = new TileLayer();
+        public TileLayer MapLayer2 = new TileLayer();
 
         LayerControlWindow layerControl = new LayerControlWindow();
 
@@ -244,14 +245,14 @@ namespace LionRiver
         int markNumber = 0;
         Mark MovingMark;
         Mark MOB;
-        Mark HitPointStbd=new Mark(), HitPointPort=new Mark();
+        Mark HitPointStbd = new Mark(), HitPointPort = new Mark();
 
         bool ManOverBoard = false;
 
         private static readonly DependencyProperty ActiveMarkProperty = DependencyProperty.Register(
             "ActiveMark", typeof(Mark), typeof(Window), null);
 
-        public Mark ActiveMark 
+        public Mark ActiveMark
         {
             get { return (Mark)GetValue(ActiveMarkProperty); }
             set { SetValue(ActiveMarkProperty, value); }
@@ -302,7 +303,7 @@ namespace LionRiver
         static public LinearGradientBrush perfGradientBrush = (LinearGradientBrush)App.Current.FindResource("PerformanceMap");
 
         Track track;
-        bool newTrackPositionAvailable=false;
+        bool newTrackPositionAvailable = false;
 
         static public List<Track> fleetTracks = new List<Track>();
 
@@ -319,8 +320,8 @@ namespace LionRiver
         MapSegment StbBearingTarget = new MapSegment();
         MapSegment PrtBearingTarget = new MapSegment();
 
-        bool laylinesVisible=false; 
-        bool bearingTargetsVisible=false;
+        bool laylinesVisible = false;
+        bool bearingTargetsVisible = false;
 
         #endregion
 
@@ -334,13 +335,13 @@ namespace LionRiver
         currentgrib cgrib;
         WindArrowGrid wagrid;
         CurrentArrowGrid cagrid;
-        DateTime minGribTime=new DateTime();
-        DateTime maxGribTime=new DateTime();
+        DateTime minGribTime = new DateTime();
+        DateTime maxGribTime = new DateTime();
         #endregion
 
         #region Plot
 
-        public  NavPlotModel NavPlotModel= new NavPlotModel();
+        public NavPlotModel NavPlotModel = new NavPlotModel();
         Binding CursorXBinding = new Binding();
         Binding CursorYBinding = new Binding();
         Binding CurrentXBinding = new Binding();
@@ -368,7 +369,7 @@ namespace LionRiver
 
         public static RoutingCalculationControl routeCalculationControl = new RoutingCalculationControl();
         ObservableCollection<RoutingResult> routingResults = new ObservableCollection<RoutingResult>();
-        private readonly BackgroundWorker CalcRouteWorker =new BackgroundWorker();
+        private readonly BackgroundWorker CalcRouteWorker = new BackgroundWorker();
         int totalVertex, processedVertexCnt;
         double lastProcessedPercentage;
         DateTime startTime;
@@ -436,13 +437,13 @@ namespace LionRiver
             GdalConfiguration.ConfigureOgr();
 
             MapLayer1.TileSource = new TileSource();
-            MapLayer1.TileSource.UriFormat="file:\\" + Properties.Settings.Default.Layer1Directory + "\\{z}\\{x}\\{v}.png";
+            MapLayer1.TileSource.UriFormat = "file:\\" + Properties.Settings.Default.Layer1Directory + "\\{z}\\{x}\\{v}.png";
             MapLayer1.Opacity = Properties.Settings.Default.Layer1Opacity;
             MapLayer1.MaxZoomLevel = 18;
             if (Properties.Settings.Default.Layer1Check) map.TileLayers.Add(MapLayer1);
 
             MapLayer2.TileSource = new TileSource();
-            MapLayer2.TileSource.UriFormat="file://" + Properties.Settings.Default.Layer2Directory + "/{z}/{x}/{v}.png";
+            MapLayer2.TileSource.UriFormat = "file://" + Properties.Settings.Default.Layer2Directory + "/{z}/{x}/{v}.png";
             MapLayer2.Opacity = Properties.Settings.Default.Layer2Opacity;
             MapLayer2.MaxZoomLevel = 18;
             if (Properties.Settings.Default.Layer2Check) map.TileLayers.Add(MapLayer2);
@@ -466,7 +467,7 @@ namespace LionRiver
 
             //boatsItemCollection.Add(boat);
             //boatsItemCollection.Add(replayBoat);     
-            
+
             mainBoat.DataContext = boat;
             repBoat.DataContext = replayBoat;
 
@@ -536,6 +537,7 @@ namespace LionRiver
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnselectFleetBoat, UnselectFleetBoatCommand_Executed, UnselectFleetBoatCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.HideUnselectedFleetBoats, HideUnselectedFleetBoatsCommand_Executed, HideUnselectedFleetBoatsCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnhideAllFleetBoats, UnhideAllFleetBoatsCommand_Executed, UnhideAllFleetBoatsCommand_CanExecute));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnselectAllFleetBoats, UnselectAllFleetBoatsCommand_Executed, UnselectAllFleetBoatsCommand_CanExecute));
 
             #endregion
 
@@ -561,6 +563,27 @@ namespace LionRiver
             StartupWdw = new StartUpWindow();
             StartupWdw.Show();
 
+            //double A = 916;
+            //double B = 316;
+
+            //double decimator = A / (A - B);
+
+            //List<double> xlist = new List<double>();
+            //List<double> ylist = new List<double>();
+
+            //for (int i = 0; i < A; i++)
+            //    xlist.Add(12.1);
+
+            //for(int j=0;j<A;j++)
+            //{
+            //    var z = j % decimator;
+
+            //    if (z >=1 ) ylist.Add(13.1);
+
+
+            //}
+
+
 
             #region Nav Plots
 
@@ -576,9 +599,9 @@ namespace LionRiver
             NavPlotModel.XFormatter = value => new System.DateTime((long)(value)).ToString("dd MMM");
 
             //NavPlotModel.XStep = (double)TimeSpan.FromDays(7).Ticks;
-                
+
             var dayConfig = Mappers.Xy<DateModel>()
-                .X(dayModel => (double)dayModel.DateTime.Ticks )
+                .X(dayModel => (double)dayModel.DateTime.Ticks)
                 .Y(dayModel => dayModel.Value ?? double.NaN);
 
             NavPlotModel.MinY1AxisValue = 0;
@@ -600,7 +623,7 @@ namespace LionRiver
                     StrokeThickness=1,
                     ScalesYAt=0
                     },
-                
+
                 new LineSeries
                     {
                     Title = "AuxPlot",
@@ -621,7 +644,7 @@ namespace LionRiver
                 var logEntry = (from x in context.Logs
                                 select x).Take(1).ToList();
 
-                if (logEntry.Count != 0) 
+                if (logEntry.Count != 0)
                 {
                     var vLast = logEntry.Last();
 
@@ -673,7 +696,7 @@ namespace LionRiver
                 // Get Fleet Activity over all available data, grouped by hour
 
                 var ftEntries = (from x in context.FleetTracks
-                                 group x by new { year = x.timestamp.Year, month = x.timestamp.Month, day = x.timestamp.Day, hour=x.timestamp.Hour } into grp
+                                 group x by new { year = x.timestamp.Year, month = x.timestamp.Month, day = x.timestamp.Day, hour = x.timestamp.Hour } into grp
                                  select new { k = grp.Key, cnt = grp.Count() }).ToList();
 
                 var ftList = (from x in ftEntries
@@ -820,10 +843,10 @@ namespace LionRiver
 
             FleetUpdateTimer.Tick += new EventHandler(FleetUpdateTimer_Tick);
             FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
-            //FleetUpdateTimer.Interval = new TimeSpan(0, 0, 20);  // For testing
+            //FleetUpdateTimer.Interval = new TimeSpan(0, 0, 60);  // For testing
 
             ReplayTimer.Tick += new EventHandler(ReplayTimer_Tick);
-            ReplayTimer.Interval = new TimeSpan(0, 0, 0, 0,150);
+            ReplayTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
 
             PlotPanTimer.Tick += new EventHandler(PlotPanTimer_Tick);
             PlotPanTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
@@ -920,7 +943,7 @@ namespace LionRiver
 
             string[] ikeys = Properties.Settings.Default.InstrumentDisplayList.Split(',');
 
-            foreach(string k in ikeys)
+            foreach (string k in ikeys)
             {
                 if (k != "")
                     InstrumentStackPanel.Children.Add(InstrumentDisplays[k]);
@@ -940,7 +963,7 @@ namespace LionRiver
         private void NMEATimer_Tick(object sender, EventArgs e)
         {
 
-            switch(DataReceiverStatus1.Result)
+            switch (DataReceiverStatus1.Result)
             {
                 case RxTxResult.Ok:
                     DataReceiverStatus1.Result = RxTxResult.NoRxData; // Reset for next period of NMEATimer
@@ -1035,7 +1058,7 @@ namespace LionRiver
                 SendNMEA();
             }
 
-            UpdateShapes();
+            UpdateNav();
         }
 
         private void MediumNavTimer_Tick(object sender, EventArgs e)
@@ -1104,7 +1127,7 @@ namespace LionRiver
             {
                 return;
             }
-            
+
             RootObj BoatsLastPosition = new RootObj();
             BoatsLastPosition = JsonConvert.DeserializeObject<RootObj>(json);
 
@@ -1140,14 +1163,12 @@ namespace LionRiver
                                 Latitude = bp.latitud,
                                 Longitude = bp.longitud
                             },
-                            Time=newUpdateTime,
-                            BoatVisible = Visibility.Hidden,
+                            Time = newUpdateTime,
+                            BoatVisible = Visibility.Visible,
                             Heading = Convert.ToDouble(bp.rumbo.TrimEnd('°')),
-                            IsSelected = false
+                            IsSelected = false,
+                            IsAvailable = true
                         };
-
-                        if (Properties.Settings.Default.FleetBoatsVisible)
-                            b.BoatVisible = Visibility.Visible;
 
                         MapItem boatMapItem = new MapItem();
                         boatMapItem.Style = (Style)Application.Current.Resources["FleetBoatItemStyle"];
@@ -1162,8 +1183,8 @@ namespace LionRiver
                     else //Update Time for existing fleet boat
                     {
                         var bx = (from x in fleetBoats
-                                 where x.Name == z.Name
-                                 select x).FirstOrDefault();
+                                  where x.Name == z.Name
+                                  select x).FirstOrDefault();
 
                         if (bx != null)
                             bx.Time = newUpdateTime;
@@ -1199,7 +1220,6 @@ namespace LionRiver
                             catch { bTrack = null; }
                         }
 
-
                         if (bTrack != null)
                         {
                             // If there is only one track point available, add and continue
@@ -1222,7 +1242,7 @@ namespace LionRiver
                                 }
                             }
 
-                            // If there are more that one track point, interpolate between entries
+                            // If there are more that one track points, interpolate between entries
                             for (int i = 1; i < bTrack.posicion.Count(); i++)
                             {
                                 var x0 = bTrack.posicion[i - 1];
@@ -1234,7 +1254,7 @@ namespace LionRiver
                                 double sog0 = Convert.ToDouble(x0.velocidad.Split(' ')[0]);
                                 double cog = CalcBearing(x0.latitud, x0.longitud, x1.latitud, x1.longitud);
                                 double dist = CalcDistance(x0.latitud, x0.longitud, x1.latitud, x1.longitud) / 1852; // nautical miles
-                                int steps = 5;
+                                int steps = 3;
                                 double deltaT = (t1 - t0).TotalHours; // Hours
 
                                 if (t1 > lastUpdateTime && deltaT != 0) // New data available
@@ -1242,7 +1262,7 @@ namespace LionRiver
                                     double a = 2 * (dist / deltaT - sog0) / deltaT;
 
                                     // Add #steps interpolated equally spaced entries if time span <2 hr
-                                    if ((t1 - t0) < TimeSpan.FromHours(2))
+                                    if ((t1 - t0) < TimeSpan.FromHours(1))
                                     {
                                         for (int j = 1; j < steps; j++)
                                         {
@@ -1315,12 +1335,14 @@ namespace LionRiver
 
             UpdatePlotResolutionTimer.Start(); // Forces updating tracks on Map s well
 
+            if (PlayButton.IsChecked == true)
+                UpdateFleet(DateTime.Now);
         }
 
         private void ReplayTimer_Tick(object sender, EventArgs e)
         {
             double deltaT = NavPlotModel.MaxXAxisValue - NavPlotModel.MinXAxisValue;
-            
+
             NavPlotModel.CurrentValue += deltaT * FwdBackSlider.Value / 1000;
 
             double lim = NavPlotModel.MinXAxisValue + 0.8 * deltaT;
@@ -1366,7 +1388,7 @@ namespace LionRiver
 
             double DataWStart, DataWEnd;
 
-            if (MainPlotValues.Count()!=0)
+            if (MainPlotValues.Count() != 0)
             {
                 DataWStart = MainPlotValues.Last().DateTime.Ticks;
                 DataWEnd = MainPlotValues.First().DateTime.Ticks;
@@ -1404,7 +1426,7 @@ namespace LionRiver
                 UpdatePlot(n, newDataWStart, newDataWEnd);
 
                 if (PlayButton.IsChecked == true)
-                    UpdateTracks(newDataWStart, new DateTime((long)NavPlotModel.MaxXAxisValue),Track.MaxLength);
+                    UpdateTracks(newDataWStart, new DateTime((long)NavPlotModel.MaxXAxisValue), Track.MaxLength);
             }
 
         }
@@ -1458,7 +1480,7 @@ namespace LionRiver
             Point p = e.GetPosition(map);
             var mouseLocation = map.ViewportPointToLocation(p);
 
-            switch(mouseHandlingMode)
+            switch (mouseHandlingMode)
             {
                 case MouseHandlingMode.MovingMark:
                     {
@@ -1474,7 +1496,7 @@ namespace LionRiver
                     }
             }
 
-            if(!fixMeasure)
+            if (!fixMeasure)
                 measureLocation = mouseLocation;
 
             if ((bool)MeasureButton.IsChecked)
@@ -1526,7 +1548,7 @@ namespace LionRiver
 
                 if (TempSegment == null)
                 {
-                    TempSegment = new MapSegment();                    
+                    TempSegment = new MapSegment();
                     map.Children.Add(TempSegment);
                     Panel.SetZIndex(TempSegment, 15);
                     TempSegment.FromLocation = mk.Location;
@@ -1616,7 +1638,7 @@ namespace LionRiver
                 var boat = lb.SelectedItem as Boat;
 
                 RouteAddMarkAt(boat.Location);
-                e.Handled=true;
+                e.Handled = true;
             }
         }
 
@@ -1670,13 +1692,13 @@ namespace LionRiver
         #region Grib handling
 
         private void GribSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {            
+        {
             double ts = (maxGribTime - minGribTime).TotalSeconds * gribControl.GribSlider.Value / (gribControl.GribSlider.Maximum + 1);
             DateTime dt = minGribTime + TimeSpan.FromSeconds(ts);
 
             SetGribTime(dt);
         }
-       
+
         private void GribNowButton_Click(object sender, RoutedEventArgs e)
         {
             SetGribTimeNow();
@@ -1703,10 +1725,10 @@ namespace LionRiver
                     cagrid.Visibility = Visibility.Hidden;
 
         }
-        
+
         private void SetGribTimeNow()
         {
-            DateTime dt=DateTime.Now.ToUniversalTime();
+            DateTime dt = DateTime.Now.ToUniversalTime();
 
             if (dt >= minGribTime && dt <= maxGribTime)
             {
@@ -1756,7 +1778,7 @@ namespace LionRiver
 
             dlg.Title = "Replay Log";
             dlg.Filter = "Log files|*.log";
-            if (Properties.Settings.Default.LogFile != "") 
+            if (Properties.Settings.Default.LogFile != "")
                 dlg.InitialDirectory = System.IO.Path.GetDirectoryName(Properties.Settings.Default.LogFile);
             Nullable<bool> result = dlg.ShowDialog();
 
@@ -1805,16 +1827,16 @@ namespace LionRiver
                 DataReceiverStatus4.Result = RxTxResult.NoRxData;
 
                 MapLayer1.TileSource = new TileSource();
-                MapLayer1.TileSource.UriFormat="file:\\" + Properties.Settings.Default.Layer1Directory + "\\{z}\\{x}\\{v}.png";
+                MapLayer1.TileSource.UriFormat = "file:\\" + Properties.Settings.Default.Layer1Directory + "\\{z}\\{x}\\{v}.png";
                 MapLayer1.Opacity = Properties.Settings.Default.Layer1Opacity;
                 MapLayer1.MaxZoomLevel = 18;
 
                 MapLayer2.TileSource = new TileSource();
-                MapLayer2.TileSource.UriFormat="file://" + Properties.Settings.Default.Layer2Directory + "/{z}/{x}/{v}.png";
+                MapLayer2.TileSource.UriFormat = "file://" + Properties.Settings.Default.Layer2Directory + "/{z}/{x}/{v}.png";
                 MapLayer2.Opacity = Properties.Settings.Default.Layer2Opacity;
                 MapLayer2.MaxZoomLevel = 18;
-                                
-                if(LogFile!=null)
+
+                if (LogFile != null)
                     LogFile.Close();
 
                 try
@@ -1926,11 +1948,11 @@ namespace LionRiver
 
                 layer = inputDS.GetLayerByName("route_points");
 
-                int last_fid = 0; 
+                int last_fid = 0;
                 while ((f = layer.GetNextFeature()) != null)
                 {
                     int route_fid = f.GetFieldAsInteger("route_fid");
-                    if(last_fid!=route_fid) 
+                    if (last_fid != route_fid)
                         prevMark = new Mark();
 
                     string name = f.GetFieldAsString("name");
@@ -1980,10 +2002,10 @@ namespace LionRiver
                 Feature f1 = new Feature(layer1.GetLayerDefn());
                 OSGeo.OGR.Geometry g1 = new OSGeo.OGR.Geometry(wkbGeometryType.wkbPoint);
 
-                foreach(Mark mk in marksItemCollection)
+                foreach (Mark mk in marksItemCollection)
                 {
                     f1.SetField("Name", mk.Name);
-                    g1.AddPoint_2D(mk.Location.Longitude,mk.Location.Latitude);
+                    g1.AddPoint_2D(mk.Location.Longitude, mk.Location.Latitude);
                     f1.SetGeometry(g1);
                     layer1.CreateFeature(f1);
                 }
@@ -1997,10 +2019,10 @@ namespace LionRiver
 
 
                 int i = 0;
-                foreach(Route rte in routeList)
+                foreach (Route rte in routeList)
                 {
-                    int j=0;
-                    Leg tleg=rte.Legs[0];
+                    int j = 0;
+                    Leg tleg = rte.Legs[0];
 
                     Mark mk = tleg.FromMark;
 
@@ -2014,14 +2036,14 @@ namespace LionRiver
 
                     j++;
 
-                    while(tleg!=null)
+                    while (tleg != null)
                     {
                         mk = tleg.ToMark;
                         g3.AddPoint_2D(mk.Location.Longitude, mk.Location.Latitude);
                         f3.SetField("route_fid", i);
                         f3.SetField("route_point_id", j);
                         f3.SetField("route_name", rte.Name);
-                        f3.SetField("name",mk.Name);
+                        f3.SetField("name", mk.Name);
                         f3.SetGeometry(g3);
                         layer3.CreateFeature(f3);
                         j++;
@@ -2105,11 +2127,11 @@ namespace LionRiver
                         }
                     wgrib.band.Add(wb);
                 }
-                
+
                 map.Children.Remove(wagrid);
-                wagrid = new WindArrowGrid(wgrib,wgrib.DeltaLat*.1);
+                wagrid = new WindArrowGrid(wgrib, wgrib.DeltaLat * .1);
                 map.Children.Add(wagrid);
-              
+
                 maxGribTime = wgrib.band[wgrib.band.Count - 1].datetime;
                 minGribTime = wgrib.band[0].datetime;
 
@@ -2237,9 +2259,9 @@ namespace LionRiver
         }
 
         #endregion
-        
+
         #region Commands
-		
+
         private void MoveMark(object sender, RoutedEventArgs e)
         {
             MenuItem mi = sender as MenuItem;
@@ -2254,7 +2276,7 @@ namespace LionRiver
                     mouseHandlingMode = MouseHandlingMode.MovingMark;
 
                 }
-            }       
+            }
 
         }
 
@@ -2350,7 +2372,7 @@ namespace LionRiver
                 routeControl.RouteListComboBox.SelectedIndex = 0;
 
             MeasureButton.IsChecked = false;
-            
+
         }
 
         private void AddMarkCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -2359,7 +2381,7 @@ namespace LionRiver
 
             Mark mk = new Mark
             {
-                Location = new Location(0,0),
+                Location = new Location(0, 0),
                 Name = "mk" + markNumber.ToString()
             };
 
@@ -2453,10 +2475,10 @@ namespace LionRiver
             }
             else
                 if (mk != ActiveMark)
-                    e.CanExecute = true;
-                else
-                    e.CanExecute = false;
-            
+                e.CanExecute = true;
+            else
+                e.CanExecute = false;
+
             e.Handled = true;
         }
 
@@ -2466,9 +2488,9 @@ namespace LionRiver
 
             ActiveMark = mk;
 
-            if(ActiveRoute!=null)
+            if (ActiveRoute != null)
             {
-                ActiveLeg = ActiveRoute.Legs.FirstOrDefault(lg => lg.ToMark==mk);
+                ActiveLeg = ActiveRoute.Legs.FirstOrDefault(lg => lg.ToMark == mk);
                 if (ActiveLeg == null)
                     ActiveRoute = null;
             }
@@ -2490,7 +2512,7 @@ namespace LionRiver
         private void ActivateRouteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             var cb = e.Parameter as ComboBox;
-            ActiveRoute = cb.SelectedItem as Route;            
+            ActiveRoute = cb.SelectedItem as Route;
             ActiveLeg = ActiveRoute.Legs[0];
             ActiveMark = (Mark)ActiveLeg.ToMark;
         }
@@ -2502,7 +2524,7 @@ namespace LionRiver
                 #region SelectionChanged
                 case RouteCtrlCmd.SelectionChanged:
                     {
-                        var newRoute =  e.RouteTarget as Route;
+                        var newRoute = e.RouteTarget as Route;
 
                         if (newRoute != null)
                         {
@@ -2511,7 +2533,7 @@ namespace LionRiver
                             ICollection<object> legsItemCollection = (ICollection<object>)Resources["LegsItemCollection"];
                             legsItemCollection.Clear();
 
-                            foreach(Leg lg in newRoute.Legs)
+                            foreach (Leg lg in newRoute.Legs)
                             {
                                 legsItemCollection.Add(lg);
                             }
@@ -2529,7 +2551,7 @@ namespace LionRiver
                         RouteButton.IsChecked = false;
                         break;
                     }
-                #endregion
+                    #endregion
             }
         }
 
@@ -2543,7 +2565,7 @@ namespace LionRiver
                         MarkButton.IsChecked = false;
                         break;
                     }
-                #endregion
+                    #endregion
             }
         }
 
@@ -2757,14 +2779,14 @@ namespace LionRiver
                 InvertedRoute.Legs.Add(nleg);
                 legsItemCollection.Add(nleg);
                 npleg = nleg;
-                tleg = tleg.PreviousLeg;  
+                tleg = tleg.PreviousLeg;
             }
 
             InvertedRoute.Name = SelectedRoute.Name;
 
             routeList.Remove(SelectedRoute);
             routeList.Add(InvertedRoute);
-            routeControl.RouteListComboBox.SelectedItem=InvertedRoute;
+            routeControl.RouteListComboBox.SelectedItem = InvertedRoute;
 
             foreach (Leg l in SelectedRoute.Legs)
             {
@@ -2794,7 +2816,7 @@ namespace LionRiver
             }
 
             routeList.Remove(SelectedRoute);
-            
+
             e.Handled = true;
         }
 
@@ -2804,7 +2826,7 @@ namespace LionRiver
             e.CanExecute = (si != null) && (si != ActiveRoute);
             e.Handled = true;
         }
-        
+
         private void SetLineBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (LAT.IsValid() && HDT.IsValid())
@@ -2830,7 +2852,7 @@ namespace LionRiver
             e.CanExecute = true;
             e.Handled = true;
         }
-        
+
         private void SetLinePinCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (LAT.IsValid() && HDT.IsValid())
@@ -2867,7 +2889,7 @@ namespace LionRiver
             if (z != null)
                 if (InstrumentStackPanel.Children.Contains(z))
                     InstrumentStackPanel.Children.Remove(z);
-            
+
             Properties.Settings.Default.InstrumentDisplayList = GetCurrentInstrumentDisplayList();
             Properties.Settings.Default.Save();
 
@@ -2943,7 +2965,7 @@ namespace LionRiver
 
         private void HideUnselectedFleetBoatsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            foreach(Boat b in fleetBoats)
+            foreach (Boat b in fleetBoats)
             {
                 if (b.IsSelected == false)
                     b.BoatVisible = Visibility.Hidden;
@@ -2971,6 +2993,30 @@ namespace LionRiver
             e.CanExecute = true;
             e.Handled = true;
         }
+
+        private void UnselectAllFleetBoatsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            foreach (Boat b in fleetBoats)
+                b.IsSelected = false;
+
+            if (PlayButton.IsChecked == false)
+            {
+                DateTime startTime = new DateTime((long)NavPlotModel.SelectionFromValue);
+                DateTime endTime = new DateTime((long)NavPlotModel.SelectionToValue);
+
+                UpdateTracks(startTime, endTime);
+            }
+
+
+            e.Handled = true;
+        }
+
+        private void UnselectAllFleetBoatsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+            e.Handled = true;
+        }
+
 
         private void Generic_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -3036,7 +3082,7 @@ namespace LionRiver
         {
             mapCenterMode = MapCenterMode.Centered;
 
-            if(PlayButton.IsChecked==false)
+            if (PlayButton.IsChecked == false)
             {
                 DateTime dt = new DateTime((long)NavPlotModel.CurrentValue);
                 UpdateFleet(dt);
@@ -3079,7 +3125,7 @@ namespace LionRiver
         {
             if (wgrib != null)
             {
-                if((bool)gribControl.DisplayWind.IsChecked)
+                if ((bool)gribControl.DisplayWind.IsChecked)
                     wagrid.Visibility = Visibility.Visible;
             }
 
@@ -3090,7 +3136,7 @@ namespace LionRiver
             }
 
             MapGrid.Children.Remove(routeCalculationControl);
-            RouteCalcButton.IsChecked  = false;
+            RouteCalcButton.IsChecked = false;
             MapGrid.Children.Add(gribControl);
         }
 
@@ -3136,11 +3182,11 @@ namespace LionRiver
             NavPlotModel.MinXAxisValue = (NavPlotModel.CurrentValue - 0.8 * deltaT);
             NavPlotModel.MaxXAxisValue = (NavPlotModel.CurrentValue + 0.2 * deltaT);
 
-            UpdateTracks(new DateTime((long)NavPlotModel.MinXAxisValue), dt);
+            UpdateTracks(new DateTime((long)NavPlotModel.MinXAxisValue), dt, Track.MaxLength);
 
             UpdateFleet(dt);
 
-            if (FwdBackSlider!=null)
+            if (FwdBackSlider != null)
                 FwdBackSlider.Value = 0;
 
             ReplayTimer.Stop();
@@ -3164,7 +3210,7 @@ namespace LionRiver
         {
             if (FwdBackSlider.Value != 0)
             {
-                if(ReplayTimer.IsEnabled==false)
+                if (ReplayTimer.IsEnabled == false)
                     ReplayTimer.Start();
             }
             else
@@ -3193,7 +3239,7 @@ namespace LionRiver
             }
 
         }
-        
+
         private void MainNavPlot_MouseMove(object sender, MouseEventArgs e)
         {
             var pos = e.GetPosition(MainNavPlot.Chart);
@@ -3218,7 +3264,7 @@ namespace LionRiver
 
                 double deltaX = PanStartingPoint.X - pos.X;
 
-                var dx = ChartFunctions.FromPlotArea(deltaX, LiveCharts.AxisOrientation.X, MainNavPlot.Chart.Model,0) -
+                var dx = ChartFunctions.FromPlotArea(deltaX, LiveCharts.AxisOrientation.X, MainNavPlot.Chart.Model, 0) -
                              ChartFunctions.FromPlotArea(0, LiveCharts.AxisOrientation.X, MainNavPlot.Chart.Model, 0);
 
                 NavPlotModel.MinXAxisValue += dx;
@@ -3232,7 +3278,7 @@ namespace LionRiver
                 {
                     NavPlotModel.CurrentValue = (NavPlotModel.MinXAxisValue + NavPlotModel.MaxXAxisValue) / 2;
 
-                    if (PlotPanTimer.IsEnabled==false)
+                    if (PlotPanTimer.IsEnabled == false)
                         PlotPanTimer.Start();
                 }
             }
@@ -3249,7 +3295,7 @@ namespace LionRiver
                     if (point.X > NavPlotModel.SelectionFromValue && point.X < NavPlotModel.SelectionToValue)
                     {
                         MainNavPlot.SelectionContextMenu.IsOpen = true;
-                    
+
                     }
 
                     mouseHandlingMode = MouseHandlingMode.None;
@@ -3301,7 +3347,7 @@ namespace LionRiver
 
                 }
 
-        }        
+        }
 
         private void MainNavPlot_MouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -3484,17 +3530,17 @@ namespace LionRiver
             if (hitTestUI == null)
                 InstrumentStackPanel.Children.Remove(MovingInstrument);
             else
-            if(hitTestUI.GetType()==typeof(System.Windows.Controls.StackPanel))
+            if (hitTestUI.GetType() == typeof(System.Windows.Controls.StackPanel))
             {
                 InstrumentStackPanel.Children.Remove(MovingInstrument);
                 InstrumentStackPanel.Children.Add(MovingInstrument);
             }
             else
-            if(MovingInstrument!=hitTestUI)
+            if (MovingInstrument != hitTestUI)
             {
                 int j = InstrumentStackPanel.Children.IndexOf(hitTestUI);
                 InstrumentStackPanel.Children.Remove(MovingInstrument);
-                InstrumentStackPanel.Children.Insert(j,MovingInstrument);
+                InstrumentStackPanel.Children.Insert(j, MovingInstrument);
             }
 
             DummyInstrument.Visibility = Visibility.Hidden;
@@ -3527,8 +3573,8 @@ namespace LionRiver
             double step = Math.Sqrt(2) / 2 * dist / (size - 5);
 
             // Create all vertex 
-            for (int j = -2; j < size-2; j++)
-                for (int i = -2; i < size-2 ; i++)
+            for (int j = -2; j < size - 2; j++)
+                for (int i = -2; i < size - 2; i++)
                 {
                     Point l = new Point(i * step, j * step);
 
@@ -3671,7 +3717,7 @@ namespace LionRiver
                 if (!vn.Visited)
                 {
 
-                    if (cuv!=null) // we've got a valid current measurment
+                    if (cuv != null) // we've got a valid current measurment
                     {
                         double brg = CalcBearing(v.Position.Latitude, v.Position.Longitude, vn.Position.Latitude, vn.Position.Longitude);
                         double dst = CalcDistance(v.Position.Latitude, v.Position.Longitude, vn.Position.Latitude, vn.Position.Longitude) / 1852;
@@ -3711,7 +3757,7 @@ namespace LionRiver
             return true;
         }
 
-        private Boolean CalcMinimumRoute(Vertex startV,Vertex endV,DateTime startTime,List<Vertex> routingGrid)
+        private Boolean CalcMinimumRoute(Vertex startV, Vertex endV, DateTime startTime, List<Vertex> routingGrid)
         {
             startV.Cost = startTime;
 
@@ -3734,11 +3780,11 @@ namespace LionRiver
             return true;
         }
 
-        public IEnumerable<Vertex> GetMinimumRoute(Vertex startV, Vertex endV,List<Vertex> routingGrid)
+        public IEnumerable<Vertex> GetMinimumRoute(Vertex startV, Vertex endV, List<Vertex> routingGrid)
         {
-            Vertex v=endV;
+            Vertex v = endV;
 
-            while (v != startV && v!=null)
+            while (v != startV && v != null)
             {
                 yield return v;
                 v = v.Previous;
@@ -3750,19 +3796,19 @@ namespace LionRiver
         private void RouteCalcButton_Click(object sender, RoutedEventArgs e)
         {
             if (routeCalculationControl.RouteListCombo.SelectedItem != null
-                &&routeCalculationControl.RouteStartTimePicker.Value!=null
-                && wgrib!=null
+                && routeCalculationControl.RouteStartTimePicker.Value != null
+                && wgrib != null
                 && NavPolar.IsLoaded)
             {
                 routeCalculationControl.CalculateRoute.IsEnabled = false;
-                
+
                 startTime = ((DateTime)routeCalculationControl.RouteStartTimePicker.Value).ToUniversalTime();
                 perfAdj = (double)routeCalculationControl.PerformanceAdjust.Value;
 
                 useCurrents = (bool)routeCalculationControl.UseCurrent.IsChecked;
 
                 var r = (Route)routeCalculationControl.RouteListCombo.SelectedItem;
-                
+
                 sourceRouteLocations.Clear();
                 sourceRouteLocations.Add(r.Legs[0].FromLocation);
                 foreach (Leg lg in r.Legs)
@@ -3773,7 +3819,7 @@ namespace LionRiver
 
         void CalcRouteWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            List<Vertex> routeResult= new List<Vertex>();
+            List<Vertex> routeResult = new List<Vertex>();
             Vertex lastVertex = null;
             DateTime st = startTime;
 
@@ -3786,12 +3832,12 @@ namespace LionRiver
             totalVertex = (locs.Count() - 1) * gridSize * gridSize;
             processedVertexCnt = 0;
 
-            for(int i=0;i<locs.Count()-1;i++)
+            for (int i = 0; i < locs.Count() - 1; i++)
             {
                 Vertex startV, endV;
                 List<Vertex> routingGrid = new List<Vertex>();
 
-                routingGrid = RoutingGridGenerate(locs[i],locs[i+1], gridSize, out startV, out endV);
+                routingGrid = RoutingGridGenerate(locs[i], locs[i + 1], gridSize, out startV, out endV);
 
                 startV.Previous = lastVertex;
 
@@ -3877,10 +3923,10 @@ namespace LionRiver
                 replayBoat.Heading = rr.vertexReplayList[0].BRG;
             }
 
-            foreach(RoutingResult rr in e.RemovedItems)
+            foreach (RoutingResult rr in e.RemovedItems)
             {
                 rr.UnSelect();
-            }            
+            }
 
         }
 
@@ -3890,7 +3936,7 @@ namespace LionRiver
             var rr = routeCalculationControl.ResultCombo.SelectedItem as RoutingResult;
 
             Vertex v = rr.vertexReplayList[(int)e.NewValue];
-            
+
             replayBoat.Location = v.Position;
             replayBoat.Heading = v.BRG;
             replayBoat.WindDirection = v.TWD;
@@ -3900,7 +3946,7 @@ namespace LionRiver
             replayBoat.BoatSpeed = v.SPD;
             replayBoat.Time = v.Cost.ToLocalTime();
         }
-        
+
         #endregion
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -3952,9 +3998,9 @@ namespace LionRiver
             }
         }
 
-        private void UpdateShapes()
+        private void UpdateNav()
         {
-            if (PlayButton.IsChecked==true)
+            if (PlayButton.IsChecked == true)
             {
 
                 if (LAT.IsValid())
@@ -4306,7 +4352,7 @@ namespace LionRiver
 
         private void UpdateFleet(DateTime dt)
         {
-            DateTime minDt= dt.AddSeconds(-4 * Math.Pow(Inst.ZoomFactor, NavPlotModel.Resolution)); // Short lookup range for position = 4 x Resolution
+            DateTime minDt = dt.AddSeconds(-4 * Math.Pow(Inst.ZoomFactor, NavPlotModel.Resolution)); // Short lookup range for position = 4 x Resolution
 
             using (var context = new LionRiverDBContext())
             {
@@ -4393,7 +4439,7 @@ namespace LionRiver
                         b.Heading = lastTrackEntry.COG;
                         b.IsAvailable = true;
                     }
-                    else 
+                    else
                     {
                         b.IsAvailable = false;
                     }
@@ -4420,6 +4466,7 @@ namespace LionRiver
         private void UpdateTracks(DateTime startTime, DateTime endTime, int n = 0)
         {
 
+
             using (var context = new LionRiverDBContext())
             {
 
@@ -4430,16 +4477,16 @@ namespace LionRiver
                 if (n == 0)
                 {
                     logEntries = (from x in context.Logs
-                                      where (x.level == NavPlotModel.Resolution && x.timestamp <= endTime && x.timestamp > startTime)
-                                      select x);
+                                  where (x.level == NavPlotModel.Resolution && x.timestamp <= endTime && x.timestamp > startTime)
+                                  select x);
                 }
                 else
                 {
                     logEntries = (from x in context.Logs
-                                        where (x.level == NavPlotModel.Resolution)
-                                        orderby x.timestamp descending
-                                        select x
-                                        ).Take(n).OrderBy(y=>y.timestamp);
+                                  where (x.level == NavPlotModel.Resolution)
+                                  orderby x.timestamp descending
+                                  select x
+                                        ).Take(n).OrderBy(y => y.timestamp);
                 }
 
 
@@ -4453,35 +4500,74 @@ namespace LionRiver
                     map.Children.Remove(ft);
                 fleetTracks.Clear();
 
+                // Add up to 5 full Track.maxLenght
+                var selCnt = fleetBoats.Count(x => x.IsSelected == true);
+                var takeCnt = (selCnt != 0) ? Track.MaxLength * 5 / selCnt : 0;
+
+                List<List<FleetTrack>> fTrackList = new List<List<FleetTrack>>();
+                List<FleetTrack> fTrackEntries;
+
                 foreach (Boat b in fleetBoats)
                 {
+
                     if (b.IsSelected)
                     {
-
-                        var fTrackEntries =
-                            (from x in context.FleetTracks
-                             where x.Name == b.Name && x.timestamp <= endTime && x.timestamp > startTime
-                             orderby x.timestamp ascending
-                             select x).ToList();
-
-                        if (fTrackEntries != null && fTrackEntries.Count() > 0)
-                        {
-
-                            Track tr = new Track(fTrackEntries, Properties.Settings.Default.SPDminVal, Properties.Settings.Default.SPDminIndex,
-                                                    Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
-
-                            if (Properties.Settings.Default.FleetTracksVisible)
-                                tr.Visibility = Visibility.Visible;
-                            else
-                                tr.Visibility = Visibility.Hidden;
-
-                            fleetTracks.Add(tr);
-                            map.Children.Add(tr);
-                            Panel.SetZIndex(tr, 5);
+                        if (n == 0)
+                        { // Include all, post-processing could decimate the list to accomodate takeCnt elements
+                            fTrackEntries =
+                                (from x in context.FleetTracks
+                                 where x.Name == b.Name && x.timestamp <= endTime && x.timestamp > startTime
+                                 orderby x.timestamp ascending
+                                 select x).ToList();
                         }
+                        else
+                        { // Make sure endtime is included, begginng could be trimmed
+                            fTrackEntries =
+                                (from x in context.FleetTracks
+                                 where x.Name == b.Name && x.timestamp <= endTime && x.timestamp > startTime
+                                 orderby x.timestamp descending
+                                 select x).Take(takeCnt).OrderBy(y => y.timestamp).ToList();
+                        }
+
+                        fTrackList.Add(fTrackEntries);
                     }
                 }
 
+
+                foreach (List<FleetTrack> fTe in fTrackList)
+                {
+                    double A = fTe.Count();
+                    double B = takeCnt;
+                    double decimator = A / (A - B);
+
+                    List<FleetTrack> rfTe= new List<FleetTrack>();
+
+                    if (n == 0 && decimator >= 1) // Deciimate list
+                    {
+                        for (int j = 0; j < fTe.Count(); j++)
+                        {
+                            if ((int)(j % decimator) >= 1)
+                                rfTe.Add(fTe[j]);
+                        }
+                    }
+                    else
+                    {
+                        rfTe = fTe;
+                    }
+
+                    if (rfTe != null && rfTe.Count() > 0)
+                    {
+
+                        Track tr = new Track(rfTe, Properties.Settings.Default.SPDminVal, Properties.Settings.Default.SPDminIndex,
+                                                Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
+
+                        tr.Visibility = Visibility.Visible;
+
+                        fleetTracks.Add(tr);
+                        map.Children.Add(tr);
+                        Panel.SetZIndex(tr, 5);
+                    }
+                }
             }
 
         }

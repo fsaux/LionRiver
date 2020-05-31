@@ -59,6 +59,18 @@
                                       Command="local:CommandLibrary.AddMark"
                                       CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                       CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
+            <MenuItem Header="Unhide all"
+                                  Command="local:CommandLibrary.UnhideAllFleetBoats"
+                                  CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                  CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
+            <MenuItem Header="Hide unselected"
+                                  Command="local:CommandLibrary.HideUnselectedFleetBoats"
+                                  CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                  CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
+            <MenuItem Header="Unselect All"
+                                  Command="local:CommandLibrary.UnselectAllFleetBoats"
+                                  CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                  CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
         </ContextMenu>
 
         <ContextMenu x:Key="MainBoatContextMenu">
