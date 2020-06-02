@@ -551,13 +551,13 @@
 
             <Grid x:Name="MapGrid" Grid.Column="0">
 
-                <Grid Name="FleetDownloadProgressGrid" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5" Visibility="Hidden">
-                    <ProgressBar Name="FleetDownloadProgressBar" Value="50" BorderBrush="{x:Null}">
+                <Grid Name="ActivityProgressGrid" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5" Visibility="Hidden">
+                    <ProgressBar Name="ActivityProgressBar" Value="50" BorderBrush="{x:Null}">
                         <ProgressBar.Background>
                             <SolidColorBrush Color="Black" Opacity="0.7"/>
                         </ProgressBar.Background>
                     </ProgressBar>
-                    <TextBlock Text="Fleet Download in Progress" FontSize="16" Foreground="White" Padding="3"></TextBlock>
+                    <TextBlock Name="ActivityProgressMsg"  FontSize="16" Foreground="White" Padding="3"></TextBlock>
                 </Grid>
 
                 <map:Map x:Name="map" IsManipulationEnabled="True"                         

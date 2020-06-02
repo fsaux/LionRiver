@@ -1120,12 +1120,13 @@ namespace LionRiver
             using (var context = new LionRiverDBContext())
             {
                 double cnt = 0;
-                FleetDownloadProgressGrid.Visibility = Visibility.Visible;
-                FleetDownloadProgressBar.Maximum = BoatsLastPosition.posicion.Count();
+                ActivityProgressMsg.Text = "Fleet download in progress";
+                ActivityProgressGrid.Visibility = Visibility.Visible;
+                ActivityProgressBar.Maximum = BoatsLastPosition.posicion.Count();
 
                 foreach (JSONBoatPosition bp in BoatsLastPosition.posicion)
                 {
-                    FleetDownloadProgressBar.Value = ++cnt;
+                    ActivityProgressBar.Value = ++cnt;
 
                     DateTime newUpdateTime = DateTime.ParseExact(bp.fecha + " " + bp.hora, "dd/MM/yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture);
 
@@ -1191,7 +1192,7 @@ namespace LionRiver
                         }
                         catch
                         {
-                            FleetDownloadProgressGrid.Visibility = Visibility.Hidden;
+                            ActivityProgressGrid.Visibility = Visibility.Hidden;
                             return;
                         }
 
@@ -1315,7 +1316,7 @@ namespace LionRiver
                 await context.SaveChangesAsync();
 
             }
-            FleetDownloadProgressGrid.Visibility = Visibility.Hidden;
+            ActivityProgressGrid.Visibility = Visibility.Hidden;
 
             UpdatePlotResolutionTimer.Start(); // Forces updating tracks on Map s well
 
@@ -2968,24 +2969,48 @@ namespace LionRiver
         {
             if (ActiveRoute != null)
             {
-
                 Regatta = new Regatta()
                 {
                     Name = "Regatta",
                     Start = new DateTime((long)NavPlotModel.SelectionFromValue),
-                    End = new DateTime((long)NavPlotModel.SelectionToValue)
+                    End = new DateTime((long)NavPlotModel.SelectionToValue),
+                    Route = ActiveRoute,
+                    Boats = new List<Boat>()
                 };
+
 
                 using (var context = new LionRiverDBContext())
                 {
-
                     var boatList =
-                        (from b in context.FleetTracks
-                         where b.timestamp > Regatta.Start && b.timestamp < Regatta.End
-                         select b.Name).Distinct();
+                            (from b in context.FleetTracks
+                             where b.timestamp > Regatta.Start && b.timestamp < Regatta.End
+                             select b.Name).Distinct().ToList();
+
+                    ActivityProgressMsg.Text = "Regatta calculation in progress";
+                    ActivityProgressGrid.Visibility = Visibility.Visible;
+                    ActivityProgressBar.Maximum = boatList.Count();
+
+                    if (boatList != null)
+                    {
+                        foreach (string bName in boatList)
+                        {
+                            var boat = fleetBoats.FirstOrDefault(x => x.Name == bName);
+                            Regatta.Boats.Add(boat);
+
+                            var tEntries =
+                                (from te in context.FleetTracks
+                                 where te.Name == bName && te.timestamp > Regatta.Start && te.timestamp < Regatta.End
+                                 select te);
+
+
+
+
+                            ActivityProgressBar.Value++;
+                        }
+                    }
+
+                    ActivityProgressGrid.Visibility = Visibility.Hidden;
                 }
-            
-            
             }
             else
             {
@@ -2998,8 +3023,6 @@ namespace LionRiver
                 MessageBox.Show(messageBoxText, caption, button, icon);
 
             }
-
-
             e.Handled = true;
         }
 
@@ -3330,7 +3353,7 @@ namespace LionRiver
         private void MainNavPlot_MouseWheel(object sender, MouseWheelEventArgs e)
         {
 
-            const double zoomFactor = 0.85;
+            const double zoomFactor = 0.7;
 
             double zoomPos;
             double zoom;
@@ -3351,8 +3374,16 @@ namespace LionRiver
             else
                 zoom = 1 / zoomFactor;
 
-            NavPlotModel.MinXAxisValue += deltaT1 * (1 - zoom);
-            NavPlotModel.MaxXAxisValue += deltaT2 * (1 - zoom);
+            var minT = NavPlotModel.MinXAxisValue + deltaT1 * (1 - zoom);
+            var maxT = NavPlotModel.MaxXAxisValue + deltaT2 * (1 - zoom);
+
+            if (minT > (DateTime.Now - TimeSpan.FromDays(365 * 10)).Ticks)  // Max 10 years back
+            {
+                NavPlotModel.MinXAxisValue = minT;
+                NavPlotModel.MaxXAxisValue = maxT;
+            }
+               
+
 
             if (PlotCenterButton.IsChecked == true)
             {
@@ -4434,11 +4465,13 @@ namespace LionRiver
                 }
                 else
                 {
+                    // Just look back for 2 * max Track lenght @ current Resolution
+                    DateTime minT = endTime - TimeSpan.FromSeconds(Math.Pow(Inst.ZoomFactor, NavPlotModel.Resolution) * Track.MaxLength * 2);
+
                     logEntries = (from x in context.Logs
-                                  where (x.level == NavPlotModel.Resolution)
+                                  where (x.level == NavPlotModel.Resolution && x.timestamp>minT)
                                   orderby x.timestamp descending
-                                  select x
-                                        ).Take(n).OrderBy(y => y.timestamp);
+                                  select x).Take(n).OrderBy(y => y.timestamp);
                 }
 
                 track = new Track(logEntries.ToList(), NavPlotModel.Resolution, Properties.Settings.Default.SPDminVal,
