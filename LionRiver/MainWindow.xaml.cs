@@ -405,6 +405,17 @@ namespace LionRiver
         {
             InitializeComponent();
 
+            #region Upgrade settings?
+
+            if (Properties.Settings.Default.UpgradeRequired)
+            {
+                Properties.Settings.Default.Upgrade();
+                Properties.Settings.Default.UpgradeRequired = false;
+                Properties.Settings.Default.Save();
+            }
+
+            #endregion
+
             this.Title = "LionRiver " + GetRunningVersion().ToString();
 
             StartupWdw = new StartUpWindow();
@@ -4359,20 +4370,28 @@ namespace LionRiver
 
                         TimeSpan deltaT = dt - lastTrackEntry.timestamp;
 
-                        if (deltaT > TimeSpan.FromMinutes(15)) 
-                            deltaT = TimeSpan.FromMinutes(15);
+                        if (deltaT < TimeSpan.FromHours(2))
+                        {
+                            if (deltaT > TimeSpan.FromMinutes(15))
+                                deltaT = TimeSpan.FromMinutes(15);
 
-                        // extrapolate Meters since last position up to 15min
+                            // extrapolate Meters since last position up to 15min
 
-                        var distance = lastTrackEntry.SOG * deltaT.TotalHours * 1852;
+                            var distance = lastTrackEntry.SOG * deltaT.TotalHours * 1852;
 
-                        double lat = 0, lon = 0;
+                            double lat = 0, lon = 0;
 
-                        CalcPosition(lastTrackEntry.Latitude, lastTrackEntry.Longitude, distance, lastTrackEntry.COG, ref lat, ref lon);
+                            CalcPosition(lastTrackEntry.Latitude, lastTrackEntry.Longitude, distance, lastTrackEntry.COG, ref lat, ref lon);
 
-                        b.Location = new Location(lat,lon);
-                        b.Heading = lastTrackEntry.COG;
-                        b.IsAvailable = true;
+                            b.Location = new Location(lat, lon);
+                            b.Heading = lastTrackEntry.COG;
+                            b.IsAvailable = true;
+
+                        }
+                        else
+                        {
+                            b.IsAvailable = false;
+                        }
                     }
                     else
                     {
@@ -4565,6 +4584,7 @@ namespace LionRiver
                 }
 
                 mSelector = AuxPlotSelectionComboBox.SelectedItem as PlotSelector;
+                result.Clear();
 
                 if (mSelector != null)
                 {

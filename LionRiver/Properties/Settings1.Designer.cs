@@ -49,6 +49,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
         public double Height {
             get {
                 return ((double)(this["Height"]));
@@ -60,6 +61,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("800")]
         public double Width {
             get {
                 return ((double)(this["Width"]));
@@ -71,6 +73,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public double Left {
             get {
                 return ((double)(this["Left"]));
@@ -82,6 +85,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
         public double Top {
             get {
                 return ((double)(this["Top"]));
@@ -93,6 +97,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Normal")]
         public global::System.Windows.WindowState WindowState {
             get {
                 return ((global::System.Windows.WindowState)(this["WindowState"]));
@@ -104,6 +109,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
         public global::System.Windows.GridLength ColumnWidth1 {
             get {
                 return ((global::System.Windows.GridLength)(this["ColumnWidth1"]));
@@ -115,6 +121,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
         public global::System.Windows.GridLength RowWidth1 {
             get {
                 return ((global::System.Windows.GridLength)(this["RowWidth1"]));
@@ -126,6 +133,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double MagVar {
             get {
                 return ((double)(this["MagVar"]));
@@ -137,6 +145,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double GPSoffsetToBow {
             get {
                 return ((double)(this["GPSoffsetToBow"]));
@@ -148,6 +157,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public double MapScale {
             get {
                 return ((double)(this["MapScale"]));
@@ -170,6 +180,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
         public global::System.Windows.GridLength RowWidth2 {
             get {
                 return ((global::System.Windows.GridLength)(this["RowWidth2"]));
@@ -181,6 +192,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.1")]
         public double WptProximity {
             get {
                 return ((double)(this["WptProximity"]));
@@ -252,6 +264,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.4")]
         public double Opacity {
             get {
                 return ((double)(this["Opacity"]));
@@ -387,6 +400,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
         public double RteWindowTop {
             get {
                 return ((double)(this["RteWindowTop"]));
@@ -398,6 +412,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
         public double RteWindowLeft {
             get {
                 return ((double)(this["RteWindowLeft"]));
@@ -409,6 +424,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("220")]
         public double MrkWindowTop {
             get {
                 return ((double)(this["MrkWindowTop"]));
@@ -420,6 +436,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("220")]
         public double MrkWindowLeft {
             get {
                 return ((double)(this["MrkWindowLeft"]));
@@ -431,6 +448,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Hidden")]
         public global::System.Windows.Visibility RteWindowVisible {
             get {
                 return ((global::System.Windows.Visibility)(this["RteWindowVisible"]));
@@ -442,6 +460,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Hidden")]
         public global::System.Windows.Visibility MrkWindowVisible {
             get {
                 return ((global::System.Windows.Visibility)(this["MrkWindowVisible"]));
@@ -489,6 +508,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("240")]
         public double LayerWindowLeft {
             get {
                 return ((double)(this["LayerWindowLeft"]));
@@ -500,6 +520,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("240")]
         public double LayerWindowTop {
             get {
                 return ((double)(this["LayerWindowTop"]));
@@ -511,6 +532,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int TrackResolution {
             get {
                 return ((int)(this["TrackResolution"]));
@@ -594,6 +616,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool UpgradeRequired {
             get {
                 return ((bool)(this["UpgradeRequired"]));
@@ -617,6 +640,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool Layer1Check {
             get {
                 return ((bool)(this["Layer1Check"]));
@@ -628,6 +652,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool Layer2Check {
             get {
                 return ((bool)(this["Layer2Check"]));
@@ -639,6 +664,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool LaylinesCheck {
             get {
                 return ((bool)(this["LaylinesCheck"]));
@@ -650,6 +676,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool TargetBearingsCheck {
             get {
                 return ((bool)(this["TargetBearingsCheck"]));
@@ -661,6 +688,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("260")]
         public double CourseWindowLeft {
             get {
                 return ((double)(this["CourseWindowLeft"]));
@@ -672,6 +700,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("260")]
         public double CourseWindowTop {
             get {
                 return ((double)(this["CourseWindowTop"]));
@@ -683,6 +712,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool WindDirectionCheck {
             get {
                 return ((bool)(this["WindDirectionCheck"]));
@@ -694,6 +724,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool CurrentDirectionCheck {
             get {
                 return ((bool)(this["CurrentDirectionCheck"]));
@@ -705,6 +736,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool BoatSpeedCheck {
             get {
                 return ((bool)(this["BoatSpeedCheck"]));
@@ -716,6 +748,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool CourseCheck {
             get {
                 return ((bool)(this["CourseCheck"]));
@@ -727,6 +760,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool BoatPerfCheck {
             get {
                 return ((bool)(this["BoatPerfCheck"]));
@@ -738,6 +772,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool RouteVisible {
             get {
                 return ((bool)(this["RouteVisible"]));
@@ -749,6 +784,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
         public global::System.Windows.GridLength RowHeight1 {
             get {
                 return ((global::System.Windows.GridLength)(this["RowHeight1"]));
@@ -760,6 +796,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool FleetTracksVisible {
             get {
                 return ((bool)(this["FleetTracksVisible"]));
@@ -771,6 +808,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool FleetBoatsVisible {
             get {
                 return ((bool)(this["FleetBoatsVisible"]));
@@ -782,6 +820,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public double FleetBoatTrackLength {
             get {
                 return ((double)(this["FleetBoatTrackLength"]));
@@ -793,6 +832,7 @@ namespace LionRiver.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool PredictedWindDirectionCheck {
             get {
                 return ((bool)(this["PredictedWindDirectionCheck"]));

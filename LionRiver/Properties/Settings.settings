@@ -9,43 +9,43 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Height" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">600</Value>
     </Setting>
     <Setting Name="Width" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">800</Value>
     </Setting>
     <Setting Name="Left" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="Top" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">50</Value>
     </Setting>
     <Setting Name="WindowState" Type="System.Windows.WindowState" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Normal</Value>
     </Setting>
     <Setting Name="ColumnWidth1" Type="System.Windows.GridLength" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Auto</Value>
     </Setting>
     <Setting Name="RowWidth1" Type="System.Windows.GridLength" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Auto</Value>
     </Setting>
     <Setting Name="MagVar" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="GPSoffsetToBow" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="MapScale" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="MapCenter" Type="MapControl.Location" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="RowWidth2" Type="System.Windows.GridLength" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Auto</Value>
     </Setting>
     <Setting Name="WptProximity" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0.1</Value>
     </Setting>
     <Setting Name="Layer1Directory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -63,7 +63,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Opacity" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0.4</Value>
     </Setting>
     <Setting Name="RouteSentence" Type="LionRiver.NMEASentence" Scope="User">
       <Value Profile="(Default)" />
@@ -99,22 +99,22 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="RteWindowTop" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">200</Value>
     </Setting>
     <Setting Name="RteWindowLeft" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">200</Value>
     </Setting>
     <Setting Name="MrkWindowTop" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">220</Value>
     </Setting>
     <Setting Name="MrkWindowLeft" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">220</Value>
     </Setting>
     <Setting Name="RteWindowVisible" Type="System.Windows.Visibility" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Hidden</Value>
     </Setting>
     <Setting Name="MrkWindowVisible" Type="System.Windows.Visibility" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Hidden</Value>
     </Setting>
     <Setting Name="Layer2Directory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -126,13 +126,13 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="LayerWindowLeft" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">240</Value>
     </Setting>
     <Setting Name="LayerWindowTop" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">240</Value>
     </Setting>
     <Setting Name="TrackResolution" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="Layer1Opacity" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.4</Value>
@@ -153,61 +153,61 @@
       <Value Profile="(Default)">9</Value>
     </Setting>
     <Setting Name="UpgradeRequired" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="LogFile" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Layer1Check" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="Layer2Check" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LaylinesCheck" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="TargetBearingsCheck" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="CourseWindowLeft" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">260</Value>
     </Setting>
     <Setting Name="CourseWindowTop" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">260</Value>
     </Setting>
     <Setting Name="WindDirectionCheck" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="CurrentDirectionCheck" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="BoatSpeedCheck" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="CourseCheck" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="BoatPerfCheck" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="RouteVisible" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="RowHeight1" Type="System.Windows.GridLength" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Auto</Value>
     </Setting>
     <Setting Name="FleetTracksVisible" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="FleetBoatsVisible" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="FleetBoatTrackLength" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="PredictedWindDirectionCheck" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="MainPlotSelector" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
