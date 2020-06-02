@@ -49,6 +49,8 @@
                             DisableAnimations="True"
                             DataTooltip="{x:Null}"
                             Hoverable="False">
+
+            
             <lvc:CartesianChart.AxisX>
 
                 <lvc:Axis Name="myXaxis"
@@ -68,11 +70,16 @@
                         <lvc:AxisSection FromValue="{Binding SelectionFromValue}"
                                          ToValue="{Binding SelectionToValue}" 
                                          Visibility="{Binding SelectionVisible}">
+
                             <lvc:AxisSection.ContextMenu>
                                 <ContextMenu Name="SelectionContextMenu">
-                                    <MenuItem Header="Calc Fleet"/>
+                                    <MenuItem Header="Calc Regatta"
+                                            Command="local:CommandLibrary.CalcRegatta"
+                                            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                            CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
                                 </ContextMenu>
                             </lvc:AxisSection.ContextMenu>
+                            
                             <lvc:AxisSection.Fill>
                                 <SolidColorBrush Color="Gray" Opacity=".4"></SolidColorBrush>
                             </lvc:AxisSection.Fill>

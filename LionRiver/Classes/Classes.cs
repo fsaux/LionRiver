@@ -1,28 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.ComponentModel;
-using System.Windows.Shapes;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Data;
-using System.Globalization;
-using System.Configuration;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 using MapControl;
-using CircularBuffer;
 using LiveCharts;
-using LiveCharts.Wpf;
-using LiveCharts.Configurations;
 
 using OSGeo.GDAL;
 using OSGeo.OSR;
@@ -1562,8 +1550,6 @@ namespace LionRiver
         private Location lastLocation;
         private DateTime lastLocationTime;
         private TimeSpan maxDuration;
-        private MapSegment LastTrackSegment;
-        private Color SegmentColor;
         private double minColorValue;
         private double minColorIndex;
         private double maxColorValue;
@@ -2168,7 +2154,7 @@ namespace LionRiver
 
     public class CurrentArrow : MapPath
     {
-        private double Direction, Intensity, Scale;
+        private double Direction, Scale;
 
         public static readonly DependencyProperty LocationProperty = DependencyProperty.Register(
             "Location", typeof(Location), typeof(CurrentArrow),
@@ -2187,7 +2173,6 @@ namespace LionRiver
             //this.Fill = Brushes.Green;
             this.StrokeThickness = 2;
             Direction = 0;
-            Intensity = 0;
             Scale = .04;
         }
 
@@ -2252,7 +2237,7 @@ namespace LionRiver
 
     public class ColorDot : MapPath
     {
-        private double Intensity, Scale;
+        private double Scale;
 
         public static readonly DependencyProperty LocationProperty = DependencyProperty.Register(
             "Location", typeof(Location), typeof(ColorDot),
@@ -2267,7 +2252,6 @@ namespace LionRiver
         public ColorDot()
         {
             Data = new StreamGeometry();
-            Intensity = 0;
             Scale = .01;
         }
 
@@ -2860,17 +2844,16 @@ namespace LionRiver
         private static RoutedUICommand hideUnselectedFleetBoats = new RoutedUICommand("HideUnselectedFleetBoats", "HideUnselectedFleetBoats", typeof(CommandLibrary));
         private static RoutedUICommand unhideAllFleetBoats = new RoutedUICommand("UnhideAllFleetBoats", "UnhideAllFleetBoats", typeof(CommandLibrary));
         private static RoutedUICommand unselectAllFleetBoats = new RoutedUICommand("UnselectAllFleetBoats", "UnselectAllFleetBoats", typeof(CommandLibrary));
+        private static RoutedUICommand calcRegatta = new RoutedUICommand("CalcRegatta", "CalcRegatta", typeof(CommandLibrary));
 
         public static RoutedUICommand AddMark
         {
             get { return addMark; }
         }
-
         public static RoutedUICommand DeleteMark
         {
             get { return deleteMark; }
         }
-
         public static RoutedUICommand NavigateTo
         {
             get { return navigateTo; }
@@ -2880,32 +2863,26 @@ namespace LionRiver
         {
             get { return activateRoute; }
         }
-
         public static RoutedUICommand StopNav
         {
             get { return stopNav; }
         }
-
         public static RoutedUICommand NewRoute
         {
             get { return newRoute; }
         }
-
         public static RoutedUICommand FwdRoute
         {
             get { return fwdRoute; }
         }
-
         public static RoutedUICommand RwdRoute
         {
             get { return rwdRoute; }
         }
-
         public static RoutedUICommand ReverseRoute
         {
             get { return reverseRoute; }
         }
-
         public static RoutedUICommand DeleteRoute
         {
             get { return deleteRoute; }
@@ -2915,7 +2892,6 @@ namespace LionRiver
         {
             get { return setLineBoat; }
         }
-
         public static RoutedUICommand SetLinePin
         {
             get { return setLinePin; }
@@ -2946,8 +2922,13 @@ namespace LionRiver
         {
             get { return unselectAllFleetBoats; }
         }
-        
+
+        public static RoutedUICommand CalcRegatta
+        {
+            get { return calcRegatta; }
+        }
     }
+
     public class MyCommand<T> : ICommand where T : class
     {
         public Predicate<T> CanExecuteDelegate { get; set; }
@@ -2989,6 +2970,16 @@ namespace LionRiver
         {
             Result = RxTxResult.NoRxData;
         }
+    }
+
+    public class Regatta
+    {
+        public string Name { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+
+        public List<Boat> Boats { get; set; }
+        public Route Route { get; set; }
     }
 }
 

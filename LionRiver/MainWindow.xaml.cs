@@ -175,10 +175,7 @@ namespace LionRiver
         StreamWriter LogFile;
         StreamReader ReplayFile;
         bool logging = false;
-        bool commentLogged = false;
         bool replayLog = false;
-        string Comment = "";
-        private readonly BackgroundWorker LoadLogFileWorker;
         StartUpWindow StartupWdw;
         #endregion
 
@@ -379,6 +376,7 @@ namespace LionRiver
         #endregion
 
         #region Sailing
+
         public enum SailingMode
         {
             None,
@@ -388,8 +386,14 @@ namespace LionRiver
         }
 
         SailingMode sailingMode = SailingMode.None;
-        SailingMode prevSailingMode = SailingMode.None;
+
         bool insideCourse;
+
+        #endregion
+
+        #region Regatta
+
+        Regatta Regatta;
 
         #endregion
 
@@ -401,6 +405,18 @@ namespace LionRiver
         {
             InitializeComponent();
 
+            this.Title = "LionRiver " + GetRunningVersion().ToString();
+
+            StartupWdw = new StartUpWindow();
+            StartupWdw.Show();
+
+            MainWindow_Initialize();
+
+            StartupWdw.Close();
+        }
+
+        private void MainWindow_Initialize()
+        {
             #region Polars
             NavPolar = new Polar();
 
@@ -530,60 +546,17 @@ namespace LionRiver
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.RwdRoute, RwdRouteCommand_Executed, RwdRouteCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.ReverseRoute, ReverseRouteCommand_Executed, ReverseRouteCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.DeleteRoute, DeleteRouteCommand_Executed, DeleteRouteCommand_CanExecute));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SetLineBoat, SetLineBoatCommand_Executed, SetLineBoatCommand_CanExecute));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SetLinePin, SetLinePinCommand_Executed, SetLinePinCommand_CanExecute));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.RemoveInstrument, RemoveInstrumentCommand_Executed, RemoveInstrumentCommand_CanExecute));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SetLineBoat, SetLineBoatCommand_Executed));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SetLinePin, SetLinePinCommand_Executed));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.RemoveInstrument, RemoveInstrumentCommand_Executed));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.SelectFleetBoat, SelectFleetBoatCommand_Executed, SelectFleetBoatCommand_CanExecute));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnselectFleetBoat, UnselectFleetBoatCommand_Executed, UnselectFleetBoatCommand_CanExecute));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.HideUnselectedFleetBoats, HideUnselectedFleetBoatsCommand_Executed, HideUnselectedFleetBoatsCommand_CanExecute));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnhideAllFleetBoats, UnhideAllFleetBoatsCommand_Executed, UnhideAllFleetBoatsCommand_CanExecute));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnselectAllFleetBoats, UnselectAllFleetBoatsCommand_Executed, UnselectAllFleetBoatsCommand_CanExecute));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.HideUnselectedFleetBoats, HideUnselectedFleetBoatsCommand_Executed));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnhideAllFleetBoats, UnhideAllFleetBoatsCommand_Executed));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnselectAllFleetBoats, UnselectAllFleetBoatsCommand_Executed));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.CalcRegatta, CalcRegattaCommand_Executed));
 
             #endregion
-
-            //LoadLogFileWorker = new BackgroundWorker();
-            //LoadLogFileWorker.DoWork += LoadLogFilePartial;
-            //LoadLogFileWorker.RunWorkerCompleted += LoadLogFile_Completed;
-            //LoadLogFileWorker.ProgressChanged += LoadLogFile_ProgressChanged;
-            //LoadLogFileWorker.WorkerReportsProgress = true;
-
-
-            //LoadLogFileWorker.RunWorkerAsync();
-
-
-            this.Title = "LionRiver " + GetRunningVersion().ToString();
-
-            MainWindow_Initialize();
-
-        }
-
-        private void MainWindow_Initialize()
-        {
-
-            StartupWdw = new StartUpWindow();
-            StartupWdw.Show();
-
-            //double A = 916;
-            //double B = 316;
-
-            //double decimator = A / (A - B);
-
-            //List<double> xlist = new List<double>();
-            //List<double> ylist = new List<double>();
-
-            //for (int i = 0; i < A; i++)
-            //    xlist.Add(12.1);
-
-            //for(int j=0;j<A;j++)
-            //{
-            //    var z = j % decimator;
-
-            //    if (z >=1 ) ylist.Add(13.1);
-
-
-            //}
-
-
 
             #region Nav Plots
 
@@ -747,6 +720,7 @@ namespace LionRiver
             #endregion
 
             #region Replay & Fleet
+
             using (var context = new LionRiverDBContext())
             {
 
@@ -774,6 +748,7 @@ namespace LionRiver
                     map.Children.Add(boatMapItem);
                 }
             }
+
             #endregion
 
             #region Starting Line
@@ -951,8 +926,6 @@ namespace LionRiver
 
 
             #endregion
-
-            StartupWdw.Close();
 
         }
 
@@ -1433,7 +1406,7 @@ namespace LionRiver
 
         #endregion
 
-        #region Mouse Manipulation
+        #region Map Mouse Manipulation
 
         private void MapMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -2847,12 +2820,6 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        private void SetLineBoatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-            e.Handled = true;
-        }
-
         private void SetLinePinCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (LAT.IsValid() && HDT.IsValid())
@@ -2876,12 +2843,6 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        private void SetLinePinCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-            e.Handled = true;
-        }
-
         private void RemoveInstrumentCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             var z = e.Source as UserControl;
@@ -2894,13 +2855,6 @@ namespace LionRiver
             Properties.Settings.Default.Save();
 
             e.Handled = true;
-        }
-
-        private void RemoveInstrumentCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-            e.Handled = true;
-
         }
 
         private void SelectFleetBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -2974,23 +2928,11 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        private void HideUnselectedFleetBoatsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-            e.Handled = true;
-        }
-
         private void UnhideAllFleetBoatsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             foreach (Boat b in fleetBoats)
                 b.BoatVisible = Visibility.Visible;
 
-            e.Handled = true;
-        }
-
-        private void UnhideAllFleetBoatsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
             e.Handled = true;
         }
 
@@ -3011,18 +2953,43 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        private void UnselectAllFleetBoatsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void CalcRegattaCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            if (ActiveRoute != null)
+            {
+
+                Regatta = new Regatta()
+                {
+                    Name = "Regatta",
+                    Start = new DateTime((long)NavPlotModel.SelectionFromValue),
+                    End = new DateTime((long)NavPlotModel.SelectionToValue)
+                };
+
+                using (var context = new LionRiverDBContext())
+                {
+
+                    var boatList =
+                        (from b in context.FleetTracks
+                         where b.timestamp > Regatta.Start && b.timestamp < Regatta.End
+                         select b.Name).Distinct();
+                }
+            
+            
+            }
+            else
+            {
+
+                string messageBoxText = "No Active Route";
+                string caption = "LionRiver";
+                MessageBoxButton button = MessageBoxButton.OK;
+                MessageBoxImage icon = MessageBoxImage.Warning;
+
+                MessageBox.Show(messageBoxText, caption, button, icon);
+
+            }
+
+
             e.Handled = true;
-        }
-
-
-        private void Generic_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-            e.Handled = true;
-
         }
 
         #endregion
@@ -3294,8 +3261,8 @@ namespace LionRiver
                 {
                     if (point.X > NavPlotModel.SelectionFromValue && point.X < NavPlotModel.SelectionToValue)
                     {
+                        MainNavPlot.SelectionContextMenu.PlacementTarget = MainNavPlot;
                         MainNavPlot.SelectionContextMenu.IsOpen = true;
-
                     }
 
                     mouseHandlingMode = MouseHandlingMode.None;
@@ -3952,54 +3919,7 @@ namespace LionRiver
 
         #endregion
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            routeControl.Close();
-            marksControl.Close();
-            layerControl.Close();
-            wlCourseSetupWindow.Close();
-
-            //readThread1.Abort();
-            //readThread2.Abort();
-            //readThread3.Abort();
-            //readThread4.Abort();
-
-            //SerialPort1.Close();
-            //SerialPort2.Close();
-            //SerialPort3.Close();
-            //SerialPort4.Close();
-
-            CloseSerialPort1();
-            CloseSerialPort2();
-            CloseSerialPort3();
-            CloseSerialPort4();
-
-            Properties.Settings.Default.MapScale = map.ZoomLevel;
-            Properties.Settings.Default.MapCenter = map.Center;
-            Properties.Settings.Default.Save();
-
-            if (logging)
-                LogFile.Close();
-        }
-
-        private void MainWnd_StateChanged(object sender, EventArgs e)
-        {
-            switch (this.WindowState)
-            {
-                case System.Windows.WindowState.Maximized:
-                    break;
-
-                case System.Windows.WindowState.Minimized:
-                    routeControl.Hide();
-                    marksControl.Hide();
-                    layerControl.Hide();
-                    wlCourseSetupWindow.Hide();
-                    break;
-
-                case System.Windows.WindowState.Normal:
-                    break;
-            }
-        }
+        #region MainWindow Updates
 
         private void UpdateNav()
         {
@@ -4480,8 +4400,6 @@ namespace LionRiver
 
         private void UpdateTracks(DateTime startTime, DateTime endTime, int n = 0)
         {
-
-
             using (var context = new LionRiverDBContext())
             {
 
@@ -4503,7 +4421,6 @@ namespace LionRiver
                                   select x
                                         ).Take(n).OrderBy(y => y.timestamp);
                 }
-
 
                 track = new Track(logEntries.ToList(), NavPlotModel.Resolution, Properties.Settings.Default.SPDminVal,
                                         Properties.Settings.Default.SPDminIndex, Properties.Settings.Default.SPDmaxVal, Properties.Settings.Default.SPDmaxIndex);
@@ -4548,7 +4465,6 @@ namespace LionRiver
                     }
                 }
 
-
                 foreach (List<FleetTrack> fTe in fTrackList)
                 {
                     double A = fTe.Count();
@@ -4584,7 +4500,6 @@ namespace LionRiver
                     }
                 }
             }
-
         }
 
         private void UpdatePlot(double n, DateTime StartTime, DateTime EndTime)
@@ -4783,6 +4698,95 @@ namespace LionRiver
             return (mResult, aResult);
         }
 
+        #endregion
+
+        #region MOB
+
+        private void LatLonGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                ManOverBoard = true;
+
+                MOB = new Mark()
+                {
+                    Location = new Location(LAT.Val, LON.Val),
+                    Name = "MOB"
+                };
+
+                marksItemCollection.Add(MOB);
+
+                ActiveRoute = null;
+                ActiveLeg = null;
+                ActiveMark = MOB;
+
+                LatLonGrid.Background = Brushes.DarkRed;
+                ContextMenuMOBClear.IsEnabled = true;
+            }
+        }
+
+        private void ContextMenuMOBClear_Click(object sender, RoutedEventArgs e)
+        {
+            ManOverBoard = false;
+
+            ActiveRoute = null;
+            ActiveLeg = null;
+            ActiveMark = null;
+
+            foreach(Mark mk in marksItemCollection.ToList())
+            {
+                if(mk.Name.Substring(0,3)=="MOB")
+                {
+                    marksItemCollection.Remove(mk);
+                }
+            }
+
+            LatLonGrid.Background = null;
+
+        }
+        #endregion
+
+        #region Other
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            routeControl.Close();
+            marksControl.Close();
+            layerControl.Close();
+            wlCourseSetupWindow.Close();
+
+            CloseSerialPort1();
+            CloseSerialPort2();
+            CloseSerialPort3();
+            CloseSerialPort4();
+
+            Properties.Settings.Default.MapScale = map.ZoomLevel;
+            Properties.Settings.Default.MapCenter = map.Center;
+            Properties.Settings.Default.Save();
+
+            if (logging)
+                LogFile.Close();
+        }
+
+        private void MainWnd_StateChanged(object sender, EventArgs e)
+        {
+            switch (this.WindowState)
+            {
+                case System.Windows.WindowState.Maximized:
+                    break;
+
+                case System.Windows.WindowState.Minimized:
+                    routeControl.Hide();
+                    marksControl.Hide();
+                    layerControl.Hide();
+                    wlCourseSetupWindow.Hide();
+                    break;
+
+                case System.Windows.WindowState.Normal:
+                    break;
+            }
+        }
+
         private Version GetRunningVersion()
         {
             try
@@ -4841,50 +4845,6 @@ namespace LionRiver
             return cx;
         }
 
-        #region MOB
-
-        private void LatLonGrid_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                ManOverBoard = true;
-
-                MOB = new Mark()
-                {
-                    Location = new Location(LAT.Val, LON.Val),
-                    Name = "MOB"
-                };
-
-                marksItemCollection.Add(MOB);
-
-                ActiveRoute = null;
-                ActiveLeg = null;
-                ActiveMark = MOB;
-
-                LatLonGrid.Background = Brushes.DarkRed;
-                ContextMenuMOBClear.IsEnabled = true;
-            }
-        }
-
-        private void ContextMenuMOBClear_Click(object sender, RoutedEventArgs e)
-        {
-            ManOverBoard = false;
-
-            ActiveRoute = null;
-            ActiveLeg = null;
-            ActiveMark = null;
-
-            foreach(Mark mk in marksItemCollection.ToList())
-            {
-                if(mk.Name.Substring(0,3)=="MOB")
-                {
-                    marksItemCollection.Remove(mk);
-                }
-            }
-
-            LatLonGrid.Background = null;
-
-        } 
         #endregion
 
     }

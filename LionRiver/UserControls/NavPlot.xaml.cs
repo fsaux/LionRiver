@@ -29,8 +29,6 @@ namespace LionRiver.UserControls
         public NavPlot()
         {
             InitializeComponent();
-
         }
-
     }
 }

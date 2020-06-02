@@ -59,11 +59,11 @@
                                       Command="local:CommandLibrary.AddMark"
                                       CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                       CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
-            <MenuItem Header="Unhide all"
+            <MenuItem Header="Show all"
                                   Command="local:CommandLibrary.UnhideAllFleetBoats"
                                   CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                   CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
-            <MenuItem Header="Hide unselected"
+            <MenuItem Header="Show Selected only"
                                   Command="local:CommandLibrary.HideUnselectedFleetBoats"
                                   CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                   CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
@@ -770,7 +770,7 @@
         
         <Grid x:Name="TransportGrid" Grid.Row="3">
 
-            <mycontrols:NavPlot  x:Name="MainNavPlot"
+                <mycontrols:NavPlot  x:Name="MainNavPlot"
                                          MouseEnter="MainNavPlot_MouseEnter"
                                          MouseLeave="MainNavPlot_MouseLeave"
                                          MouseMove="MainNavPlot_MouseMove"
@@ -778,31 +778,31 @@
                                          MouseUp="MainNavPlot_MouseUp" 
                                          MouseWheel="MainNavPlot_MouseWheel"/>
 
-            <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="22,0,0,2"
+                <Slider Name="FwdBackSlider" Orientation="Horizontal" Height="Auto" Margin="22,0,0,2"
                                 TickFrequency="10"  HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                 Foreground="White"  SmallChange="1" Minimum="-10" Width="50"  ValueChanged="FwdBackSlider_ValueChanged"
                                 AutoToolTipPlacement="BottomRight" Delay="488" >
-                <Slider.Triggers>
-                    <EventTrigger SourceName="FwdBackSlider" RoutedEvent="Thumb.DragCompleted">
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetName="FwdBackSlider" Storyboard.TargetProperty="Value" From="{Binding Value, ElementName=FwdBackSlider}" To="0" Duration="0:0:0.1"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </Slider.Triggers>
-            </Slider>
+                    <Slider.Triggers>
+                        <EventTrigger SourceName="FwdBackSlider" RoutedEvent="Thumb.DragCompleted">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="FwdBackSlider" Storyboard.TargetProperty="Value" From="{Binding Value, ElementName=FwdBackSlider}" To="0" Duration="0:0:0.1"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Slider.Triggers>
+                </Slider>
 
-            <ToggleButton   Name="PlotCenterButton"  Style="{StaticResource MainToggleButton}"
+                <ToggleButton   Name="PlotCenterButton"  Style="{StaticResource MainToggleButton}"
                                         HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,25,2"
                                         Checked="PlotCenterButton_Checked" >
-                <ToggleButton.Content>
-                    <Image  Source="Images/Image-Edition-Tools-Collapse-icon.png" Stretch="Fill" ToolTip="Center Plot" 
+                    <ToggleButton.Content>
+                        <Image  Source="Images/Image-Edition-Tools-Collapse-icon.png" Stretch="Fill" ToolTip="Center Plot" 
                                         Width="25" Height="25"/>
-                </ToggleButton.Content>
-            </ToggleButton>
+                    </ToggleButton.Content>
+                </ToggleButton>
 
-            <ComboBox x:Name="AuxPlotSelectionComboBox" Width="60"  Margin="0,0,25,0"
+                <ComboBox x:Name="AuxPlotSelectionComboBox" Width="60"  Margin="0,0,25,0"
                               ItemsSource="{Binding}"
                               DisplayMemberPath="Name"
                               SelectedValue="{Binding Source={x:Static p:Settings.Default}, Path=AuxPlotSelector, Mode=TwoWay}"
@@ -811,14 +811,14 @@
                               Foreground="MediumVioletRed"
                               Background="Black"
                               Style="{StaticResource ComboBoxStyle1}" SelectionChanged="AuxPlotSelectionComboBox_SelectionChanged">
-                <ComboBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ComboBoxItem}">
-                        <Setter Property="Foreground" Value="MediumVioletRed"/>
-                    </Style>
-                </ComboBox.ItemContainerStyle>
-            </ComboBox>
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ComboBoxItem}">
+                            <Setter Property="Foreground" Value="MediumVioletRed"/>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
 
-            <ComboBox x:Name="MainPlotSelectionComboBox" Width="60"
+                <ComboBox x:Name="MainPlotSelectionComboBox" Width="60"
                               ItemsSource="{Binding}"
                               DisplayMemberPath="Name"
                               SelectedValue="{Binding Source={x:Static p:Settings.Default}, Path=MainPlotSelector, Mode=TwoWay}"
@@ -827,12 +827,13 @@
                               Foreground="DodgerBlue" 
                               Background="Black"
                               Style="{StaticResource ComboBoxStyle1}" SelectionChanged="MainPlotSelectionComboBox_SelectionChanged">
-                <ComboBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ComboBoxItem}">
-                        <Setter Property="Foreground" Value="DodgerBlue"/>
-                    </Style>
-                </ComboBox.ItemContainerStyle>
-            </ComboBox>
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ComboBoxItem}">
+                            <Setter Property="Foreground" Value="DodgerBlue"/>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
+
         </Grid>
 
     </Grid>
