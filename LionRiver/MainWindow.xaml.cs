@@ -832,10 +832,10 @@ namespace LionRiver
             //FleetUpdateTimer.Interval = new TimeSpan(0, 0, 60);  // For testing
 
             ReplayTimer.Tick += new EventHandler(ReplayTimer_Tick);
-            ReplayTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
+            ReplayTimer.Interval = new TimeSpan(0, 0, 0, 0, 80);
 
             PlotPanTimer.Tick += new EventHandler(PlotPanTimer_Tick);
-            PlotPanTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
+            PlotPanTimer.Interval = new TimeSpan(0, 0, 0, 0, 80);
 
             UpdatePlotResolutionTimer.Tick += new EventHandler(UpdatePlotResolution_Tick);
             UpdatePlotResolutionTimer.Interval = new TimeSpan(0, 0, 1);
@@ -1328,7 +1328,7 @@ namespace LionRiver
         {
             double deltaT = NavPlotModel.MaxXAxisValue - NavPlotModel.MinXAxisValue;
 
-            NavPlotModel.CurrentValue += deltaT * FwdBackSlider.Value / 1000;
+            NavPlotModel.CurrentValue += deltaT * FwdBackSlider.Value / 2000;
 
             double lim = NavPlotModel.MinXAxisValue + 0.8 * deltaT;
 

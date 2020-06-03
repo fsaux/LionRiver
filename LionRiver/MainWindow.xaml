@@ -557,7 +557,7 @@
                             <SolidColorBrush Color="Black" Opacity="0.7"/>
                         </ProgressBar.Background>
                     </ProgressBar>
-                    <TextBlock Name="ActivityProgressMsg"  FontSize="16" Foreground="White" Padding="3"></TextBlock>
+                    <TextBlock Name="ActivityProgressMsg" Text="Dummy Progress" FontSize="16" Foreground="White" Padding="3"></TextBlock>
                 </Grid>
 
                 <map:Map x:Name="map" IsManipulationEnabled="True"                         
