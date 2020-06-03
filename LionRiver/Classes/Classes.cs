@@ -2979,7 +2979,7 @@ namespace LionRiver
         public DateTime End { get; set; }
 
         public List<string> Boats { get; set; }
-        public List<Location> Waypoints { get; set; }
+        public List<IData<Location>> Waypoints { get; set; }
     }
 }
 

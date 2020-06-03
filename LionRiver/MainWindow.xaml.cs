@@ -168,6 +168,8 @@ namespace LionRiver
         DispatcherTimer ReplayTimer = new DispatcherTimer();
         DispatcherTimer PlotPanTimer = new DispatcherTimer();
         DispatcherTimer UpdatePlotResolutionTimer = new DispatcherTimer();
+        DispatcherTimer CalcRegattaTimer = new DispatcherTimer();
+
 
         #endregion
 
@@ -394,6 +396,7 @@ namespace LionRiver
         #region Regatta
 
         Regatta Regatta;
+        bool regattaCalcInProgress = false;
 
         #endregion
 
@@ -565,7 +568,7 @@ namespace LionRiver
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.HideUnselectedFleetBoats, HideUnselectedFleetBoatsCommand_Executed));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnhideAllFleetBoats, UnhideAllFleetBoatsCommand_Executed));
             CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.UnselectAllFleetBoats, UnselectAllFleetBoatsCommand_Executed));
-            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.CalcRegatta, CalcRegattaCommand_Executed));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(CommandLibrary.CalcRegatta, CalcRegattaCommand_Executed, CalcRegattaCommand_CanExecute));
 
             #endregion
 
@@ -839,6 +842,9 @@ namespace LionRiver
 
             UpdatePlotResolutionTimer.Tick += new EventHandler(UpdatePlotResolution_Tick);
             UpdatePlotResolutionTimer.Interval = new TimeSpan(0, 0, 1);
+
+            CalcRegattaTimer.Tick += new EventHandler(CalcRegattaTimer_Tick);
+            CalcRegattaTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
 
             NMEATimer.Start();
             ShortNavTimer.Start();
@@ -1413,6 +1419,15 @@ namespace LionRiver
                 if (PlayButton.IsChecked == true)
                     UpdateTracks(newDataWStart, new DateTime((long)NavPlotModel.MaxXAxisValue), Track.MaxLength);
             }
+
+        }
+
+        private  async void CalcRegattaTimer_Tick(object sender, EventArgs e)
+        {
+            CalcRegattaTimer.Stop();
+
+            await CalcRegatta();
+
 
         }
 
@@ -2969,14 +2984,50 @@ namespace LionRiver
         {
             if (ActiveRoute != null)
             {
+                regattaCalcInProgress = true;
+
+                ActivityProgressMsg.Text = "Regatta calculation in progress";
+                ActivityProgressGrid.Visibility = Visibility.Visible;
+                ActivityProgressBar.Maximum = 100;
+
+                await CalcRegatta();
+            }
+            else
+            {
+
+                string messageBoxText = "No Active Route";
+                string caption = "LionRiver";
+                MessageBoxButton button = MessageBoxButton.OK;
+                MessageBoxImage icon = MessageBoxImage.Warning;
+
+                MessageBox.Show(messageBoxText, caption, button, icon);
+            }
+
+
+            e.Handled = true;
+        }
+
+        private void CalcRegattaCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (regattaCalcInProgress == true)
+                e.CanExecute = false;
+            else
+                e.CanExecute = true;
+
+            e.Handled = true;
+        }
+
+        private async Task CalcRegatta()
+        {
+            if (ActiveRoute != null)
+            {
                 Regatta = new Regatta()
                 {
                     Name = "Regatta",
                     Start = new DateTime((long)NavPlotModel.SelectionFromValue),
                     End = new DateTime((long)NavPlotModel.SelectionToValue),
-                    Waypoints = new List<Location>()
+                    Waypoints = new List<IData<Location>>()
                 };
-
 
                 using (var context = new LionRiverDBContext())
                 {
@@ -2987,22 +3038,36 @@ namespace LionRiver
 
                     Regatta.Boats = boatList;
 
-                    Regatta.Waypoints.Add(ActiveRoute.Legs[0].FromLocation);
+                }
 
-                    foreach (Leg lg in ActiveRoute.Legs)
-                        Regatta.Waypoints.Add(lg.ToLocation);
+                Regatta.Waypoints.Add(new IData<Location>()
+                {
+                    Val = ActiveRoute.Legs[0].FromLocation,
+                    Time = DateTime.MaxValue
+                });
 
-                    ActivityProgressMsg.Text = "Regatta calculation in progress";
-                    ActivityProgressGrid.Visibility = Visibility.Visible;
-                    ActivityProgressBar.Maximum = boatList.Count();
-
-                    // wptArrival used to calculate time of arrival at each WP based on minimum distance
-                    (double, DateTime)[] wptArrival = new (double, DateTime)[Regatta.Waypoints.Count()];
-
-                    if (boatList != null)
+                foreach (Leg lg in ActiveRoute.Legs)
+                    Regatta.Waypoints.Add(new IData<Location>()
                     {
-                        foreach (string bName in boatList)
+                        Val = lg.ToLocation,
+                        Time = DateTime.MaxValue
+                    });
+
+                ActivityProgressMsg.Text = "Regatta calculation in progress";
+                ActivityProgressGrid.Visibility = Visibility.Visible;
+                ActivityProgressBar.Maximum = Regatta.Boats.Count();
+
+                // wptArrival used to calculate time of arrival at each WP based on minimum distance
+                (double, DateTime)[] wptArrival = new (double, DateTime)[Regatta.Waypoints.Count()];
+
+                if (Regatta.Boats != null)
+                {
+                    foreach (string bName in Regatta.Boats)
+                    {
+
+                        using (var context = new LionRiverDBContext())
                         {
+
                             var tEntries =
                                 (from te in context.FleetTracks
                                  where te.Name == bName && te.timestamp > Regatta.Start && te.timestamp < Regatta.End
@@ -3011,14 +3076,14 @@ namespace LionRiver
                             //Initialize to max values
                             for (int i = 1; i < Regatta.Waypoints.Count(); i++)
                                 wptArrival[i] = (double.MaxValue, DateTime.MaxValue);
-                            
+
                             // 1st sweep: Calculate time @ each waypoint
 
                             foreach (FleetTrack te in tEntries)
                             {
                                 for (int i = 1; i < Regatta.Waypoints.Count(); i++)
                                 {
-                                    var dist = CalcDistance(te.Latitude, te.Longitude, Regatta.Waypoints[i].Latitude, Regatta.Waypoints[i].Longitude);
+                                    var dist = CalcDistance(te.Latitude, te.Longitude, Regatta.Waypoints[i].Val.Latitude, Regatta.Waypoints[i].Val.Longitude);
                                     (var prevDist, _) = wptArrival[i];
                                     if (dist < prevDist)
                                         wptArrival[i] = (dist, te.timestamp);
@@ -3032,21 +3097,21 @@ namespace LionRiver
 
                             foreach (FleetTrack te in tEntries)
                             {
-                                var bearing1 = CalcBearing(Regatta.Waypoints[j - 1].Latitude, Regatta.Waypoints[j - 1].Longitude,
-                                                           Regatta.Waypoints[j].Latitude, Regatta.Waypoints[j].Longitude);
-                                var bearing2 = CalcBearing(Regatta.Waypoints[j - 1].Latitude, Regatta.Waypoints[j - 1].Longitude,
-                                                           te.Latitude,te.Longitude);
+                                var bearing1 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
+                                                           Regatta.Waypoints[j].Val.Latitude, Regatta.Waypoints[j].Val.Longitude);
+                                var bearing2 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
+                                                           te.Latitude, te.Longitude);
 
                                 var alpha = bearing2 - bearing1;
 
-                                var distance = CalcDistance(Regatta.Waypoints[j - 1].Latitude, Regatta.Waypoints[j - 1].Longitude,
+                                var distance = CalcDistance(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
                                                             te.Latitude, te.Longitude);
 
                                 var DMG = BaseDMG + distance * Math.Cos(alpha * Math.PI / 180);
 
                                 (_, var arrivalT) = wptArrival[j];
 
-                                if(te.timestamp>arrivalT)
+                                if (te.timestamp > arrivalT)
                                 {
                                     if (j < Regatta.Waypoints.Count() - 1)
                                     {
@@ -3060,26 +3125,19 @@ namespace LionRiver
 
                             await context.SaveChangesAsync();
 
-                            ActivityProgressBar.Value++;
                         }
+
+                        ActivityProgressBar.Value++;
                     }
 
                     ActivityProgressGrid.Visibility = Visibility.Hidden;
                 }
             }
-            else
-            {
 
-                string messageBoxText = "No Active Route";
-                string caption = "LionRiver";
-                MessageBoxButton button = MessageBoxButton.OK;
-                MessageBoxImage icon = MessageBoxImage.Warning;
+            regattaCalcInProgress = false;
 
-                MessageBox.Show(messageBoxText, caption, button, icon);
-
-            }
-            e.Handled = true;
         }
+
 
         #endregion
 
