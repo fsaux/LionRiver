@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="mainModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="Data Source=C:\Users\fsaux\Source\Repos\LionRiver\LionRiver\Databases\LionRiver.sqlite" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="mainModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="Data Source=C:\Users\fsu\source\repos\fsaux\LionRiver\LionRiver\Databases\LionRiver.sqlite" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="FleetTrack">
           <Key>
             <PropertyRef Name="Name" />
@@ -16,7 +16,6 @@
           <Property Name="Longitude" Type="real" Nullable="false" />
           <Property Name="COG" Type="real" Nullable="false" />
           <Property Name="SOG" Type="real" Nullable="false" />
-          <Property Name="DMG" Type="real" />
         </EntityType>
         <EntityType Name="Log">
           <Key>
@@ -81,7 +80,6 @@
           <Property Name="Longitude" Type="Double" Nullable="false" />
           <Property Name="COG" Type="Double" Nullable="false" />
           <Property Name="SOG" Type="Double" Nullable="false" />
-          <Property Name="DMG" Type="Double" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -113,7 +111,6 @@
           <EntitySetMapping Name="FleetTracks">
             <EntityTypeMapping TypeName="mainModel.FleetTrack">
               <MappingFragment StoreEntitySet="FleetTrack">
-                <ScalarProperty Name="DMG" ColumnName="DMG" />
                 <ScalarProperty Name="SOG" ColumnName="SOG" />
                 <ScalarProperty Name="COG" ColumnName="COG" />
                 <ScalarProperty Name="Longitude" ColumnName="Longitude" />

@@ -20,6 +20,5 @@ namespace LionRiver
         public double Longitude { get; set; }
         public double COG { get; set; }
         public double SOG { get; set; }
-        public Nullable<double> DMG { get; set; }
     }
 }

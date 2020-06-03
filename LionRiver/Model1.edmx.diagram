@@ -6,7 +6,7 @@
     <edmx:Diagrams>
       <Diagram DiagramId="ce6c389dde8542f08063828ffe8053eb" Name="Diagram1" ZoomLevel="76">
         <EntityTypeShape EntityType="mainModel.Log" Width="1.5" PointX="0.5" PointY="0.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="mainModel.FleetTrack" Width="1.5" PointX="3.375" PointY="0.75" />
+        <EntityTypeShape EntityType="mainModel.FleetTrack" Width="1.5" PointX="2.75" PointY="0.625" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

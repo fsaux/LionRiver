@@ -2980,6 +2980,8 @@ namespace LionRiver
 
         public List<string> Boats { get; set; }
         public List<IData<Location>> Waypoints { get; set; }
+
+        public Dictionary<string, List<IData<double>>> BoatDMG { get; set; }
     }
 }
 

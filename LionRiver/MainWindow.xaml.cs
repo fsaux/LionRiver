@@ -168,7 +168,6 @@ namespace LionRiver
         DispatcherTimer ReplayTimer = new DispatcherTimer();
         DispatcherTimer PlotPanTimer = new DispatcherTimer();
         DispatcherTimer UpdatePlotResolutionTimer = new DispatcherTimer();
-        DispatcherTimer CalcRegattaTimer = new DispatcherTimer();
 
 
         #endregion
@@ -348,6 +347,7 @@ namespace LionRiver
 
         ChartValues<DateModel> MainPlotValues = new ChartValues<DateModel>();
         ChartValues<DateModel> AuxPlotValues = new ChartValues<DateModel>();
+        List<ChartValues<DateModel>> FleetPlotValues = new List<ChartValues<DateModel>>();
         ChartValues<DateModel> FleetActivityValues = new ChartValues<DateModel>();
 
         ObservableCollection<PlotSelector> PlotSelectors = new ObservableCollection<PlotSelector>
@@ -357,9 +357,11 @@ namespace LionRiver
             new PlotSelector {Name="TWD",Description="True Wind Direction",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
             new PlotSelector {Name="TWS",Description="True Wind Speed",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
             new PlotSelector {Name="Drift",Description="Drift",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="Perf",Description="Performance",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="Perf",Description="Performance",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
             new PlotSelector {Name="Depth",Description="Depth",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("#.#") },
-            new PlotSelector {Name="Fleet",Description="Fleet boats",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") }
+            new PlotSelector {Name="Active",Description="Fleet boats",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="DMG",Description="Distance Made Good",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") }
+
         };
 
         #endregion
@@ -842,9 +844,6 @@ namespace LionRiver
 
             UpdatePlotResolutionTimer.Tick += new EventHandler(UpdatePlotResolution_Tick);
             UpdatePlotResolutionTimer.Interval = new TimeSpan(0, 0, 1);
-
-            CalcRegattaTimer.Tick += new EventHandler(CalcRegattaTimer_Tick);
-            CalcRegattaTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
 
             NMEATimer.Start();
             ShortNavTimer.Start();
@@ -1419,15 +1418,6 @@ namespace LionRiver
                 if (PlayButton.IsChecked == true)
                     UpdateTracks(newDataWStart, new DateTime((long)NavPlotModel.MaxXAxisValue), Track.MaxLength);
             }
-
-        }
-
-        private  async void CalcRegattaTimer_Tick(object sender, EventArgs e)
-        {
-            CalcRegattaTimer.Stop();
-
-            await CalcRegatta();
-
 
         }
 
@@ -2991,6 +2981,9 @@ namespace LionRiver
                 ActivityProgressBar.Maximum = 100;
 
                 await CalcRegatta();
+
+                ActivityProgressGrid.Visibility = Visibility.Hidden;
+
             }
             else
             {
@@ -3026,118 +3019,129 @@ namespace LionRiver
                     Name = "Regatta",
                     Start = new DateTime((long)NavPlotModel.SelectionFromValue),
                     End = new DateTime((long)NavPlotModel.SelectionToValue),
-                    Waypoints = new List<IData<Location>>()
+                    Waypoints = new List<IData<Location>>(),
+                    BoatDMG=new Dictionary<string, List<IData<double>>>()
                 };
 
                 using (var context = new LionRiverDBContext())
                 {
-                    var boatList =
+                    var boatList = await
                             (from b in context.FleetTracks
                              where b.timestamp > Regatta.Start && b.timestamp < Regatta.End
-                             select b.Name).Distinct().ToList();
+                             select b.Name).Distinct().ToListAsync();
 
                     Regatta.Boats = boatList;
 
-                }
-
-                Regatta.Waypoints.Add(new IData<Location>()
-                {
-                    Val = ActiveRoute.Legs[0].FromLocation,
-                    Time = DateTime.MaxValue
-                });
-
-                foreach (Leg lg in ActiveRoute.Legs)
                     Regatta.Waypoints.Add(new IData<Location>()
                     {
-                        Val = lg.ToLocation,
+                        Val = ActiveRoute.Legs[0].FromLocation,
                         Time = DateTime.MaxValue
                     });
 
-                ActivityProgressMsg.Text = "Regatta calculation in progress";
-                ActivityProgressGrid.Visibility = Visibility.Visible;
-                ActivityProgressBar.Maximum = Regatta.Boats.Count();
+                    foreach (Leg lg in ActiveRoute.Legs)
+                        Regatta.Waypoints.Add(new IData<Location>()
+                        {
+                            Val = lg.ToLocation,
+                            Time = DateTime.MaxValue
+                        });
 
-                // wptArrival used to calculate time of arrival at each WP based on minimum distance
-                (double, DateTime)[] wptArrival = new (double, DateTime)[Regatta.Waypoints.Count()];
+                    ActivityProgressBar.Maximum = Regatta.Boats.Count();
 
-                if (Regatta.Boats != null)
-                {
-                    foreach (string bName in Regatta.Boats)
+                    // wptArrival used to calculate time of arrival at each WP based on minimum distance
+                    (double, DateTime)[] wptArrival = new (double, DateTime)[Regatta.Waypoints.Count()];
+
+                    if (Regatta.Boats != null)
                     {
-
-                        using (var context = new LionRiverDBContext())
+                        foreach (string bName in Regatta.Boats)
                         {
 
-                            var tEntries =
+                            var tEntries = await
                                 (from te in context.FleetTracks
                                  where te.Name == bName && te.timestamp > Regatta.Start && te.timestamp < Regatta.End
-                                 select te).ToList();
+                                 select new IData<Location>()
+                                    { Time = te.timestamp, Val = new Location() { Latitude = te.Latitude, Longitude = te.Longitude } })
+                                    .ToListAsync();
 
-                            //Initialize to max values
-                            for (int i = 1; i < Regatta.Waypoints.Count(); i++)
-                                wptArrival[i] = (double.MaxValue, DateTime.MaxValue);
-
-                            // 1st sweep: Calculate time @ each waypoint
-
-                            foreach (FleetTrack te in tEntries)
-                            {
-                                for (int i = 1; i < Regatta.Waypoints.Count(); i++)
-                                {
-                                    var dist = CalcDistance(te.Latitude, te.Longitude, Regatta.Waypoints[i].Val.Latitude, Regatta.Waypoints[i].Val.Longitude);
-                                    (var prevDist, _) = wptArrival[i];
-                                    if (dist < prevDist)
-                                        wptArrival[i] = (dist, te.timestamp);
-                                }
-                            }
-
-                            // 2nd sweep: Accumulate DMG
-
-                            double BaseDMG = 0;
-                            int j = 1;  // Waypoint[0] only used to calc bearing 0-1
-
-                            foreach (FleetTrack te in tEntries)
-                            {
-                                var bearing1 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
-                                                           Regatta.Waypoints[j].Val.Latitude, Regatta.Waypoints[j].Val.Longitude);
-                                var bearing2 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
-                                                           te.Latitude, te.Longitude);
-
-                                var alpha = bearing2 - bearing1;
-
-                                var distance = CalcDistance(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
-                                                            te.Latitude, te.Longitude);
-
-                                var DMG = BaseDMG + distance * Math.Cos(alpha * Math.PI / 180);
-
-                                (_, var arrivalT) = wptArrival[j];
-
-                                if (te.timestamp > arrivalT)
-                                {
-                                    if (j < Regatta.Waypoints.Count() - 1)
-                                    {
-                                        BaseDMG = DMG;
-                                        j++;
-                                    }
-                                }
-
-                                te.DMG = DMG;
-                            }
-
-                            await context.SaveChangesAsync();
-
+                            Regatta.BoatDMG.Add(bName, GetBoatDMG(tEntries));
                         }
+
+                        var bEntries= await
+                               (from b in context.Logs
+                                where b.level==3 && b.timestamp > Regatta.Start && b.timestamp < Regatta.End
+                                select new IData<Location>()
+                                { Time = b.timestamp, Val = new Location() { Latitude = b.LAT, Longitude = b.LON } })
+                                    .ToListAsync();
+
+                        Regatta.BoatDMG.Add("__Own", GetBoatDMG(bEntries));
 
                         ActivityProgressBar.Value++;
                     }
-
-                    ActivityProgressGrid.Visibility = Visibility.Hidden;
                 }
             }
 
             regattaCalcInProgress = false;
-
         }
 
+        List<IData<double>> GetBoatDMG(List<IData<Location>> tEntries)
+        {
+
+            List<IData<double>> DMGList = new List<IData<double>>();
+
+            (double, DateTime)[] wptArrival = new (double, DateTime)[Regatta.Waypoints.Count()];
+
+
+            //Initialize to max values
+            for (int i = 1; i < Regatta.Waypoints.Count(); i++)
+                wptArrival[i] = (double.MaxValue, DateTime.MaxValue);
+
+            // 1st sweep: Calculate time @ each waypoint
+
+            foreach (IData<Location> te in tEntries)
+            {
+                for (int i = 1; i < Regatta.Waypoints.Count(); i++)
+                {
+                    var dist = CalcDistance(te.Val.Latitude, te.Val.Longitude, Regatta.Waypoints[i].Val.Latitude, Regatta.Waypoints[i].Val.Longitude);
+                    (var prevDist, _) = wptArrival[i];
+                    if (dist < prevDist)
+                        wptArrival[i] = (dist, te.Time);
+                }
+            }
+
+            // 2nd sweep: Accumulate DMG
+
+            double BaseDMG = 0;
+            int j = 1;  // Waypoint[0] only used to calc bearing 0-1
+
+            foreach (IData<Location> te in tEntries)
+            {
+                var bearing1 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
+                                           Regatta.Waypoints[j].Val.Latitude, Regatta.Waypoints[j].Val.Longitude);
+                var bearing2 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
+                                           te.Val.Latitude, te.Val.Longitude);
+
+                var alpha = bearing2 - bearing1;
+
+                var distance = CalcDistance(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
+                                            te.Val.Latitude, te.Val.Longitude);
+
+                var DMG = BaseDMG + distance * Math.Cos(alpha * Math.PI / 180);
+
+                (_, var arrivalT) = wptArrival[j];
+
+                if (te.Time > arrivalT)
+                {
+                    if (j < Regatta.Waypoints.Count() - 1)
+                    {
+                        BaseDMG = DMG;
+                        j++;
+                    }
+                }
+
+                DMGList.Add(new IData<double> { Val = DMG, Time = te.Time });
+            }
+
+            return DMGList;
+        }
 
         #endregion
 
@@ -4160,7 +4164,7 @@ namespace LionRiver
                         // Update Plot
 
                         DateTime cTime = POS.GetLastVal(level).Time;
-                        (double? mVal, double? aVal) = GetLastPloValue(level);
+                        (double? mVal, double? aVal) = GetLastPlotValue(level);
 
                         MainPlotValues.Add(new DateModel { DateTime = cTime, Value = mVal });
                         if (MainPlotValues.Count > NavPlotModel.MaxData)
@@ -4675,194 +4679,146 @@ namespace LionRiver
                                  where (x.level == n && x.timestamp > StartTime && x.timestamp < EndTime)
                                  select x;
 
-                PlotSelector mSelector =  MainPlotSelectionComboBox.SelectedItem as PlotSelector;
+                PlotSelector Selector =  MainPlotSelectionComboBox.SelectedItem as PlotSelector;
 
-                List<DateModel> result = new List<DateModel>();
+                List<DateModel> result=null;
 
-                if(mSelector!=null)
-                {
-                    switch(mSelector.Name)
-                    {
-                        case "SOG":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SOG }).ToList();
-                            break;
-
-                        case "SPD":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList();
-
-                            break;
-                        case "TWD":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.TWD + 360) % 360 }).ToList();
-
-                            break;
-                        case "TWS":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList();
-
-                            break;
-                        case "Drift":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList();
-                            break;
-
-                        case "Perf":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList();
-                            break; 
-
-                        case "Depth":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = -x.DPT }).ToList();
-                            break;
-
-                        case "Fleet":
-                            result = (from x in FleetActivityValues
-                                      where x.DateTime > StartTime && x.DateTime < EndTime
-                                      select x).ToList();
-                            break;
-                    }
-                }
+                if (Selector != null)
+                    result = GetPlotValues(Selector.Name, logEntries, StartTime, EndTime);
 
                 if (result.Count() != 0)
                 {
                     MainPlotValues.Clear();
                     MainPlotValues.AddRange(result);
 
-                    NavPlotModel.MinY1AxisValue = mSelector.MinValue;
-                    NavPlotModel.MaxY1AxisValue = mSelector.MaxValue;
-                    NavPlotModel.Y1Formatter = mSelector.Formatter;
+                    NavPlotModel.MinY1AxisValue = Selector.MinValue;
+                    NavPlotModel.MaxY1AxisValue = Selector.MaxValue;
+                    NavPlotModel.Y1Formatter = Selector.Formatter;
                 }
 
-                mSelector = AuxPlotSelectionComboBox.SelectedItem as PlotSelector;
-                result.Clear();
+                Selector = AuxPlotSelectionComboBox.SelectedItem as PlotSelector;
 
-                if (mSelector != null)
-                {
-                    switch (mSelector.Name)
-                    {
-                        case "SOG":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SOG }).ToList();
-                            break;
-
-                        case "SPD":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList();
-
-                            break;
-                        case "TWD":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.TWD + 360) % 360 }).ToList();
-
-                            break;
-                        case "TWS":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList();
-
-                            break;
-                        case "Drift":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList();
-                            break;
-
-                        case "Perf":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList();
-                            break;
-
-                        case "Depth":
-                            result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = -x.DPT }).ToList();
-                            break;
-
-                        case "Fleet":
-                            result = (from x in FleetActivityValues
-                                      where x.DateTime > StartTime && x.DateTime < EndTime
-                                      select x).ToList();
-                            break;
-                    }
-                }
+                if (Selector != null)
+                    result = GetPlotValues(Selector.Name, logEntries, StartTime, EndTime);
 
                 if (result.Count() != 0)
                 {
                     AuxPlotValues.Clear();
                     AuxPlotValues.AddRange(result);
 
-                    NavPlotModel.MinY2AxisValue = mSelector.MinValue;
-                    NavPlotModel.MaxY2AxisValue = mSelector.MaxValue;
-                    NavPlotModel.Y2Formatter = mSelector.Formatter;
+                    NavPlotModel.MinY2AxisValue = Selector.MinValue;
+                    NavPlotModel.MaxY2AxisValue = Selector.MaxValue;
+                    NavPlotModel.Y2Formatter = Selector.Formatter;
                 }
-
             }
         }
 
-        private (double? mainV,double? auxV ) GetLastPloValue(int level)
+        private List<DateModel> GetPlotValues(string Selector,IQueryable<Log> logEntries,DateTime StartTime,DateTime EndTime)
         {
-            PlotSelector mSelector = MainPlotSelectionComboBox.SelectedItem as PlotSelector;
+            List<DateModel> result = new List<DateModel>();
+
+            switch (Selector)
+            {
+                case "SOG":
+                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SOG }).ToList();
+                    break;
+
+                case "SPD":
+                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList();
+
+                    break;
+                case "TWD":
+                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.TWD + 360) % 360 }).ToList();
+
+                    break;
+                case "TWS":
+                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList();
+
+                    break;
+                case "Drift":
+                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList();
+                    break;
+
+                case "Perf":
+                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList();
+                    break;
+
+                case "Depth":
+                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = -x.DPT }).ToList();
+                    break;
+
+                case "Activity":
+                    result = (from x in FleetActivityValues
+                              where x.DateTime > StartTime && x.DateTime < EndTime
+                              select x).ToList();
+                    break;
+
+                case "DMG":
+                    result = (from x in FleetActivityValues
+                              where x.DateTime > StartTime && x.DateTime < EndTime
+                              select x).ToList();
+                    break;
+            }
+
+            return result;
+        }
+
+        private (double? mainV,double? auxV ) GetLastPlotValue(int level)
+        {
+            PlotSelector Selector = MainPlotSelectionComboBox.SelectedItem as PlotSelector;
             double? mResult = null;
 
-            if (mSelector != null)
-            {
-                switch (mSelector.Name)
-                {
-                    case "SOG":
-                        mResult = SOG.GetLastVal(level).Val;
-                        break;
+            if (Selector != null)
+                mResult = GetLastPlotValue(Selector.Name, level);
 
-                    case "SPD":
-                        mResult = SPD.GetLastVal(level).Val;
-                        break;
-
-                    case "TWD":
-                        mResult = (TWD.GetLastVal(level).Val + 360) % 360;
-                        break;
-
-                    case "TWS":
-                        mResult = TWS.GetLastVal(level).Val;
-                        break;
-
-                    case "Drift":
-                        mResult = DRIFT.GetLastVal(level).Val;
-                        break;
-
-                    case "Perf":
-                        mResult = PERF.GetLastVal(level).Val * 100;
-                        break;
-
-                    case "Depth":
-                        mResult = -DPT.GetLastVal(level).Val;
-                        break;
-                }
-            }
-
-            mSelector = AuxPlotSelectionComboBox.SelectedItem as PlotSelector;
+            Selector = AuxPlotSelectionComboBox.SelectedItem as PlotSelector;
             double? aResult = null;
 
-            if (mSelector != null)
-            {
-                switch (mSelector.Name)
-                {
-                    case "SOG":
-                        aResult = SOG.GetLastVal(level).Val;
-                        break;
+            if (Selector != null)
+                aResult = GetLastPlotValue(Selector.Name, level);
 
-                    case "SPD":
-                        aResult = SPD.GetLastVal(level).Val;
-                        break;
-
-                    case "TWD":
-                        aResult = (TWD.GetLastVal(level).Val + 360) % 360;
-                        break;
-
-                    case "TWS":
-                        aResult = TWS.GetLastVal(level).Val;
-                        break;
-
-                    case "Drift":
-                        aResult = DRIFT.GetLastVal(level).Val;
-                        break;
-
-                    case "Perf":
-                        aResult = PERF.GetLastVal(level).Val * 100;
-                        break;
-
-                    case "Depth":
-                        aResult = -DPT.GetLastVal(level).Val;
-                        break;
-                }
-            }
 
             return (mResult, aResult);
         }
+
+        private double? GetLastPlotValue(string Selector, int level)
+        {
+            double? mResult = null;
+
+            switch (Selector)
+            {
+                case "SOG":
+                    mResult = SOG.GetLastVal(level).Val;
+                    break;
+
+                case "SPD":
+                    mResult = SPD.GetLastVal(level).Val;
+                    break;
+
+                case "TWD":
+                    mResult = (TWD.GetLastVal(level).Val + 360) % 360;
+                    break;
+
+                case "TWS":
+                    mResult = TWS.GetLastVal(level).Val;
+                    break;
+
+                case "Drift":
+                    mResult = DRIFT.GetLastVal(level).Val;
+                    break;
+
+                case "Perf":
+                    mResult = PERF.GetLastVal(level).Val * 100;
+                    break;
+
+                case "Depth":
+                    mResult = -DPT.GetLastVal(level).Val;
+                    break;
+            }
+
+            return mResult;
+        }
+
 
         #endregion
 
