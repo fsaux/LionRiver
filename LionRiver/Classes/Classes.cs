@@ -2978,8 +2978,8 @@ namespace LionRiver
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
 
-        public List<Boat> Boats { get; set; }
-        public Route Route { get; set; }
+        public List<string> Boats { get; set; }
+        public List<Location> Waypoints { get; set; }
     }
 }
 

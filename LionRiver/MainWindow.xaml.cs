@@ -2965,7 +2965,7 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        private void CalcRegattaCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void CalcRegattaCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (ActiveRoute != null)
             {
@@ -2974,8 +2974,7 @@ namespace LionRiver
                     Name = "Regatta",
                     Start = new DateTime((long)NavPlotModel.SelectionFromValue),
                     End = new DateTime((long)NavPlotModel.SelectionToValue),
-                    Route = ActiveRoute,
-                    Boats = new List<Boat>()
+                    Waypoints = new List<Location>()
                 };
 
 
@@ -2986,24 +2985,80 @@ namespace LionRiver
                              where b.timestamp > Regatta.Start && b.timestamp < Regatta.End
                              select b.Name).Distinct().ToList();
 
+                    Regatta.Boats = boatList;
+
+                    Regatta.Waypoints.Add(ActiveRoute.Legs[0].FromLocation);
+
+                    foreach (Leg lg in ActiveRoute.Legs)
+                        Regatta.Waypoints.Add(lg.ToLocation);
+
                     ActivityProgressMsg.Text = "Regatta calculation in progress";
                     ActivityProgressGrid.Visibility = Visibility.Visible;
                     ActivityProgressBar.Maximum = boatList.Count();
+
+                    // wptArrival used to calculate time of arrival at each WP based on minimum distance
+                    (double, DateTime)[] wptArrival = new (double, DateTime)[Regatta.Waypoints.Count()];
 
                     if (boatList != null)
                     {
                         foreach (string bName in boatList)
                         {
-                            var boat = fleetBoats.FirstOrDefault(x => x.Name == bName);
-                            Regatta.Boats.Add(boat);
-
                             var tEntries =
                                 (from te in context.FleetTracks
                                  where te.Name == bName && te.timestamp > Regatta.Start && te.timestamp < Regatta.End
-                                 select te);
+                                 select te).ToList();
 
+                            //Initialize to max values
+                            for (int i = 1; i < Regatta.Waypoints.Count(); i++)
+                                wptArrival[i] = (double.MaxValue, DateTime.MaxValue);
+                            
+                            // 1st sweep: Calculate time @ each waypoint
 
+                            foreach (FleetTrack te in tEntries)
+                            {
+                                for (int i = 1; i < Regatta.Waypoints.Count(); i++)
+                                {
+                                    var dist = CalcDistance(te.Latitude, te.Longitude, Regatta.Waypoints[i].Latitude, Regatta.Waypoints[i].Longitude);
+                                    (var prevDist, _) = wptArrival[i];
+                                    if (dist < prevDist)
+                                        wptArrival[i] = (dist, te.timestamp);
+                                }
+                            }
 
+                            // 2nd sweep: Accumulate DMG
+
+                            double BaseDMG = 0;
+                            int j = 1;  // Waypoint[0] only used to calc bearing 0-1
+
+                            foreach (FleetTrack te in tEntries)
+                            {
+                                var bearing1 = CalcBearing(Regatta.Waypoints[j - 1].Latitude, Regatta.Waypoints[j - 1].Longitude,
+                                                           Regatta.Waypoints[j].Latitude, Regatta.Waypoints[j].Longitude);
+                                var bearing2 = CalcBearing(Regatta.Waypoints[j - 1].Latitude, Regatta.Waypoints[j - 1].Longitude,
+                                                           te.Latitude,te.Longitude);
+
+                                var alpha = bearing2 - bearing1;
+
+                                var distance = CalcDistance(Regatta.Waypoints[j - 1].Latitude, Regatta.Waypoints[j - 1].Longitude,
+                                                            te.Latitude, te.Longitude);
+
+                                var DMG = BaseDMG + distance * Math.Cos(alpha * Math.PI / 180);
+
+                                (_, var arrivalT) = wptArrival[j];
+
+                                if(te.timestamp>arrivalT)
+                                {
+                                    if (j < Regatta.Waypoints.Count() - 1)
+                                    {
+                                        BaseDMG = DMG;
+                                        j++;
+                                    }
+                                }
+
+                                te.DMG = DMG;
+                            }
+
+                            await context.SaveChangesAsync();
 
                             ActivityProgressBar.Value++;
                         }
