@@ -28,14 +28,10 @@ using System.Windows.Threading;
 
 namespace LionRiver
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    /// 
 
     public partial class MainWindow : Window
     {
-        #region MainWindow Properties (Globals)
+        #region MainWindow Model
 
         TimeSpan deltaLog;
 
@@ -275,7 +271,7 @@ namespace LionRiver
 
         #region MapItems
 
-        ICollection<object> boatsItemCollection;
+        ICollection<object> fleetBoatItemCollection;
         ICollection<object> legsItemCollection;
 
         SampleItemCollection marksItemCollection;
@@ -346,22 +342,33 @@ namespace LionRiver
         Binding CurrentYBinding = new Binding();
 
         ChartValues<DateModel> MainPlotValues = new ChartValues<DateModel>();
+        LineSeries MainSeries;
+
         ChartValues<DateModel> AuxPlotValues = new ChartValues<DateModel>();
-        List<ChartValues<DateModel>> FleetPlotValues = new List<ChartValues<DateModel>>();
+        LineSeries AuxSeries;
+
+        Dictionary<string,ChartValues<DateModel>> MainFleetPlotValues = new Dictionary<string, ChartValues<DateModel>>();
+        Dictionary<string, LineSeries> MainFleetSeries = new Dictionary<string, LineSeries>();
+
+        Dictionary<string, ChartValues<DateModel>> AuxFleetPlotValues = new Dictionary<string, ChartValues<DateModel>>();
+        Dictionary<string, LineSeries> AuxFleetSeries = new Dictionary<string, LineSeries>();
+
         ChartValues<DateModel> FleetActivityValues = new ChartValues<DateModel>();
 
         ObservableCollection<PlotSelector> PlotSelectors = new ObservableCollection<PlotSelector>
-        {
-            new PlotSelector {Name="SOG",Description="Speed Over Ground", MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="SPD",Description="Speed through Water",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="TWD",Description="True Wind Direction",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="TWS",Description="True Wind Speed",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="Drift",Description="Drift",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="Perf",Description="Performance",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="Depth",Description="Depth",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("#.#") },
-            new PlotSelector {Name="Active",Description="Fleet boats",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="DMG",Description="Distance Made Good",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") }
 
+        // Group=A => Single series
+        // Group=B => Multi series (regatta)
+        {
+            new PlotSelector {Name="SOG", Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
+            new PlotSelector {Name="SPD",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
+            new PlotSelector {Name="TWD",Group="A",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="TWS",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="Drift",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
+            new PlotSelector {Name="Perf",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="Depth",Group="A",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("#.#") },
+            new PlotSelector {Name="Active",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="DMG",Group="B",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") }
         };
 
         #endregion
@@ -494,7 +501,7 @@ namespace LionRiver
 
             #region MapItems
 
-            boatsItemCollection = (ICollection<object>)Resources["BoatsItemCollection"];
+            fleetBoatItemCollection = (ICollection<object>)Resources["FleetBoatItemCollection"];
             legsItemCollection = (ICollection<object>)Resources["LegsItemCollection"];
 
             //boatsItemCollection.Add(boat);
@@ -599,32 +606,34 @@ namespace LionRiver
             NavPlotModel.MinY2AxisValue = 0;
             NavPlotModel.MaxY2AxisValue = double.NaN;
 
-            NavPlotModel.SeriesCollection = new SeriesCollection(dayConfig)
-                {
-                new LineSeries
-                    {
-                    Title = "MainPlot",
-                    Values = MainPlotValues,
-                    Fill=System.Windows.Media.Brushes.Transparent,
-                    Stroke=System.Windows.Media.Brushes.DodgerBlue,
-                    PointGeometry = null,
-                    LineSmoothness=0,
-                    StrokeThickness=1,
-                    ScalesYAt=0
-                    },
+            NavPlotModel.SeriesCollection = new SeriesCollection(dayConfig);
 
-                new LineSeries
-                    {
-                    Title = "AuxPlot",
-                    Values = AuxPlotValues,
-                    Fill=System.Windows.Media.Brushes.Transparent,
-                    Stroke=System.Windows.Media.Brushes.MediumVioletRed,
-                    PointGeometry = null,
-                    LineSmoothness=0,
-                    StrokeThickness=1,
-                    ScalesYAt=1
-                    }
-                };
+            MainSeries = new LineSeries
+            {
+                Title = "MainPlot",
+                Values = MainPlotValues,
+                Fill = System.Windows.Media.Brushes.Transparent,
+                Stroke = System.Windows.Media.Brushes.DodgerBlue,
+                PointGeometry = null,
+                LineSmoothness = 0,
+                StrokeThickness = 1,
+                ScalesYAt = 0
+            };
+
+            AuxSeries = new LineSeries
+            {
+                Title = "AuxPlot",
+                Values = AuxPlotValues,
+                Fill = System.Windows.Media.Brushes.Transparent,
+                Stroke = System.Windows.Media.Brushes.MediumVioletRed,
+                PointGeometry = null,
+                LineSmoothness = 0,
+                StrokeThickness = 1,
+                ScalesYAt = 1
+            };
+
+            NavPlotModel.SeriesCollection.Add(MainSeries);
+            NavPlotModel.SeriesCollection.Add(AuxSeries);
 
             using (var context = new LionRiverDBContext())
             {
@@ -751,17 +760,23 @@ namespace LionRiver
                     Boat b = new Boat()
                     {
                         Name = name,
-                        IsSelected = false
+                        IsSelected = false,
+                        BoatColor= Color.FromRgb((byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256))
                     };
 
-                    MapItem boatMapItem = new MapItem();
-                    boatMapItem.Style = (Style)Application.Current.Resources["FleetBoatItemStyle"];
-
-                    b.BoatColor = Color.FromRgb((byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256));
-
                     fleetBoats.Add(b);
+
+                    //MapItem boatMapItem = new MapItem();
+                    //boatMapItem.Style = (Style)Application.Current.Resources["FleetBoatItemStyle"];
+
+                    //fleetBoats.Add(b);
+                    //boatMapItem.DataContext = b;
+                    //map.Children.Add(boatMapItem);
+
+                    MapItem boatMapItem = new MapItem();
                     boatMapItem.DataContext = b;
-                    map.Children.Add(boatMapItem);
+                    fleetBoatItemCollection.Add(boatMapItem);
+
                 }
             }
 
@@ -2876,7 +2891,7 @@ namespace LionRiver
 
         private void SelectFleetBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var fboat = (e.Source as MapItem).DataContext as Boat;
+            var fboat = ((e.Source as MapItemsControl).SelectedItem as MapItem).DataContext as Boat;
 
             fboat.IsSelected = true;
 
@@ -2893,7 +2908,7 @@ namespace LionRiver
 
         private void SelectFleetBoatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            var fboat = (e.Source as MapItem).DataContext as Boat;
+            var fboat = ((e.Source as MapItemsControl).SelectedItem as MapItem).DataContext as Boat;
 
             if (fboat.IsSelected)
                 e.CanExecute = false;
@@ -2906,7 +2921,7 @@ namespace LionRiver
 
         private void UnselectFleetBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var fboat = (e.Source as MapItem).DataContext as Boat;
+            var fboat = ((e.Source as MapItemsControl).SelectedItem as MapItem).DataContext as Boat;
 
             fboat.IsSelected = false;
 
@@ -2923,7 +2938,7 @@ namespace LionRiver
 
         private void UnselectFleetBoatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            var fboat = (e.Source as MapItem).DataContext as Boat;
+            var fboat = ((e.Source as MapItemsControl).SelectedItem as MapItem).DataContext as Boat;
 
             if (fboat.IsSelected == false)
                 e.CanExecute = false;
@@ -2980,10 +2995,11 @@ namespace LionRiver
                 ActivityProgressGrid.Visibility = Visibility.Visible;
                 ActivityProgressBar.Maximum = 100;
 
-                await CalcRegatta();
+                await CalcRegattaData();
+
+                SetupRegattaPlots();
 
                 ActivityProgressGrid.Visibility = Visibility.Hidden;
-
             }
             else
             {
@@ -2995,7 +3011,6 @@ namespace LionRiver
 
                 MessageBox.Show(messageBoxText, caption, button, icon);
             }
-
 
             e.Handled = true;
         }
@@ -3010,7 +3025,7 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        private async Task CalcRegatta()
+        private async Task CalcRegattaData()
         {
             if (ActiveRoute != null)
             {
@@ -3080,6 +3095,75 @@ namespace LionRiver
             }
 
             regattaCalcInProgress = false;
+        }
+
+        private void SetupRegattaPlots()
+        {
+            MainFleetSeries.Clear();
+            AuxFleetSeries.Clear();
+
+            MainFleetPlotValues.Clear();
+            AuxFleetPlotValues.Clear();
+
+            foreach (var bName in Regatta.Boats)
+            {
+                var bMapItem = fleetBoatItemCollection.FirstOrDefault(x => ((x as MapItem).DataContext as Boat).Name == bName);
+
+                var boat = (bMapItem as MapItem).DataContext as Boat;
+                var clr = boat.BoatColor;
+
+                MainFleetPlotValues.Add(bName, new ChartValues<DateModel>());
+
+                MainFleetSeries.Add(bName, new LineSeries
+                {
+                    Title = bName,
+                    Values = MainFleetPlotValues[bName],
+                    Fill = System.Windows.Media.Brushes.Transparent,
+                    Stroke = new SolidColorBrush(clr),
+                    PointGeometry = null,
+                    LineSmoothness = 0,
+                    StrokeThickness = 1,
+                    ScalesYAt = 0,
+                    Visibility=Visibility.Visible
+                });
+
+                AuxFleetPlotValues.Add(bName, new ChartValues<DateModel>());
+
+                AuxFleetSeries.Add(bName, new LineSeries
+                {
+                    Title = bName,
+                    Values = AuxFleetPlotValues[bName],
+                    Fill = System.Windows.Media.Brushes.Transparent,
+                    Stroke = new SolidColorBrush(clr),
+                    PointGeometry = null,
+                    LineSmoothness = 0,
+                    StrokeThickness = 1,
+                    ScalesYAt = 1
+                });
+
+                //Binding bMain = new Binding()
+                //{
+                //    Source = boat,
+                //    Path = new PropertyPath("Visibility"),
+                //    Mode = BindingMode.OneWay,
+                //    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                //};
+
+                //Binding bAux = new Binding()
+                //{
+                //    Source = boat,
+                //    Path = new PropertyPath("Visibility"),
+                //    Mode = BindingMode.OneWay,
+                //    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                //};
+
+                //BindingOperations.SetBinding(MainFleetSeries[bName], LineSeries.VisibilityProperty, bMain);
+                //BindingOperations.SetBinding(AuxFleetSeries[bName], LineSeries.VisibilityProperty, bAux);
+
+            }
+
+
+
         }
 
         List<IData<double>> GetBoatDMG(List<IData<Location>> tEntries)
@@ -3535,6 +3619,35 @@ namespace LionRiver
         private void MainPlotSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             MainPlotValues.Clear();
+
+            //string oldGroup = null, newGroup = null;
+
+            //if(e.RemovedItems.Count!=0)
+            //    oldGroup = (e.RemovedItems[0] as PlotSelector).Group;
+
+            //newGroup = ((sender as ComboBox).SelectedItem as PlotSelector).Group;
+
+            //if (oldGroup != newGroup)
+            //    NavPlotModel.SeriesCollection.Clear();
+
+            //switch(newGroup)
+            //{
+            //    case "A":
+            //        NavPlotModel.SeriesCollection.Add(MainSeries);
+            //        break;
+
+            //    case "B":
+            //        foreach(var b in fleetBoats)
+            //        {
+
+            //        }
+
+            //        break;
+
+            //}
+
+
+
             UpdatePlotResolutionTimer.Start();
         }
 
@@ -4675,21 +4788,29 @@ namespace LionRiver
         {
             using (var context = new LionRiverDBContext())
             {
+
                 var logEntries = from x in context.Logs
                                  where (x.level == n && x.timestamp > StartTime && x.timestamp < EndTime)
                                  select x;
 
                 PlotSelector Selector =  MainPlotSelectionComboBox.SelectedItem as PlotSelector;
 
-                List<DateModel> result=null;
+                List<List<DateModel>> result=null;
 
                 if (Selector != null)
                     result = GetPlotValues(Selector.Name, logEntries, StartTime, EndTime);
 
-                if (result.Count() != 0)
+                if (result!=null && result.Count() != 0)
                 {
-                    MainPlotValues.Clear();
-                    MainPlotValues.AddRange(result);
+                    if (Selector.Group == "A")
+                    {
+                        MainPlotValues.Clear();
+                        MainPlotValues.AddRange(result[0]);
+                    }
+                    else
+                    {
+
+                    }
 
                     NavPlotModel.MinY1AxisValue = Selector.MinValue;
                     NavPlotModel.MaxY1AxisValue = Selector.MaxValue;
@@ -4701,10 +4822,17 @@ namespace LionRiver
                 if (Selector != null)
                     result = GetPlotValues(Selector.Name, logEntries, StartTime, EndTime);
 
-                if (result.Count() != 0)
+                if (result!=null && result.Count() != 0)
                 {
-                    AuxPlotValues.Clear();
-                    AuxPlotValues.AddRange(result);
+                    if (Selector.Group == "A")
+                    {
+                        AuxPlotValues.Clear();
+                        AuxPlotValues.AddRange(result[0]);
+                    }
+                    else
+                    {
+
+                    }
 
                     NavPlotModel.MinY2AxisValue = Selector.MinValue;
                     NavPlotModel.MaxY2AxisValue = Selector.MaxValue;
@@ -4713,50 +4841,50 @@ namespace LionRiver
             }
         }
 
-        private List<DateModel> GetPlotValues(string Selector,IQueryable<Log> logEntries,DateTime StartTime,DateTime EndTime)
+        private List<List<DateModel>> GetPlotValues(string Selector,IQueryable<Log> logEntries,DateTime StartTime,DateTime EndTime)
         {
-            List<DateModel> result = new List<DateModel>();
+            List<List<DateModel>> result = new List<List<DateModel>>();
 
             switch (Selector)
             {
                 case "SOG":
-                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SOG }).ToList();
+                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SOG }).ToList());
                     break;
 
                 case "SPD":
-                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList();
+                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList());
 
                     break;
                 case "TWD":
-                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.TWD + 360) % 360 }).ToList();
+                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.TWD + 360) % 360 }).ToList());
 
                     break;
                 case "TWS":
-                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList();
+                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList());
 
                     break;
                 case "Drift":
-                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList();
+                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList());
                     break;
 
                 case "Perf":
-                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList();
+                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList());
                     break;
 
                 case "Depth":
-                    result = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = -x.DPT }).ToList();
+                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = -x.DPT }).ToList());
                     break;
 
-                case "Activity":
-                    result = (from x in FleetActivityValues
-                              where x.DateTime > StartTime && x.DateTime < EndTime
-                              select x).ToList();
+                case "Active":
+                    result.Add((from x in FleetActivityValues
+                                where x.DateTime > StartTime && x.DateTime < EndTime
+                                select x).ToList());
                     break;
 
                 case "DMG":
-                    result = (from x in FleetActivityValues
-                              where x.DateTime > StartTime && x.DateTime < EndTime
-                              select x).ToList();
+                    result.Add((from x in FleetActivityValues
+                                where x.DateTime > StartTime && x.DateTime < EndTime
+                                select x).ToList());
                     break;
             }
 

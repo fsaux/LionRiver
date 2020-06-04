@@ -2815,6 +2815,7 @@ namespace LionRiver
     public class PlotSelector
     {
         public string Name { get; set; }
+        public string Group { get; set; }
         public string Description { get; set; }
         public double MinValue { get; set; }
         public double MaxValue { get; set; }

@@ -25,9 +25,9 @@
 
     <Window.Resources>
         <local:Inst x:Key="InstrumentData"></local:Inst>
-        <local:SampleItemCollection x:Key="BoatsItemCollection"/>
+        <!--<local:SampleItemCollection x:Key="BoatsItemCollection"/>-->
+        <local:SampleItemCollection x:Key="FleetBoatItemCollection"/>
         <local:SampleItemCollection x:Key="LegsItemCollection"/>
-
         <local:LabelConverterTop x:Key="LabelConverterTop" />
         <local:LabelConverterLeft x:Key="LabelConverterLeft" />
         <local:CheckToVisConverter x:Key="CheckToVisConverter"/>
@@ -571,12 +571,10 @@
 
                          ContextMenu="{StaticResource MapContextMenu_Standard}">
 
-                    <map:MapItemsControl ItemsSource="{StaticResource BoatsItemCollection}"
-                                             ItemContainerStyle="{StaticResource BoatItemStyle}"
+                    <map:MapItemsControl x:Name="FleetBoatItemsControl" ItemsSource="{StaticResource FleetBoatItemCollection}"
+                                             ItemContainerStyle="{StaticResource FleetBoatItemStyle }"
                                              SelectionMode="Single"
-                                             Panel.ZIndex="20"
-                                             PreviewMouseLeftButtonDown="Boat_PreviewMouseLeftButtonDown"
-                                             PreviewMouseLeftButtonUp="Boat_PreviewMouseLeftButtonUp"/>
+                                             Panel.ZIndex="20"/>
 
                     <map:MapItemsControl  x:Name="LegItemsControl" ItemsSource="{StaticResource LegsItemCollection}"        				
                                               ItemContainerStyle="{StaticResource LegItemStyle}"                        
