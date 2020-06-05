@@ -1224,6 +1224,8 @@ namespace LionRiver
                             }
                             catch { bTrack = null; }
                         }
+                        else
+                            bTrack = null;
 
                         if (bTrack != null)
                         {
@@ -2985,7 +2987,7 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        private async void CalcRegattaCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void CalcRegattaCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (ActiveRoute != null)
             {
@@ -2995,7 +2997,7 @@ namespace LionRiver
                 ActivityProgressGrid.Visibility = Visibility.Visible;
                 ActivityProgressBar.Maximum = 100;
 
-                await CalcRegattaData();
+                CalcRegattaData();
 
                 SetupRegattaPlots();
 
@@ -3025,7 +3027,7 @@ namespace LionRiver
             e.Handled = true;
         }
 
-        private async Task CalcRegattaData()
+        private void CalcRegattaData()
         {
             if (ActiveRoute != null)
             {
@@ -3040,12 +3042,14 @@ namespace LionRiver
 
                 using (var context = new LionRiverDBContext())
                 {
-                    var boatList = await
+                    var boatList =
                             (from b in context.FleetTracks
                              where b.timestamp > Regatta.Start && b.timestamp < Regatta.End
-                             select b.Name).Distinct().ToListAsync();
+                             select b.Name).Distinct();
 
-                    Regatta.Boats = boatList;
+                    Regatta.Boats = (from b in fleetBoats
+                                     where boatList.Contains(b.Name)
+                                     select b).ToList();
 
                     Regatta.Waypoints.Add(new IData<Location>()
                     {
@@ -3067,25 +3071,24 @@ namespace LionRiver
 
                     if (Regatta.Boats != null)
                     {
-                        foreach (string bName in Regatta.Boats)
+                        foreach (Boat bt in Regatta.Boats)
                         {
-
-                            var tEntries = await
+                            var tEntries =
                                 (from te in context.FleetTracks
-                                 where te.Name == bName && te.timestamp > Regatta.Start && te.timestamp < Regatta.End
+                                 where te.Name == bt.Name && te.timestamp > Regatta.Start && te.timestamp < Regatta.End
                                  select new IData<Location>()
                                     { Time = te.timestamp, Val = new Location() { Latitude = te.Latitude, Longitude = te.Longitude } })
-                                    .ToListAsync();
+                                    .ToList();
 
-                            Regatta.BoatDMG.Add(bName, GetBoatDMG(tEntries));
+                            Regatta.BoatDMG.Add(bt.Name, GetBoatDMG(tEntries));
                         }
 
-                        var bEntries= await
+                        var bEntries= 
                                (from b in context.Logs
-                                where b.level==3 && b.timestamp > Regatta.Start && b.timestamp < Regatta.End
+                                where b.level==2 && b.timestamp > Regatta.Start && b.timestamp < Regatta.End
                                 select new IData<Location>()
                                 { Time = b.timestamp, Val = new Location() { Latitude = b.LAT, Longitude = b.LON } })
-                                    .ToListAsync();
+                                    .ToList();
 
                         Regatta.BoatDMG.Add("__Own", GetBoatDMG(bEntries));
 
@@ -3105,19 +3108,19 @@ namespace LionRiver
             MainFleetPlotValues.Clear();
             AuxFleetPlotValues.Clear();
 
-            foreach (var bName in Regatta.Boats)
+            foreach (var bt in Regatta.Boats)
             {
-                var bMapItem = fleetBoatItemCollection.FirstOrDefault(x => ((x as MapItem).DataContext as Boat).Name == bName);
+                var bMapItem = fleetBoatItemCollection.FirstOrDefault(x => ((x as MapItem).DataContext as Boat) == bt);
 
                 var boat = (bMapItem as MapItem).DataContext as Boat;
                 var clr = boat.BoatColor;
 
-                MainFleetPlotValues.Add(bName, new ChartValues<DateModel>());
+                MainFleetPlotValues.Add(bt.Name, new ChartValues<DateModel>());
 
-                MainFleetSeries.Add(bName, new LineSeries
+                MainFleetSeries.Add(bt.Name, new LineSeries
                 {
-                    Title = bName,
-                    Values = MainFleetPlotValues[bName],
+                    Title = bt.Name,
+                    Values = MainFleetPlotValues[bt.Name],
                     Fill = System.Windows.Media.Brushes.Transparent,
                     Stroke = new SolidColorBrush(clr),
                     PointGeometry = null,
@@ -3127,12 +3130,14 @@ namespace LionRiver
                     Visibility=Visibility.Visible
                 });
 
-                AuxFleetPlotValues.Add(bName, new ChartValues<DateModel>());
+                NavPlotModel.SeriesCollection.Add(MainFleetSeries[bt.Name]);
 
-                AuxFleetSeries.Add(bName, new LineSeries
+                AuxFleetPlotValues.Add(bt.Name, new ChartValues<DateModel>());
+
+                AuxFleetSeries.Add(bt.Name, new LineSeries
                 {
-                    Title = bName,
-                    Values = AuxFleetPlotValues[bName],
+                    Title = bt.Name,
+                    Values = AuxFleetPlotValues[bt.Name],
                     Fill = System.Windows.Media.Brushes.Transparent,
                     Stroke = new SolidColorBrush(clr),
                     PointGeometry = null,
@@ -3140,6 +3145,9 @@ namespace LionRiver
                     StrokeThickness = 1,
                     ScalesYAt = 1
                 });
+
+                NavPlotModel.SeriesCollection.Add(AuxFleetSeries[bt.Name]);
+
 
                 //Binding bMain = new Binding()
                 //{
@@ -4793,98 +4801,136 @@ namespace LionRiver
                                  where (x.level == n && x.timestamp > StartTime && x.timestamp < EndTime)
                                  select x;
 
-                PlotSelector Selector =  MainPlotSelectionComboBox.SelectedItem as PlotSelector;
+                PlotSelector Selector = MainPlotSelectionComboBox.SelectedItem as PlotSelector;
 
-                List<List<DateModel>> result=null;
+                Dictionary<string, List<DateModel>> result = null;
 
                 if (Selector != null)
                     result = GetPlotValues(Selector.Name, logEntries, StartTime, EndTime);
 
-                if (result!=null && result.Count() != 0)
+                if (result != null && result.Count() != 0)
                 {
-                    if (Selector.Group == "A")
+                    switch (Selector.Group)
                     {
-                        MainPlotValues.Clear();
-                        MainPlotValues.AddRange(result[0]);
-                    }
-                    else
-                    {
+                        case "A":
+                            MainPlotValues.Clear();
+                            MainPlotValues.AddRange(result["_single"]);
+                            break;
 
+                        case "B":
+                            foreach(KeyValuePair<string,List<DateModel>> kvp in result)
+                            {
+                                MainFleetPlotValues[kvp.Key].Clear();
+                                MainFleetPlotValues[kvp.Key].AddRange(kvp.Value);
+                            }
+                            break;
                     }
-
-                    NavPlotModel.MinY1AxisValue = Selector.MinValue;
-                    NavPlotModel.MaxY1AxisValue = Selector.MaxValue;
-                    NavPlotModel.Y1Formatter = Selector.Formatter;
                 }
+
+                NavPlotModel.MinY1AxisValue = Selector.MinValue;
+                NavPlotModel.MaxY1AxisValue = Selector.MaxValue;
+                NavPlotModel.Y1Formatter = Selector.Formatter;
 
                 Selector = AuxPlotSelectionComboBox.SelectedItem as PlotSelector;
 
                 if (Selector != null)
                     result = GetPlotValues(Selector.Name, logEntries, StartTime, EndTime);
 
-                if (result!=null && result.Count() != 0)
+                if (result != null && result.Count() != 0)
                 {
-                    if (Selector.Group == "A")
+                    switch (Selector.Group)
                     {
-                        AuxPlotValues.Clear();
-                        AuxPlotValues.AddRange(result[0]);
-                    }
-                    else
-                    {
+                        case "A":
+                            AuxPlotValues.Clear();
+                            AuxPlotValues.AddRange(result["_single"]);
+                            break;
 
+                        case "B":
+                            foreach (KeyValuePair<string, List<DateModel>> kvp in result)
+                            {
+                                AuxFleetPlotValues[kvp.Key].Clear();
+                                AuxFleetPlotValues[kvp.Key].AddRange(kvp.Value);
+                            }
+                            break;
                     }
-
-                    NavPlotModel.MinY2AxisValue = Selector.MinValue;
-                    NavPlotModel.MaxY2AxisValue = Selector.MaxValue;
-                    NavPlotModel.Y2Formatter = Selector.Formatter;
                 }
             }
         }
+        
 
-        private List<List<DateModel>> GetPlotValues(string Selector,IQueryable<Log> logEntries,DateTime StartTime,DateTime EndTime)
+        private Dictionary<string,List<DateModel>> GetPlotValues(string Selector,IQueryable<Log> logEntries,DateTime StartTime,DateTime EndTime)
         {
-            List<List<DateModel>> result = new List<List<DateModel>>();
+            Dictionary<string, List<DateModel>> result = new Dictionary<string, List<DateModel>>();
 
             switch (Selector)
             {
                 case "SOG":
-                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SOG }).ToList());
+                    result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SOG }).ToList());
                     break;
 
                 case "SPD":
-                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList());
+                    result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList());
 
                     break;
                 case "TWD":
-                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.TWD + 360) % 360 }).ToList());
+                    result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.TWD + 360) % 360 }).ToList());
 
                     break;
                 case "TWS":
-                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList());
+                    result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList());
 
                     break;
                 case "Drift":
-                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList());
+                    result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList());
                     break;
 
                 case "Perf":
-                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList());
+                    result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList());
                     break;
 
                 case "Depth":
-                    result.Add(logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = -x.DPT }).ToList());
+                    result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = -x.DPT }).ToList());
                     break;
 
                 case "Active":
-                    result.Add((from x in FleetActivityValues
+                    result.Add("_single",(from x in FleetActivityValues
                                 where x.DateTime > StartTime && x.DateTime < EndTime
                                 select x).ToList());
                     break;
 
                 case "DMG":
-                    result.Add((from x in FleetActivityValues
-                                where x.DateTime > StartTime && x.DateTime < EndTime
-                                select x).ToList());
+                    if (Regatta != null)
+                    {
+                        foreach (Boat bt in Regatta.Boats)
+                        {
+                            if (bt.IsSelected == true)
+                            {
+                                List<DateModel> rr = new List<DateModel>();
+
+                                var flist = (from fe in Regatta.BoatDMG[bt.Name]
+                                             where fe.Time > StartTime && fe.Time < EndTime
+                                             select fe);
+
+                                foreach (var fbEntry in flist)
+                                {
+                                    var bRef = (from b in Regatta.BoatDMG["__Own"]
+                                                where b.Time > fbEntry.Time
+                                                select b).FirstOrDefault();
+
+                                    double? vv = null;
+
+                                    if (bRef != null)
+                                        if ((bRef.Time - fbEntry.Time).Duration() < TimeSpan.FromSeconds(150))
+                                            vv = bRef.Val - fbEntry.Val;
+
+                                    rr.Add(new DateModel { DateTime = fbEntry.Time, Value = vv });
+
+                                }
+                                result.Add(bt.Name, rr);
+                            }
+                        }
+                    }
+
                     break;
             }
 
