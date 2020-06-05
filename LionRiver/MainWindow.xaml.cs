@@ -17,6 +17,8 @@ using System.IO.Ports;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -369,7 +371,7 @@ namespace LionRiver
             new PlotSelector {Name="Depth",Group="A",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("#.#") },
             new PlotSelector {Name="DMG",Group="B",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
             new PlotSelector {Name="Active",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="None"}
+            new PlotSelector {Name="None",Group="C"}
         };
 
         #endregion
@@ -758,21 +760,18 @@ namespace LionRiver
 
                 foreach (string name in boatList)
                 {
+                    var md5 = MD5.Create();
+                    var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(name));
+                    var color = Color.FromRgb(hash[0], hash[1], hash[2]);
+
                     Boat b = new Boat()
                     {
                         Name = name,
                         IsSelected = false,
-                        BoatColor= Color.FromRgb((byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256))
+                        BoatColor= color
                     };
 
                     fleetBoats.Add(b);
-
-                    //MapItem boatMapItem = new MapItem();
-                    //boatMapItem.Style = (Style)Application.Current.Resources["FleetBoatItemStyle"];
-
-                    //fleetBoats.Add(b);
-                    //boatMapItem.DataContext = b;
-                    //map.Children.Add(boatMapItem);
 
                     MapItem boatMapItem = new MapItem();
                     boatMapItem.DataContext = b;
@@ -1179,8 +1178,13 @@ namespace LionRiver
                         MapItem boatMapItem = new MapItem();
                         boatMapItem.Style = (Style)Application.Current.Resources["FleetBoatItemStyle"];
 
-                        Random rnd = new Random();
-                        b.BoatColor = Color.FromRgb((byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256));
+                        var md5 = MD5.Create();
+                        var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(b.Name));
+                        b.BoatColor = Color.FromRgb(hash[0], hash[1], hash[2]);
+
+
+                        //Random rnd = new Random();
+                        //b.BoatColor = Color.FromRgb((byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256));
 
                         fleetBoats.Add(b);
                         boatMapItem.DataContext = b;
@@ -2907,6 +2911,8 @@ namespace LionRiver
                 
             }
 
+            UpdatePlotResolutionTimer.Start();
+
             e.Handled = true;
         }
 
@@ -3193,6 +3199,7 @@ namespace LionRiver
                     PointGeometry = null,
                     LineSmoothness = 0,
                     StrokeThickness = 1,
+                    StrokeDashArray = new DoubleCollection { 4 },
                     ScalesYAt = 0,
                     Visibility=Visibility.Visible
                 });
@@ -3221,14 +3228,17 @@ namespace LionRiver
                     Source = boat,
                     Path = new PropertyPath("IsSelected"),
                     Mode = BindingMode.OneWay,
+                    Converter= new CheckToVisConverter(),
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 };
+
 
                 Binding bAux = new Binding()
                 {
                     Source = boat,
                     Path = new PropertyPath("IsSelected"),
                     Mode = BindingMode.OneWay,
+                    Converter = new CheckToVisConverter(),
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 };
 
@@ -3240,7 +3250,6 @@ namespace LionRiver
 
 
         }
-
 
         #endregion
 
@@ -3633,42 +3642,58 @@ namespace LionRiver
 
         private void MainPlotSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MainPlotValues.Clear();
 
-            //string oldGroup = null, newGroup = null;
+            var newGroup = ((sender as ComboBox).SelectedItem as PlotSelector).Group;
 
-            //if(e.RemovedItems.Count!=0)
-            //    oldGroup = (e.RemovedItems[0] as PlotSelector).Group;
+            switch (newGroup)
+            {
+                case "A":
+                    foreach (KeyValuePair <string,LineSeries> kvp in MainFleetSeries)
+                        kvp.Value.Visibility = Visibility.Hidden;
+                    MainSeries.Visibility = Visibility.Visible;
+                    break;
 
-            //newGroup = ((sender as ComboBox).SelectedItem as PlotSelector).Group;
+                case "B":
+                    foreach (KeyValuePair<string, LineSeries> kvp in MainFleetSeries)
+                        kvp.Value.Visibility = Visibility.Visible;
+                    MainSeries.Visibility = Visibility.Hidden;
+                    break;
 
-            //if (oldGroup != newGroup)
-            //    NavPlotModel.SeriesCollection.Clear();
-
-            //switch(newGroup)
-            //{
-            //    case "A":
-            //        NavPlotModel.SeriesCollection.Add(MainSeries);
-            //        break;
-
-            //    case "B":
-            //        foreach(var b in fleetBoats)
-            //        {
-
-            //        }
-
-            //        break;
-
-            //}
-
-
+                case "C":
+                    foreach (KeyValuePair<string, LineSeries> kvp in MainFleetSeries)
+                        kvp.Value.Visibility = Visibility.Hidden;
+                    MainSeries.Visibility = Visibility.Hidden;
+                    break;
+            }
 
             UpdatePlotResolutionTimer.Start();
         }
 
         private void AuxPlotSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            AuxPlotValues.Clear();
+            var newGroup = ((sender as ComboBox).SelectedItem as PlotSelector).Group;
+
+            switch (newGroup)
+            {
+                case "A":
+                    foreach (KeyValuePair<string, LineSeries> kvp in AuxFleetSeries)
+                        kvp.Value.Visibility = Visibility.Hidden;
+                    AuxSeries.Visibility = Visibility.Visible;
+                    break;
+
+                case "B":
+                    foreach (KeyValuePair<string, LineSeries> kvp in AuxFleetSeries)
+                        kvp.Value.Visibility = Visibility.Visible;
+                    AuxSeries.Visibility = Visibility.Hidden;
+                    break;
+
+                case "C":
+                    foreach (KeyValuePair<string, LineSeries> kvp in AuxFleetSeries)
+                        kvp.Value.Visibility = Visibility.Hidden;
+                    AuxSeries.Visibility = Visibility.Hidden;
+                    break;
+            }
+
             UpdatePlotResolutionTimer.Start();
         }
 
