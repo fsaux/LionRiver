@@ -367,8 +367,9 @@ namespace LionRiver
             new PlotSelector {Name="Drift",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
             new PlotSelector {Name="Perf",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
             new PlotSelector {Name="Depth",Group="A",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("#.#") },
+            new PlotSelector {Name="DMG",Group="B",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
             new PlotSelector {Name="Active",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="DMG",Group="B",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") }
+            new PlotSelector {Name="None"}
         };
 
         #endregion
@@ -2903,6 +2904,7 @@ namespace LionRiver
                 DateTime endTime = new DateTime((long)NavPlotModel.SelectionToValue);
 
                 UpdateTracks(startTime, endTime);
+                
             }
 
             e.Handled = true;
@@ -3100,8 +3102,73 @@ namespace LionRiver
             regattaCalcInProgress = false;
         }
 
+        List<IData<double>> GetBoatDMG(List<IData<Location>> tEntries)
+        {
+            List<IData<double>> DMGList = new List<IData<double>>();
+
+            (double, DateTime)[] wptArrival = new (double, DateTime)[Regatta.Waypoints.Count()];
+
+            //Initialize to max values
+            for (int i = 1; i < Regatta.Waypoints.Count(); i++)
+                wptArrival[i] = (double.MaxValue, DateTime.MaxValue);
+
+            // 1st sweep: Calculate time @ each waypoint
+
+            foreach (IData<Location> te in tEntries)
+            {
+                for (int i = 1; i < Regatta.Waypoints.Count(); i++)
+                {
+                    var dist = CalcDistance(te.Val.Latitude, te.Val.Longitude, Regatta.Waypoints[i].Val.Latitude, Regatta.Waypoints[i].Val.Longitude);
+                    (var prevDist, _) = wptArrival[i];
+                    if (dist < prevDist)
+                        wptArrival[i] = (dist, te.Time);
+                }
+            }
+
+            // 2nd sweep: Accumulate DMG
+
+            double BaseDMG = 0;
+            int j = 1;  // Waypoint[0] only used to calc bearing 0-1
+
+            foreach (IData<Location> te in tEntries)
+            {
+                var bearing1 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
+                                           Regatta.Waypoints[j].Val.Latitude, Regatta.Waypoints[j].Val.Longitude);
+                var bearing2 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
+                                           te.Val.Latitude, te.Val.Longitude);
+
+                var alpha = bearing2 - bearing1;
+
+                var distance = CalcDistance(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
+                                            te.Val.Latitude, te.Val.Longitude);
+
+                var DMG = BaseDMG + distance * Math.Cos(alpha * Math.PI / 180);
+
+                (_, var arrivalT) = wptArrival[j];
+
+                if (te.Time > arrivalT)
+                {
+                    if (j < Regatta.Waypoints.Count() - 1)
+                    {
+                        BaseDMG += CalcDistance(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
+                                               Regatta.Waypoints[j].Val.Latitude, Regatta.Waypoints[j].Val.Longitude);
+                        j++;
+                    }
+                }
+
+                DMGList.Add(new IData<double> { Val = DMG, Time = te.Time });
+            }
+
+            return DMGList;
+        }
+
         private void SetupRegattaPlots()
         {
+            NavPlotModel.SeriesCollection.Clear();
+
+            NavPlotModel.SeriesCollection.Add(MainSeries);
+            NavPlotModel.SeriesCollection.Add(AuxSeries);
+
             MainFleetSeries.Clear();
             AuxFleetSeries.Clear();
 
@@ -3149,24 +3216,24 @@ namespace LionRiver
                 NavPlotModel.SeriesCollection.Add(AuxFleetSeries[bt.Name]);
 
 
-                //Binding bMain = new Binding()
-                //{
-                //    Source = boat,
-                //    Path = new PropertyPath("Visibility"),
-                //    Mode = BindingMode.OneWay,
-                //    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-                //};
+                Binding bMain = new Binding()
+                {
+                    Source = boat,
+                    Path = new PropertyPath("IsSelected"),
+                    Mode = BindingMode.OneWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                };
 
-                //Binding bAux = new Binding()
-                //{
-                //    Source = boat,
-                //    Path = new PropertyPath("Visibility"),
-                //    Mode = BindingMode.OneWay,
-                //    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-                //};
+                Binding bAux = new Binding()
+                {
+                    Source = boat,
+                    Path = new PropertyPath("IsSelected"),
+                    Mode = BindingMode.OneWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                };
 
-                //BindingOperations.SetBinding(MainFleetSeries[bName], LineSeries.VisibilityProperty, bMain);
-                //BindingOperations.SetBinding(AuxFleetSeries[bName], LineSeries.VisibilityProperty, bAux);
+                BindingOperations.SetBinding(MainFleetSeries[bt.Name], LineSeries.VisibilityProperty, bMain);
+                BindingOperations.SetBinding(AuxFleetSeries[bt.Name], LineSeries.VisibilityProperty, bAux);
 
             }
 
@@ -3174,66 +3241,6 @@ namespace LionRiver
 
         }
 
-        List<IData<double>> GetBoatDMG(List<IData<Location>> tEntries)
-        {
-
-            List<IData<double>> DMGList = new List<IData<double>>();
-
-            (double, DateTime)[] wptArrival = new (double, DateTime)[Regatta.Waypoints.Count()];
-
-
-            //Initialize to max values
-            for (int i = 1; i < Regatta.Waypoints.Count(); i++)
-                wptArrival[i] = (double.MaxValue, DateTime.MaxValue);
-
-            // 1st sweep: Calculate time @ each waypoint
-
-            foreach (IData<Location> te in tEntries)
-            {
-                for (int i = 1; i < Regatta.Waypoints.Count(); i++)
-                {
-                    var dist = CalcDistance(te.Val.Latitude, te.Val.Longitude, Regatta.Waypoints[i].Val.Latitude, Regatta.Waypoints[i].Val.Longitude);
-                    (var prevDist, _) = wptArrival[i];
-                    if (dist < prevDist)
-                        wptArrival[i] = (dist, te.Time);
-                }
-            }
-
-            // 2nd sweep: Accumulate DMG
-
-            double BaseDMG = 0;
-            int j = 1;  // Waypoint[0] only used to calc bearing 0-1
-
-            foreach (IData<Location> te in tEntries)
-            {
-                var bearing1 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
-                                           Regatta.Waypoints[j].Val.Latitude, Regatta.Waypoints[j].Val.Longitude);
-                var bearing2 = CalcBearing(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
-                                           te.Val.Latitude, te.Val.Longitude);
-
-                var alpha = bearing2 - bearing1;
-
-                var distance = CalcDistance(Regatta.Waypoints[j - 1].Val.Latitude, Regatta.Waypoints[j - 1].Val.Longitude,
-                                            te.Val.Latitude, te.Val.Longitude);
-
-                var DMG = BaseDMG + distance * Math.Cos(alpha * Math.PI / 180);
-
-                (_, var arrivalT) = wptArrival[j];
-
-                if (te.Time > arrivalT)
-                {
-                    if (j < Regatta.Waypoints.Count() - 1)
-                    {
-                        BaseDMG = DMG;
-                        j++;
-                    }
-                }
-
-                DMGList.Add(new IData<double> { Val = DMG, Time = te.Time });
-            }
-
-            return DMGList;
-        }
 
         #endregion
 
@@ -4825,11 +4832,10 @@ namespace LionRiver
                             }
                             break;
                     }
+                    NavPlotModel.MinY1AxisValue = Selector.MinValue;
+                    NavPlotModel.MaxY1AxisValue = Selector.MaxValue;
+                    NavPlotModel.Y1Formatter = Selector.Formatter;
                 }
-
-                NavPlotModel.MinY1AxisValue = Selector.MinValue;
-                NavPlotModel.MaxY1AxisValue = Selector.MaxValue;
-                NavPlotModel.Y1Formatter = Selector.Formatter;
 
                 Selector = AuxPlotSelectionComboBox.SelectedItem as PlotSelector;
 
@@ -4853,10 +4859,12 @@ namespace LionRiver
                             }
                             break;
                     }
+                    NavPlotModel.MinY2AxisValue = Selector.MinValue;
+                    NavPlotModel.MaxY2AxisValue = Selector.MaxValue;
+                    NavPlotModel.Y2Formatter = Selector.Formatter;
                 }
             }
         }
-        
 
         private Dictionary<string,List<DateModel>> GetPlotValues(string Selector,IQueryable<Log> logEntries,DateTime StartTime,DateTime EndTime)
         {
@@ -4921,7 +4929,7 @@ namespace LionRiver
 
                                     if (bRef != null)
                                         if ((bRef.Time - fbEntry.Time).Duration() < TimeSpan.FromSeconds(150))
-                                            vv = bRef.Val - fbEntry.Val;
+                                            vv = (bRef.Val - fbEntry.Val) / 1852;
 
                                     rr.Add(new DateModel { DateTime = fbEntry.Time, Value = vv });
 
@@ -4930,7 +4938,6 @@ namespace LionRiver
                             }
                         }
                     }
-
                     break;
             }
 
