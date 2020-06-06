@@ -99,7 +99,7 @@
                           MaxValue="{Binding MaxY1AxisValue, Mode=TwoWay}"
                           FontSize="12">
                     <lvc:Axis.Separator>
-                        <lvc:Separator StrokeThickness="1" StrokeDashArray="4">
+                        <lvc:Separator StrokeThickness="1" StrokeDashArray="1 4">
                             <lvc:Separator.Stroke>
                                 <SolidColorBrush Color="#404F56" />
                             </lvc:Separator.Stroke>
