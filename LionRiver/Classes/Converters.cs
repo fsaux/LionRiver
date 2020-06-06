@@ -276,4 +276,54 @@ namespace LionRiver
             throw new NotImplementedException();
         }
     }
+
+    [ValueConversion(typeof(PlotSelector), typeof(Visibility))]
+    public class GroupAToVisConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var ps = (value as PlotSelector);
+
+            if (ps != null)
+            {
+                if ((value as PlotSelector).Group == "A")
+                    return Visibility.Visible;
+                else
+                    return Visibility.Hidden;
+            }
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class GroupBToVisConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool selected = (values[0] != null && values[0] != DependencyProperty.UnsetValue) ? (bool)(values[0]) : false;
+            string group = (values[1] != null && values[1] != DependencyProperty.UnsetValue) ? (values[1] as PlotSelector).Group : "";
+
+            if (group == "B")
+            {
+                if (selected == true)
+                    return Visibility.Visible;
+                else
+                    return
+                        Visibility.Hidden;
+            }
+            else
+                return Visibility.Hidden;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 }

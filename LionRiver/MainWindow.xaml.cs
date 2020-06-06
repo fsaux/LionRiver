@@ -2,6 +2,7 @@
 using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Wpf;
+using LiveCharts.Wpf.Charts.Base;
 using MapControl;
 using Newtonsoft.Json;
 using OSGeo.GDAL;
@@ -166,6 +167,9 @@ namespace LionRiver
         DispatcherTimer ReplayTimer = new DispatcherTimer();
         DispatcherTimer PlotPanTimer = new DispatcherTimer();
         DispatcherTimer UpdatePlotResolutionTimer = new DispatcherTimer();
+
+        DispatcherTimer DummyTimer = new DispatcherTimer();
+
 
 
         #endregion
@@ -343,10 +347,10 @@ namespace LionRiver
         Binding CurrentXBinding = new Binding();
         Binding CurrentYBinding = new Binding();
 
-        ChartValues<DateModel> MainPlotValues = new ChartValues<DateModel>();
+        ChartValues<DateModel> MainPlotValues = new ChartValues<DateModel>() { new DateModel() };
         LineSeries MainSeries;
 
-        ChartValues<DateModel> AuxPlotValues = new ChartValues<DateModel>();
+        ChartValues<DateModel> AuxPlotValues = new ChartValues<DateModel>() { new DateModel() };
         LineSeries AuxSeries;
 
         Dictionary<string,ChartValues<DateModel>> MainFleetPlotValues = new Dictionary<string, ChartValues<DateModel>>();
@@ -637,6 +641,11 @@ namespace LionRiver
 
             NavPlotModel.SeriesCollection.Add(MainSeries);
             NavPlotModel.SeriesCollection.Add(AuxSeries);
+            
+            MainNavPlot.DataContext = NavPlotModel;
+
+            MainPlotSelectionComboBox.DataContext = PlotSelectors;
+            AuxPlotSelectionComboBox.DataContext = PlotSelectors;
 
             using (var context = new LionRiverDBContext())
             {
@@ -732,10 +741,7 @@ namespace LionRiver
             CurrentYBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
             BindingOperations.SetBinding(MainNavPlot.Current, VisualElement.YProperty, CurrentYBinding);
 
-            MainNavPlot.DataContext = NavPlotModel;
-
-            MainPlotSelectionComboBox.DataContext = PlotSelectors;
-            AuxPlotSelectionComboBox.DataContext = PlotSelectors;
+            MainNavPlot.Chart.UpdaterTick += Chart_UpdaterTick;
 
             PlayButton.IsChecked = true;
 
@@ -756,19 +762,13 @@ namespace LionRiver
                     (from b in context.FleetTracks
                      select b.Name).Distinct();
 
-                Random rnd = new Random();
-
                 foreach (string name in boatList)
                 {
-                    var md5 = MD5.Create();
-                    var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(name));
-                    var color = Color.FromRgb(hash[0], hash[1], hash[2]);
-
                     Boat b = new Boat()
                     {
                         Name = name,
                         IsSelected = false,
-                        BoatColor= color
+                        BoatColor= ColorFromString(name)
                     };
 
                     fleetBoats.Add(b);
@@ -859,6 +859,10 @@ namespace LionRiver
 
             UpdatePlotResolutionTimer.Tick += new EventHandler(UpdatePlotResolution_Tick);
             UpdatePlotResolutionTimer.Interval = new TimeSpan(0, 0, 1);
+
+            DummyTimer.Tick += new EventHandler(Dummy_Tick);
+            DummyTimer.Interval = new TimeSpan(0, 0, 0,0,100);
+            //DummyTimer.Start();
 
             NMEATimer.Start();
             ShortNavTimer.Start();
@@ -954,8 +958,6 @@ namespace LionRiver
                 if (k != "")
                     InstrumentStackPanel.Children.Add(InstrumentDisplays[k]);
             }
-
-
             #endregion
 
         }
@@ -1178,10 +1180,7 @@ namespace LionRiver
                         MapItem boatMapItem = new MapItem();
                         boatMapItem.Style = (Style)Application.Current.Resources["FleetBoatItemStyle"];
 
-                        var md5 = MD5.Create();
-                        var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(b.Name));
-                        b.BoatColor = Color.FromRgb(hash[0], hash[1], hash[2]);
-
+                        b.BoatColor = ColorFromString(b.Name); ;
 
                         //Random rnd = new Random();
                         //b.BoatColor = Color.FromRgb((byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256));
@@ -1440,9 +1439,44 @@ namespace LionRiver
                 if (PlayButton.IsChecked == true)
                     UpdateTracks(newDataWStart, new DateTime((long)NavPlotModel.MaxXAxisValue), Track.MaxLength);
             }
-
         }
 
+        private void Chart_UpdaterTick(object sender)
+        {
+            // Setup bindings ... got to wait until first Updater to be able to do this
+
+            Binding bMain = new Binding()
+            {
+                Source = MainPlotSelectionComboBox,
+                Path = new PropertyPath("SelectedItem"),
+                Mode = BindingMode.OneWay,
+                Converter = new GroupAToVisConverter(),
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
+
+            BindingOperations.SetBinding(MainSeries, LineSeries.VisibilityProperty, bMain);
+
+            Binding bAux = new Binding()
+            {
+                Source = AuxPlotSelectionComboBox,
+                Path = new PropertyPath("SelectedItem"),
+                Mode = BindingMode.OneWay,
+                Converter = new GroupAToVisConverter(),
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
+
+            BindingOperations.SetBinding(AuxSeries, LineSeries.VisibilityProperty, bAux);
+
+            MainNavPlot.Chart.UpdaterTick -= Chart_UpdaterTick;
+        }
+
+
+        private void Dummy_Tick(object sender, EventArgs e)
+        {
+            DummyTimer.Stop();
+
+        }
+        
         #endregion
 
         #region Map Mouse Manipulation
@@ -3199,9 +3233,8 @@ namespace LionRiver
                     PointGeometry = null,
                     LineSmoothness = 0,
                     StrokeThickness = 1,
-                    StrokeDashArray = new DoubleCollection { 4 },
-                    ScalesYAt = 0,
-                    Visibility=Visibility.Visible
+                    StrokeDashArray = new DoubleCollection { 4, 2 },
+                    ScalesYAt = 0
                 });
 
                 NavPlotModel.SeriesCollection.Add(MainFleetSeries[bt.Name]);
@@ -3217,21 +3250,32 @@ namespace LionRiver
                     PointGeometry = null,
                     LineSmoothness = 0,
                     StrokeThickness = 1,
+                    StrokeDashArray = new DoubleCollection { 4, 2 },
                     ScalesYAt = 1
                 });
 
                 NavPlotModel.SeriesCollection.Add(AuxFleetSeries[bt.Name]);
 
-
-                Binding bMain = new Binding()
+                Binding bMain1 = new Binding()
                 {
                     Source = boat,
                     Path = new PropertyPath("IsSelected"),
                     Mode = BindingMode.OneWay,
-                    Converter= new CheckToVisConverter(),
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 };
 
+                Binding bMain2 = new Binding()
+                {
+                    Source = MainPlotSelectionComboBox,
+                    Path = new PropertyPath("SelectedItem"),
+                    Mode = BindingMode.OneWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                };
+
+                MultiBinding mbMain = new MultiBinding();
+                mbMain.Bindings.Add(bMain1);
+                mbMain.Bindings.Add(bMain2);
+                mbMain.Converter = new GroupBToVisConverter();
 
                 Binding bAux = new Binding()
                 {
@@ -3242,13 +3286,10 @@ namespace LionRiver
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 };
 
-                BindingOperations.SetBinding(MainFleetSeries[bt.Name], LineSeries.VisibilityProperty, bMain);
+                BindingOperations.SetBinding(MainFleetSeries[bt.Name], LineSeries.VisibilityProperty, mbMain);
                 BindingOperations.SetBinding(AuxFleetSeries[bt.Name], LineSeries.VisibilityProperty, bAux);
 
             }
-
-
-
         }
 
         #endregion
@@ -3643,28 +3684,28 @@ namespace LionRiver
         private void MainPlotSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            var newGroup = ((sender as ComboBox).SelectedItem as PlotSelector).Group;
+            //var newGroup = ((sender as ComboBox).SelectedItem as PlotSelector).Group;
 
-            switch (newGroup)
-            {
-                case "A":
-                    foreach (KeyValuePair <string,LineSeries> kvp in MainFleetSeries)
-                        kvp.Value.Visibility = Visibility.Hidden;
-                    MainSeries.Visibility = Visibility.Visible;
-                    break;
+            //switch (newGroup)
+            //{
+            //    case "A":
+            //        foreach (KeyValuePair <string,LineSeries> kvp in MainFleetSeries)
+            //            kvp.Value.Visibility = Visibility.Hidden;
+            //        MainSeries.Visibility = Visibility.Visible;
+            //        break;
 
-                case "B":
-                    foreach (KeyValuePair<string, LineSeries> kvp in MainFleetSeries)
-                        kvp.Value.Visibility = Visibility.Visible;
-                    MainSeries.Visibility = Visibility.Hidden;
-                    break;
+            //    case "B":
+            //        foreach (KeyValuePair<string, LineSeries> kvp in MainFleetSeries)
+            //            kvp.Value.Visibility = Visibility.Visible;
+            //        MainSeries.Visibility = Visibility.Hidden;
+            //        break;
 
-                case "C":
-                    foreach (KeyValuePair<string, LineSeries> kvp in MainFleetSeries)
-                        kvp.Value.Visibility = Visibility.Hidden;
-                    MainSeries.Visibility = Visibility.Hidden;
-                    break;
-            }
+            //    case "C":
+            //        foreach (KeyValuePair<string, LineSeries> kvp in MainFleetSeries)
+            //            kvp.Value.Visibility = Visibility.Hidden;
+            //        MainSeries.Visibility = Visibility.Hidden;
+            //        break;
+            //}
 
             UpdatePlotResolutionTimer.Start();
         }
@@ -5173,6 +5214,23 @@ namespace LionRiver
             return cx;
         }
 
+        static public Color ColorFromString(string s)
+        {
+            var md5 = MD5.Create();
+            var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(s));
+
+            int i = 0;
+
+            while (i<13)
+            {
+                var Y = 0.33 * hash[i] + 0.5 * hash[i + 1] + 0.16 * hash[i + 2];
+                if (Y > 30)
+                    break;
+                i++;
+            }
+
+            return Color.FromRgb(hash[i], hash[i + 1], hash[i + 2]);
+        }
         #endregion
 
     }

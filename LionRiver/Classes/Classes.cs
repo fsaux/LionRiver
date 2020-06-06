@@ -2812,7 +2812,7 @@ namespace LionRiver
 
     }
 
-    public class PlotSelector
+    public class PlotSelector 
     {
         public string Name { get; set; }
         public string Group { get; set; }
@@ -2820,6 +2820,7 @@ namespace LionRiver
         public double MinValue { get; set; }
         public double MaxValue { get; set; }
         public Func<double, string> Formatter { get; set; }
+
     }
     #endregion
 
