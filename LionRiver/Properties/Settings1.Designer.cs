@@ -877,5 +877,29 @@ namespace LionRiver.Properties {
                 this["InstrumentDisplayList"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastGPXFile {
+            get {
+                return ((string)(this["LastGPXFile"]));
+            }
+            set {
+                this["LastGPXFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastSelectedRoute {
+            get {
+                return ((string)(this["LastSelectedRoute"]));
+            }
+            set {
+                this["LastSelectedRoute"] = value;
+            }
+        }
     }
 }

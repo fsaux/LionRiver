@@ -50,7 +50,7 @@
             </Border>
         </Viewbox>
 
-        <Image VerticalAlignment="Top" HorizontalAlignment="Right" Source="/LionRiver;component/Images/interface.png" Width="14" Height="14" Margin="0,4,8,0"/>
+        <!--<Image VerticalAlignment="Top" HorizontalAlignment="Right" Source="/LionRiver;component/Images/interface.png" Width="14" Height="14" Margin="0,4,8,0"/>-->
 
     </Grid>
 

@@ -78,13 +78,16 @@ namespace LionRiver
                 RenameTextBox.Visibility = Visibility.Collapsed;
                 var rte = RouteListComboBox.SelectedItem as Route;
                 rte.Name = RenameTextBox.Text;
+
+                RouteCtrlEventArgs ea = new RouteCtrlEventArgs(null, RouteCtrlCmd.Rename);
+                OnRouteCtrl(ea);
+
                 e.Handled = true;
             }
         }
 
 
     }
-
 
     public class RouteCtrlEventArgs : EventArgs
     {
@@ -113,7 +116,8 @@ namespace LionRiver
     public enum RouteCtrlCmd
     {
         SelectionChanged,
-        Hiding
+        Hiding,
+        Rename
     }
 
 }

@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -242,7 +243,6 @@ namespace LionRiver
 
         #region Marks
         MarkControlWindow marksControl = new MarkControlWindow();
-        int markNumber = 0;
         Mark MovingMark;
         Mark MOB;
         Mark HitPointStbd = new Mark(), HitPointPort = new Mark();
@@ -265,9 +265,10 @@ namespace LionRiver
         static Route ActiveRoute;
         static Leg ActiveLeg;
 
+        bool LastRouteSaved = true;
+
         // These are for creating a new route
         Route TempRoute;
-        int routeNumber = 1;
         MapSegment TempSegment;
         Mark FirstMark;
         List<Mark> NewMarksOnRoute = new List<Mark>();
@@ -380,7 +381,7 @@ namespace LionRiver
 
         #endregion
 
-        #region Routing
+        #region Weather Routing
 
         public static RoutingCalculationControl routeCalculationControl = new RoutingCalculationControl();
         ObservableCollection<RoutingResult> routingResults = new ObservableCollection<RoutingResult>();
@@ -533,15 +534,29 @@ namespace LionRiver
             #endregion
 
             #region Routes & Marks & Layers
+
             routeControl.RouteCtrlHd += new RouteCtrlEventHandler(RouteCtrlCommandReceived);
             marksControl.MarkCtrlHd += new MarkCtrlEventHandler(MarkCtrlCommandReceived);
             layerControl.LayerCtrlHd += new LayerControlWindow.LayerCtrlEventHandler(LayerCtrlCommandReceived);
 
             routeControl.LoadButton.Click += new RoutedEventHandler(GPXLoadButton_Click);
             routeControl.RouteListComboBox.DataContext = routeList;
-            #endregion
+
+            var GPXFile = Properties.Settings.Default.LastGPXFile;
+
+            if (File.Exists(GPXFile))
+                LoadGPXFile(GPXFile);
+            else
+                Properties.Settings.Default.LastGPXFile = "";
+
+            var selRoute =  routeList.FirstOrDefault(r => r.Name == Properties.Settings.Default.LastSelectedRoute);
+            if (selRoute != null)
+                routeControl.RouteListComboBox.SelectedIndex = routeList.IndexOf(selRoute);
+
+                         #endregion
 
             #region Grib
+
             gribControl.GribSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(GribSlider_ValueChanged);
             gribControl.NowButton.Click += new RoutedEventHandler(GribNowButton_Click);
             gribControl.DisplayWind.Checked += new RoutedEventHandler(GribDisplay_Checked);
@@ -550,7 +565,7 @@ namespace LionRiver
             gribControl.DisplayCurrent.Unchecked += new RoutedEventHandler(GribDisplay_Checked);
             #endregion
 
-            #region Routing
+            #region Weather Routing
             routeCalculationControl.RouteListCombo.DataContext = routeList;
             routeCalculationControl.ResultCombo.DataContext = routingResults;
             routeCalculationControl.CalculateRoute.Click += new RoutedEventHandler(RouteCalcButton_Click);
@@ -1699,11 +1714,10 @@ namespace LionRiver
                 Panel.SetZIndex(TempSegment, 15);
                 TempSegment.FromLocation = loc;
 
-                markNumber++;
                 FirstMark = new Mark
                 {
                     Location = loc,
-                    Name = "mk" + markNumber.ToString()
+                    Name = "mk" + GetLastMarkNumber().ToString()
                 };
 
                 marksItemCollection.Add(FirstMark);
@@ -1711,11 +1725,10 @@ namespace LionRiver
             }
             else
             {
-                markNumber++;
                 Mark mk = new Mark
                 {
                     Location = loc,
-                    Name = "mk" + markNumber.ToString()
+                    Name = "mk" + GetLastMarkNumber().ToString()
                 };
 
                 marksItemCollection.Add(mk);
@@ -1950,18 +1963,29 @@ namespace LionRiver
 
             dlg.Filter = "gpx files|*.gpx";
             dlg.InitialDirectory = Properties.Settings.Default.WaypointDirectory;
+            dlg.FileName= Properties.Settings.Default.LastGPXFile;
             Nullable<bool> result = dlg.ShowDialog();
 
             if (result == true)
             {
                 string filename = dlg.FileName;
-                Properties.Settings.Default.WaypointDirectory = System.IO.Path.GetDirectoryName(filename);
+                //Properties.Settings.Default.WaypointDirectory = System.IO.Path.GetDirectoryName(filename);
+                Properties.Settings.Default.LastGPXFile = filename;
 
+                LoadGPXFile(filename);
+
+            }
+        }
+
+        private void LoadGPXFile(string GPXFile)
+        {
+            if (File.Exists(GPXFile))
+            {
                 DataSource inputDS;
                 Layer layer;
                 Feature f;
 
-                inputDS = Ogr.Open(filename, 0);
+                inputDS = Ogr.Open(GPXFile, 0);
 
                 marksItemCollection.Clear();
 
@@ -2014,64 +2038,86 @@ namespace LionRiver
 
                 if (routeList.Count() > 0)
                     routeControl.RouteListComboBox.SelectedIndex = 0;
+
             }
         }
 
-        private void MenuItem_SaveWaypoint_Click(object sender, RoutedEventArgs e)
+        private void GPXSaveButton_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
 
             dlg.Filter = "gpx files|*.gpx";
             dlg.InitialDirectory = Properties.Settings.Default.WaypointDirectory;
+            dlg.FileName = Properties.Settings.Default.LastGPXFile;
             Nullable<bool> result = dlg.ShowDialog();
 
             if (result == true)
             {
-                string filename = dlg.FileName;
-                Properties.Settings.Default.WaypointDirectory = System.IO.Path.GetDirectoryName(filename);
+                SaveGPXFile(dlg.FileName);
+                LastRouteSaved = true;
+            }
+        }
+
+        private void SaveGPXFile(string GPXFile)
+        {
+            string filename = GPXFile;
+            Properties.Settings.Default.WaypointDirectory = System.IO.Path.GetDirectoryName(filename);
+            Properties.Settings.Default.LastGPXFile = GPXFile;
+
+            if (File.Exists(filename))
+                File.Delete(filename);
+
+            SpatialReference wgs84;
+            string wkt;
+            Osr.GetWellKnownGeogCSAsWKT("WGS84", out wkt);
+            wgs84 = new SpatialReference(wkt);
+
+            OSGeo.OGR.Driver drv = Ogr.GetDriverByName("GPX");
+            DataSource ds = drv.CreateDataSource(filename, new string[] { });
+
+            //Write Waypoints
+
+            Layer layer1 = ds.CreateLayer("waypoints", wgs84, wkbGeometryType.wkbPoint, new string[] { });
+            Feature f1 = new Feature(layer1.GetLayerDefn());
+            OSGeo.OGR.Geometry g1 = new OSGeo.OGR.Geometry(wkbGeometryType.wkbPoint);
+
+            foreach (Mark mk in marksItemCollection)
+            {
+                f1.SetField("Name", mk.Name);
+                g1.AddPoint_2D(mk.Location.Longitude, mk.Location.Latitude);
+                f1.SetGeometry(g1);
+                layer1.CreateFeature(f1);
+            }
 
 
-                if (File.Exists(filename))
-                    File.Delete(filename);
+            //Write Routes
 
-                SpatialReference wgs84;
-                string wkt;
-                Osr.GetWellKnownGeogCSAsWKT("WGS84", out wkt);
-                wgs84 = new SpatialReference(wkt);
+            Layer layer3 = ds.CreateLayer("route_points", wgs84, wkbGeometryType.wkbPoint, new string[] { });
+            Feature f3 = new Feature(layer3.GetLayerDefn());
+            OSGeo.OGR.Geometry g3 = new OSGeo.OGR.Geometry(wkbGeometryType.wkbPoint);
 
-                OSGeo.OGR.Driver drv = Ogr.GetDriverByName("GPX");
-                DataSource ds = drv.CreateDataSource(filename, new string[] { });
 
-                //Write Waypoints
+            int i = 0;
+            foreach (Route rte in routeList)
+            {
+                int j = 0;
+                Leg tleg = rte.Legs[0];
 
-                Layer layer1 = ds.CreateLayer("waypoints", wgs84, wkbGeometryType.wkbPoint, new string[] { });
-                Feature f1 = new Feature(layer1.GetLayerDefn());
-                OSGeo.OGR.Geometry g1 = new OSGeo.OGR.Geometry(wkbGeometryType.wkbPoint);
+                Mark mk = tleg.FromMark;
 
-                foreach (Mark mk in marksItemCollection)
+                g3.AddPoint_2D(mk.Location.Longitude, mk.Location.Latitude);
+                f3.SetField("route_fid", i);
+                f3.SetField("route_point_id", j);
+                f3.SetField("route_name", rte.Name);
+                f3.SetField("name", mk.Name);
+                f3.SetGeometry(g3);
+                layer3.CreateFeature(f3);
+
+                j++;
+
+                while (tleg != null)
                 {
-                    f1.SetField("Name", mk.Name);
-                    g1.AddPoint_2D(mk.Location.Longitude, mk.Location.Latitude);
-                    f1.SetGeometry(g1);
-                    layer1.CreateFeature(f1);
-                }
-
-
-                //Write Routes
-
-                Layer layer3 = ds.CreateLayer("route_points", wgs84, wkbGeometryType.wkbPoint, new string[] { });
-                Feature f3 = new Feature(layer3.GetLayerDefn());
-                OSGeo.OGR.Geometry g3 = new OSGeo.OGR.Geometry(wkbGeometryType.wkbPoint);
-
-
-                int i = 0;
-                foreach (Route rte in routeList)
-                {
-                    int j = 0;
-                    Leg tleg = rte.Legs[0];
-
-                    Mark mk = tleg.FromMark;
-
+                    mk = tleg.ToMark;
                     g3.AddPoint_2D(mk.Location.Longitude, mk.Location.Latitude);
                     f3.SetField("route_fid", i);
                     f3.SetField("route_point_id", j);
@@ -2079,25 +2125,12 @@ namespace LionRiver
                     f3.SetField("name", mk.Name);
                     f3.SetGeometry(g3);
                     layer3.CreateFeature(f3);
-
                     j++;
-
-                    while (tleg != null)
-                    {
-                        mk = tleg.ToMark;
-                        g3.AddPoint_2D(mk.Location.Longitude, mk.Location.Latitude);
-                        f3.SetField("route_fid", i);
-                        f3.SetField("route_point_id", j);
-                        f3.SetField("route_name", rte.Name);
-                        f3.SetField("name", mk.Name);
-                        f3.SetGeometry(g3);
-                        layer3.CreateFeature(f3);
-                        j++;
-                        tleg = tleg.NextLeg;
-                    }
-                    i++;
+                    tleg = tleg.NextLeg;
                 }
+                i++;
             }
+
         }
 
         private void GribWindLoadButton_Click(object sender, RoutedEventArgs e)
@@ -2320,7 +2353,8 @@ namespace LionRiver
 
                     MovingMark = (Mark)miCtrl.SelectedItem;
                     mouseHandlingMode = MouseHandlingMode.MovingMark;
-
+                    
+                    LastRouteSaved = false;
                 }
             }
 
@@ -2338,11 +2372,10 @@ namespace LionRiver
                     var miCtrl = cm.PlacementTarget as MapItemsControl;
                     Leg lg = (Leg)miCtrl.SelectedItem;
 
-                    markNumber++;
                     Mark mk = new Mark
                     {
                         Location = new Location(0, 0),
-                        Name = "mk" + markNumber.ToString()
+                        Name = "mk" + GetLastMarkNumber().ToString()
                     };
 
                     Leg nleg = new Leg(mk, lg.ToMark);
@@ -2371,6 +2404,8 @@ namespace LionRiver
 
                     MovingMark = mk;
                     mouseHandlingMode = MouseHandlingMode.MovingMark;
+
+                    LastRouteSaved = false;
                 }
             }
         }
@@ -2387,6 +2422,8 @@ namespace LionRiver
 
             MeasureButton.IsChecked = false;
             measureRange.Visibility = Visibility.Hidden;
+
+            LastRouteSaved = false;
         }
 
         private void CancelCreateRoute(object sender, RoutedEventArgs e)
@@ -2410,7 +2447,6 @@ namespace LionRiver
             map.Children.Remove(TempSegment);
 
             routeList.Remove(TempRoute);
-            routeNumber--;
 
             if (ActiveRoute != null)
                 routeControl.RouteListComboBox.SelectedItem = ActiveRoute;
@@ -2423,12 +2459,10 @@ namespace LionRiver
 
         private void AddMarkCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            markNumber++;
-
             Mark mk = new Mark
             {
                 Location = new Location(0, 0),
-                Name = "mk" + markNumber.ToString()
+                Name = "mk" + GetLastMarkNumber().ToString()
             };
 
             marksItemCollection.Add(mk);
@@ -2436,6 +2470,44 @@ namespace LionRiver
             MovingMark = mk;
             mouseHandlingMode = MouseHandlingMode.MovingMark;
 
+            LastRouteSaved = false;
+
+        }
+
+        private int GetLastMarkNumber()
+        {
+            var mkList = (from m in marksItemCollection
+                          where (m as Mark).Name.Substring(0, 2) == "mk"
+                          select (m as Mark).Name.Remove(0, 2).TrimEnd(' '));
+
+            int lastM = 0;
+
+            if(mkList!=null)
+                lastM = (from x in mkList
+                          let isP = int.TryParse(x, out _)
+                          where isP == true
+                          orderby int.Parse(x)
+                          select int.Parse(x)).LastOrDefault();
+
+            return lastM + 1;
+        }
+
+        private int GetLastRouteNumber()
+        {
+            var rtList = (from r in routeList
+                          where (r as Route).Name.Substring(0, 6) == "Route "
+                          select (r as Route).Name.Remove(0, 6).TrimEnd(' '));
+
+            int lastR = 0;
+
+            if (rtList != null)
+                lastR = (from x in rtList
+                         let isP = int.TryParse(x, out _)
+                         where isP == true
+                         orderby int.Parse(x)
+                         select int.Parse(x)).LastOrDefault();
+
+            return lastR + 1;
         }
 
         private void AddMarkCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -2506,6 +2578,8 @@ namespace LionRiver
 
             foreach (Route r in routesToDel)
                 routeList.Remove(r);
+
+            LastRouteSaved = false;
         }
 
         private void DeleteMarkCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -2597,7 +2671,17 @@ namespace LionRiver
                         RouteButton.IsChecked = false;
                         break;
                     }
-                    #endregion
+
+                #endregion
+
+                #region Rename
+                case RouteCtrlCmd.Rename:
+                    {
+                        LastRouteSaved = false;
+                        break;
+                    }
+
+                #endregion
             }
         }
 
@@ -2731,8 +2815,7 @@ namespace LionRiver
         private void NewRouteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             TempRoute = new Route();
-            TempRoute.Name = "Route " + routeNumber.ToString();
-            routeNumber++;
+            TempRoute.Name = "Route " + GetLastRouteNumber().ToString();
 
             routeList.Add(TempRoute);
             routeControl.RouteListComboBox.SelectedItem = TempRoute;
@@ -2862,6 +2945,8 @@ namespace LionRiver
             }
 
             routeList.Remove(SelectedRoute);
+
+            LastRouteSaved = false;
 
             e.Handled = true;
         }
@@ -3031,7 +3116,7 @@ namespace LionRiver
 
         private void CalcRegattaCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (ActiveRoute != null)
+            if (routeControl.RouteListComboBox.SelectedItem != null)
             {
                 regattaCalcInProgress = true;
 
@@ -3047,8 +3132,7 @@ namespace LionRiver
             }
             else
             {
-
-                string messageBoxText = "No Active Route";
+                string messageBoxText = "No Route Selected";
                 string caption = "LionRiver";
                 MessageBoxButton button = MessageBoxButton.OK;
                 MessageBoxImage icon = MessageBoxImage.Warning;
@@ -3071,7 +3155,9 @@ namespace LionRiver
 
         private void CalcRegattaData()
         {
-            if (ActiveRoute != null)
+            Route regRoute = routeControl.RouteListComboBox.SelectedItem as Route;
+
+            if (regRoute != null)
             {
                 Regatta = new Regatta()
                 {
@@ -3095,11 +3181,11 @@ namespace LionRiver
 
                     Regatta.Waypoints.Add(new IData<Location>()
                     {
-                        Val = ActiveRoute.Legs[0].FromLocation,
+                        Val = regRoute.Legs[0].FromLocation,
                         Time = DateTime.MaxValue
                     });
 
-                    foreach (Leg lg in ActiveRoute.Legs)
+                    foreach (Leg lg in regRoute.Legs)
                         Regatta.Waypoints.Add(new IData<Location>()
                         {
                             Val = lg.ToLocation,
@@ -5119,6 +5205,43 @@ namespace LionRiver
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if(LastRouteSaved==false)
+            {
+                string messageBoxText = "Save "+ Path.GetFileName(Properties.Settings.Default.LastGPXFile)  +" Waypoints/Routes";
+                string caption = "LionRiver";
+                MessageBoxButton button = MessageBoxButton.YesNoCancel;
+                MessageBoxImage icon = MessageBoxImage.Question;
+
+                MessageBoxResult mbResult=MessageBox.Show(messageBoxText, caption, button, icon);
+
+                switch(mbResult)
+                {
+                    case MessageBoxResult.Cancel:
+                        e.Cancel = true;
+                        return;
+
+                    case MessageBoxResult.No:
+                        break;
+
+                    case MessageBoxResult.Yes:
+                        Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+                        {
+                            Filter = "gpx files|*.gpx",
+                            InitialDirectory = Properties.Settings.Default.WaypointDirectory,
+                            FileName = Properties.Settings.Default.LastGPXFile
+                        };
+
+                        bool? result = dlg.ShowDialog();
+
+                        if (result == true)
+                        {
+                            SaveGPXFile(dlg.FileName);
+                            Properties.Settings.Default.LastGPXFile = dlg.FileName;
+                        }
+                        break;
+                }
+            }
+
             routeControl.Close();
             marksControl.Close();
             layerControl.Close();
@@ -5131,6 +5254,11 @@ namespace LionRiver
 
             Properties.Settings.Default.MapScale = map.ZoomLevel;
             Properties.Settings.Default.MapCenter = map.Center;
+
+
+            if (routeControl.RouteListComboBox.SelectedItem is Route lastRoute)
+                Properties.Settings.Default.LastSelectedRoute = lastRoute.Name;
+
             Properties.Settings.Default.Save();
 
             if (logging)

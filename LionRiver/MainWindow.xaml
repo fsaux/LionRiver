@@ -530,7 +530,7 @@
                     <MenuItem Header="Load Current Grib" Click="GribCurrentLoadButton_Click"/>
                     <MenuItem Header="Replay Log" Click="ReplayLogButton_Click"/>
                     <Separator />
-                    <MenuItem Header="Save Waypoint/Route" Click="MenuItem_SaveWaypoint_Click"/>
+                    <MenuItem Header="Save Waypoint/Route" Click="GPXSaveButton_Click"/>
                     <MenuItem Header="Save Track" />
                     <Separator />
                     <MenuItem Header="Setup" Click="MenuItem_Setup_Click"/>
