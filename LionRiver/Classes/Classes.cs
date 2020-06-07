@@ -2639,14 +2639,14 @@ namespace LionRiver
 
         private Double _minY1AxisValue;
         private Double _maxY1AxisValue;
+        private Func<double, string> _y1Formatter;
+        private Func<double, string> _y2Formatter;
 
         private Double _minY2AxisValue;
         private Double _maxY2AxisValue;
 
         public const int MaxData = 300;
         public SeriesCollection SeriesCollection { get; set; }
-        public Func<double, string> Y1Formatter { get; set; }
-        public Func<double, string> Y2Formatter { get; set; }
         public Func<double, string> XFormatter { get; set; }
         public int Resolution { get; set; }
 
@@ -2776,6 +2776,18 @@ namespace LionRiver
                 OnPropertyChanged("MaxY1AxisValue");
             }
         }
+        public Func<double, string> Y1Formatter
+        {
+            get
+            { return _y1Formatter; }
+
+            set
+            {
+                _y1Formatter = value;
+                OnPropertyChanged("Y1Formatter");
+            }
+        }
+
 
         public Double MinY2AxisValue
         {
@@ -2799,6 +2811,18 @@ namespace LionRiver
                 OnPropertyChanged("MaxY2AxisValue");
             }
         }
+        public Func<double, string> Y2Formatter
+        {
+            get
+            { return _y2Formatter; }
+
+            set
+            {
+                _y2Formatter = value;
+                OnPropertyChanged("Y2Formatter");
+            }
+        }
+
 
 
         public MyCommand<RangeChangedEventArgs> RangeChangedCommand { get; set; }

@@ -18,6 +18,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -369,7 +370,7 @@ namespace LionRiver
         {
             new PlotSelector {Name="SOG", Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
             new PlotSelector {Name="SPD",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="TWD",Group="A",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="TWD",Group="A",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>((s+360)%360).ToString("#") },
             new PlotSelector {Name="TWS",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
             new PlotSelector {Name="Drift",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
             new PlotSelector {Name="Perf",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
@@ -5030,16 +5031,30 @@ namespace LionRiver
 
                 case "SPD":
                     result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.SPD }).ToList());
-
                     break;
+
                 case "TWD":
-                    result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.TWD + 360) % 360 }).ToList());
+                    var rrx = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.TWD + 360) % 360 }).ToList();
+                    for (int i = 1; i < rrx.Count(); i++)
+                    {
+                        if (rrx[i].Value != null && rrx[i - 1].Value != null)
+                        {
+                            var delta = rrx[i].Value - rrx[i - 1].Value;
+                            if (delta > 150)
+                                rrx[i].Value -= 360;
+                            else
+                                if (delta < -150)
+                                rrx[i].Value += 360;
+                        }
+                    }
 
+                    result.Add("_single",rrx);
                     break;
+
                 case "TWS":
                     result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.TWS }).ToList());
-
                     break;
+
                 case "Drift":
                     result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList());
                     break;
