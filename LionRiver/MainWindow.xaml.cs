@@ -370,13 +370,13 @@ namespace LionRiver
         {
             new PlotSelector {Name="SOG", Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
             new PlotSelector {Name="SPD",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="TWD",Group="A",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>((s+360)%360).ToString("#") },
-            new PlotSelector {Name="TWS",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="TWD",Group="A",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>((s+360)%360).ToString("0") },
+            new PlotSelector {Name="TWS",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
             new PlotSelector {Name="Drift",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
-            new PlotSelector {Name="Perf",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="Depth",Group="A",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("#.#") },
-            new PlotSelector {Name="DMG",Group="B",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
-            new PlotSelector {Name="Active",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("#") },
+            new PlotSelector {Name="Perf",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
+            new PlotSelector {Name="Depth",Group="A",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("0.0") },
+            new PlotSelector {Name="DMG",Group="B",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
+            new PlotSelector {Name="Active",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
             new PlotSelector {Name="None",Group="C"}
         };
 
@@ -3650,6 +3650,16 @@ namespace LionRiver
                     {
                         MainNavPlot.SelectionContextMenu.PlacementTarget = MainNavPlot;
                         MainNavPlot.SelectionContextMenu.IsOpen = true;
+                    }
+                    else 
+                    {
+                        NavPlotModel.SelectionFromValue = NavPlotModel.MinXAxisValue;
+                        NavPlotModel.SelectionToValue = NavPlotModel.MinXAxisValue;
+
+                        DateTime startTime = new DateTime((long)NavPlotModel.SelectionFromValue);
+                        DateTime endTime = new DateTime((long)NavPlotModel.SelectionToValue);
+
+                        UpdateTracks(startTime, endTime);
                     }
 
                     mouseHandlingMode = MouseHandlingMode.None;
