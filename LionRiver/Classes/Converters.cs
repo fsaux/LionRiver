@@ -327,7 +327,7 @@ namespace LionRiver
         }
     }
 
-    public class DoubleToVisConverter : IValueConverter
+    public class StringToVisConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

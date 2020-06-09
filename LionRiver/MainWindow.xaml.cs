@@ -734,60 +734,96 @@ namespace LionRiver
 
             //-- somehow binding from XAML desnt work
 
-            Binding bnd = new Binding();
-            bnd.Source = NavPlotModel;
-            bnd.Path = new PropertyPath("CursorPosition");
-            bnd.Mode = BindingMode.OneWay;
-            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            Binding bnd = new Binding
+            {
+                Source = NavPlotModel,
+                Path = new PropertyPath("CursorPosition"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
             BindingOperations.SetBinding(MainNavPlot.Cursor, VisualElement.XProperty, bnd);
 
-            bnd = new Binding();
-            bnd.Source = NavPlotModel;
-            bnd.Path = new PropertyPath("MinY1AxisValue");
-            bnd.Mode = BindingMode.OneWay;
-            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            bnd = new Binding
+            {
+                Source = NavPlotModel,
+                Path = new PropertyPath("MinY1AxisValue"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
             BindingOperations.SetBinding(MainNavPlot.Cursor, VisualElement.YProperty, bnd);
 
-            bnd = new Binding();
-            bnd.Source = NavPlotModel;
-            bnd.Path = new PropertyPath("CursorMainValue");
-            bnd.Mode = BindingMode.OneWay;
-            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            bnd = new Binding
+            {
+                Source = NavPlotModel,
+                Path = new PropertyPath("CursorMainValue"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
             BindingOperations.SetBinding(MainNavPlot.CursorMainValue, VisualElement.YProperty, bnd);
 
-            bnd = new Binding();
-            bnd.Source = NavPlotModel;
-            bnd.Path = new PropertyPath("CursorPosition");
-            bnd.Mode = BindingMode.OneWay;
-            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            bnd = new Binding
+            {
+                Source = NavPlotModel,
+                Path = new PropertyPath("CursorPosition"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
             BindingOperations.SetBinding(MainNavPlot.CursorMainValue, VisualElement.XProperty, bnd);
 
-            bnd = new Binding();
-            bnd.Source = NavPlotModel;
-            bnd.Path = new PropertyPath("CursorAuxValue");
-            bnd.Mode = BindingMode.OneWay;
-            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            bnd = new Binding()
+            {
+                Source = MainPlotSelectionComboBox,
+                Path = new PropertyPath("SelectedItem"),
+                Mode = BindingMode.OneWay,
+                Converter = new GroupAToVisConverter(),
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
+            BindingOperations.SetBinding(MainNavPlot.CursorMainValueUI, LineSeries.VisibilityProperty, bnd);
+
+            bnd = new Binding
+            {
+                Source = NavPlotModel,
+                Path = new PropertyPath("CursorAuxValue"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
             BindingOperations.SetBinding(MainNavPlot.CursorAuxValue, VisualElement.YProperty, bnd);
 
-            bnd = new Binding();
-            bnd.Source = NavPlotModel;
-            bnd.Path = new PropertyPath("CursorPosition");
-            bnd.Mode = BindingMode.OneWay;
-            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            bnd = new Binding
+            {
+                Source = NavPlotModel,
+                Path = new PropertyPath("CursorPosition"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
             BindingOperations.SetBinding(MainNavPlot.CursorAuxValue, VisualElement.XProperty, bnd);
 
-            bnd = new Binding();
-            bnd.Source = NavPlotModel;
-            bnd.Path = new PropertyPath("CurrentPosition");
-            bnd.Mode = BindingMode.OneWay;
-            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            bnd = new Binding()
+            {
+                Source = AuxPlotSelectionComboBox,
+                Path = new PropertyPath("SelectedItem"),
+                Mode = BindingMode.OneWay,
+                Converter = new GroupAToVisConverter(),
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
+            BindingOperations.SetBinding(MainNavPlot.CursorAuxValueUI, LineSeries.VisibilityProperty, bnd);
+
+            bnd = new Binding
+            {
+                Source = NavPlotModel,
+                Path = new PropertyPath("CurrentPosition"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
             BindingOperations.SetBinding(MainNavPlot.Current, VisualElement.XProperty, bnd);
 
-            bnd = new Binding();
-            bnd.Source = NavPlotModel;
-            bnd.Path = new PropertyPath("MaxY1AxisValue");
-            bnd.Mode = BindingMode.OneWay;
-            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            bnd = new Binding
+            {
+                Source = NavPlotModel,
+                Path = new PropertyPath("MaxY1AxisValue"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
             BindingOperations.SetBinding(MainNavPlot.Current, VisualElement.YProperty, bnd); 
 
             #endregion
@@ -3650,20 +3686,21 @@ namespace LionRiver
                 if (i != MainPlotValues.Count() - 1 && v1.Value != null)
                 {
                     var v2 = MainPlotValues[i + 1];
-                    NavPlotModel.CursorMainValue = (double)(v1.Value + v2.Value) / 2;
+                    if (v2.Value != null)
+                        NavPlotModel.CursorMainValue = (double)(v1.Value + v2.Value) / 2;
+                    else
+                        NavPlotModel.CursorMainValue = double.NaN;
                 }
                 else
                     NavPlotModel.CursorMainValue = double.NaN;
             }
             else
-                NavPlotModel.CursorMainValue = double.NaN;
-
+                NavPlotModel.CursorMainValue = double.NaN; ;
 
             v1 = (from x in AuxPlotValues
                       where x.DateTime < dt
                       orderby x.DateTime
                       select x).LastOrDefault();
-
 
             if (v1 != null)
             {
@@ -3672,7 +3709,10 @@ namespace LionRiver
                 if (i != AuxPlotValues.Count() - 1 && v1.Value != null)
                 {
                     var v2 = AuxPlotValues[i + 1];
-                    NavPlotModel.CursorAuxValue = (double)(v1.Value + v2.Value) / 2;
+                    if(v2.Value!=null)
+                        NavPlotModel.CursorAuxValue = (double)(v1.Value + v2.Value) / 2;
+                    else
+                        NavPlotModel.CursorAuxValue = double.NaN;
                 }
                 else
                     NavPlotModel.CursorAuxValue = double.NaN;

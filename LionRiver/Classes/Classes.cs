@@ -2627,10 +2627,14 @@ namespace LionRiver
     public class NavPlotModel : INotifyPropertyChanged
     {
         private Double _currentPosition;
+
         private Double _cursorPosition;
-        private Double _cursorMainValue;
-        private Double _cursorAuxValue;
+        private double _cursorMainValue;
+        private string _cursorMainValueText;
+        private double _cursorAuxValue;
+        private string _cursorAuxValueText;
         private Visibility _cursorVisible;
+
         private Visibility _selectionVisible;
 
         private Double _minXAxisValue;
@@ -2676,7 +2680,7 @@ namespace LionRiver
                 OnPropertyChanged("CursorPosition");
             }
         }
-        public Double CursorMainValue
+        public double CursorMainValue
         {
             get
             { return _cursorMainValue; }
@@ -2685,9 +2689,22 @@ namespace LionRiver
             {
                 _cursorMainValue = value;
                 OnPropertyChanged("CursorMainValue");
+
+                if (_y1Formatter != null)
+                {
+                    _cursorMainValueText = Y1Formatter(value);
+                    OnPropertyChanged("CursorMainValueText");
+                }
             }
         }
-        public Double CursorAuxValue
+        public string CursorMainValueText
+        {
+            get
+            { return _cursorMainValueText; }
+
+            set { }
+        }
+        public double CursorAuxValue
         {
             get
             { return _cursorAuxValue; }
@@ -2696,7 +2713,20 @@ namespace LionRiver
             {
                 _cursorAuxValue = value;
                 OnPropertyChanged("CursorAuxValue");
+
+                if (_y2Formatter != null)
+                {
+                    _cursorAuxValueText = Y2Formatter(value);
+                    OnPropertyChanged("CursorAuxValueText");
+                }
             }
+        }
+        public string CursorAuxValueText
+        {
+            get
+            { return _cursorAuxValueText; }
+
+            set { }
         }
         public Visibility CursorVisible
         {

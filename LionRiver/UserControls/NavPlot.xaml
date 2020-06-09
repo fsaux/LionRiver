@@ -13,7 +13,7 @@
         <local:CenterTextboxConverter x:Key="CenterTextboxConverter" />
         <local:TopTextboxConverter x:Key="TopTextboxConverter" />
         <local:XValuetoDateConverter x:Key="XValuetoDateConverter" />
-        <local:DoubleToVisConverter x:Key="DoubleToVisConverter" /> 
+        <local:StringToVisConverter x:Key="DoubleToVisConverter" /> 
         
         <Style x:Key="CenteredTextBlock" TargetType="{x:Type TextBlock}">
             <Setter Property="Margin">
@@ -154,18 +154,21 @@
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
                                     AxisY="0"
-                                    Margin="2">
-                    <lvc:VisualElement.UIElement>
-                        <Grid Visibility="{Binding CursorVisible}">
-                            <Border  Visibility="{Binding CursorMainValue, Converter={StaticResource DoubleToVisConverter}}"
+                                    Margin="2"
+                                    Visibility="Hidden">
+                    <lvc:VisualElement.UIElement >
+                        <Grid x:Name="CursorMainValueUI">
+                            <Grid Visibility="{Binding CursorVisible}">
+                                <Border  Visibility="{Binding CursorMainValue, Converter={StaticResource DoubleToVisConverter}}"
                                      Background="Black" BorderBrush="DodgerBlue" BorderThickness="1"
                                      Margin="2">
-                                <TextBlock Text="{Binding CursorMainValue}"
+                                    <TextBlock Text="{Binding CursorMainValueText}"
                                    FontSize="12"
                                    Foreground="DodgerBlue" 
                                    Padding="2">
-                                </TextBlock>
-                            </Border>
+                                    </TextBlock>
+                                </Border>
+                            </Grid>
                         </Grid>
                     </lvc:VisualElement.UIElement>
                 </lvc:VisualElement>
@@ -176,16 +179,18 @@
                                     AxisY="1"
                                     Margin="2">
                     <lvc:VisualElement.UIElement>
-                        <Grid Visibility="{Binding CursorVisible}">
-                            <Border  Visibility="{Binding CursorAuxValue, Converter={StaticResource DoubleToVisConverter}}"
+                        <Grid x:Name="CursorAuxValueUI">
+                            <Grid Visibility="{Binding CursorVisible}">
+                                <Border  Visibility="{Binding CursorAuxValue, Converter={StaticResource DoubleToVisConverter}}"
                                      Background="Black" BorderBrush="MediumVioletRed" BorderThickness="1"
                                      Margin="2">
-                                <TextBlock Text="{Binding CursorAuxValue}"
+                                    <TextBlock Text="{Binding CursorAuxValueText}"
                                    FontSize="12"
                                    Foreground="MediumVioletRed" 
                                    Padding="2">
-                                </TextBlock>
-                            </Border>
+                                    </TextBlock>
+                                </Border>
+                            </Grid>
                         </Grid>
                     </lvc:VisualElement.UIElement>
                 </lvc:VisualElement>
