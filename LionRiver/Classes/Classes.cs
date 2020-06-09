@@ -2626,8 +2626,10 @@ namespace LionRiver
 
     public class NavPlotModel : INotifyPropertyChanged
     {
-        private Double _currentValue;
-        private Double _cursorValue;
+        private Double _currentPosition;
+        private Double _cursorPosition;
+        private Double _cursorMainValue;
+        private Double _cursorAuxValue;
         private Visibility _cursorVisible;
         private Visibility _selectionVisible;
 
@@ -2651,26 +2653,49 @@ namespace LionRiver
         public int Resolution { get; set; }
 
 
-        public Double CurrentValue
+        public Double CurrentPosition
         {
             get
-            { return _currentValue; }
+            { return _currentPosition; }
 
             set
             {
-                _currentValue = value;
-                OnPropertyChanged("CurrentValue");
+                _currentPosition = value;
+                OnPropertyChanged("CurrentPosition");
             }
         }
-        public Double CursorValue
+
+        public Double CursorPosition
         {
             get
-            { return _cursorValue; }
+            { return _cursorPosition; }
 
             set
             {
-                _cursorValue = value;
-                OnPropertyChanged("CursorValue");
+                _cursorPosition = value;
+                OnPropertyChanged("CursorPosition");
+            }
+        }
+        public Double CursorMainValue
+        {
+            get
+            { return _cursorMainValue; }
+
+            set
+            {
+                _cursorMainValue = value;
+                OnPropertyChanged("CursorMainValue");
+            }
+        }
+        public Double CursorAuxValue
+        {
+            get
+            { return _cursorAuxValue; }
+
+            set
+            {
+                _cursorAuxValue = value;
+                OnPropertyChanged("CursorAuxValue");
             }
         }
         public Visibility CursorVisible

@@ -344,10 +344,6 @@ namespace LionRiver
         #region Plot
 
         public NavPlotModel NavPlotModel = new NavPlotModel();
-        Binding CursorXBinding = new Binding();
-        Binding CursorYBinding = new Binding();
-        Binding CurrentXBinding = new Binding();
-        Binding CurrentYBinding = new Binding();
 
         ChartValues<DateModel> MainPlotValues = new ChartValues<DateModel>() { new DateModel() };
         LineSeries MainSeries;
@@ -606,16 +602,18 @@ namespace LionRiver
 
             #region Nav Plots
 
-            NavPlotModel.CurrentValue = DateTime.Now.Ticks;
+            NavPlotModel.CurrentPosition = DateTime.Now.Ticks;
 
-            DateTime minV = new DateTime((long)(NavPlotModel.CurrentValue - TimeSpan.FromHours(2).Ticks));
-            DateTime maxV = new DateTime((long)(NavPlotModel.CurrentValue));
+            DateTime minV = new DateTime((long)(NavPlotModel.CurrentPosition - TimeSpan.FromHours(2).Ticks));
+            DateTime maxV = new DateTime((long)(NavPlotModel.CurrentPosition));
 
             NavPlotModel.MinXAxisValue = minV.Ticks;
-            NavPlotModel.MaxXAxisValue = NavPlotModel.CurrentValue +
-                                            (NavPlotModel.CurrentValue - NavPlotModel.MinXAxisValue) * 0.2;
+            NavPlotModel.MaxXAxisValue = NavPlotModel.CurrentPosition +
+                                            (NavPlotModel.CurrentPosition - NavPlotModel.MinXAxisValue) * 0.2;
             NavPlotModel.Resolution = 2;
-            NavPlotModel.XFormatter = value => new System.DateTime((long)(value)).ToString("dd MMM");
+            //NavPlotModel.XFormatter = value => new System.DateTime((long)(value)).ToString("dd MMM");
+            NavPlotModel.XFormatter = value => "";
+
 
             //NavPlotModel.XStep = (double)TimeSpan.FromDays(7).Ticks;
 
@@ -732,30 +730,67 @@ namespace LionRiver
 
             }
 
-            CursorXBinding.Source = NavPlotModel;
-            CursorXBinding.Path = new PropertyPath("CursorValue");
-            CursorXBinding.Mode = BindingMode.OneWay;
-            CursorXBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(MainNavPlot.Cursor, VisualElement.XProperty, CursorXBinding);
+            #region Visal Elements bindings 
 
-            CursorYBinding.Source = NavPlotModel;
-            CursorYBinding.Path = new PropertyPath("MinY1AxisValue");
-            CursorYBinding.Mode = BindingMode.OneWay;
-            CursorYBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(MainNavPlot.Cursor, VisualElement.YProperty, CursorYBinding);
+            //-- somehow binding from XAML desnt work
 
+            Binding bnd = new Binding();
+            bnd.Source = NavPlotModel;
+            bnd.Path = new PropertyPath("CursorPosition");
+            bnd.Mode = BindingMode.OneWay;
+            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.Cursor, VisualElement.XProperty, bnd);
 
-            CurrentXBinding.Source = NavPlotModel;
-            CurrentXBinding.Path = new PropertyPath("CurrentValue");
-            CurrentXBinding.Mode = BindingMode.OneWay;
-            CurrentXBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(MainNavPlot.Current, VisualElement.XProperty, CurrentXBinding);
+            bnd = new Binding();
+            bnd.Source = NavPlotModel;
+            bnd.Path = new PropertyPath("MinY1AxisValue");
+            bnd.Mode = BindingMode.OneWay;
+            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.Cursor, VisualElement.YProperty, bnd);
 
-            CurrentYBinding.Source = NavPlotModel;
-            CurrentYBinding.Path = new PropertyPath("MaxY1AxisValue");
-            CurrentYBinding.Mode = BindingMode.OneWay;
-            CurrentYBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(MainNavPlot.Current, VisualElement.YProperty, CurrentYBinding);
+            bnd = new Binding();
+            bnd.Source = NavPlotModel;
+            bnd.Path = new PropertyPath("CursorMainValue");
+            bnd.Mode = BindingMode.OneWay;
+            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.CursorMainValue, VisualElement.YProperty, bnd);
+
+            bnd = new Binding();
+            bnd.Source = NavPlotModel;
+            bnd.Path = new PropertyPath("CursorPosition");
+            bnd.Mode = BindingMode.OneWay;
+            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.CursorMainValue, VisualElement.XProperty, bnd);
+
+            bnd = new Binding();
+            bnd.Source = NavPlotModel;
+            bnd.Path = new PropertyPath("CursorAuxValue");
+            bnd.Mode = BindingMode.OneWay;
+            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.CursorAuxValue, VisualElement.YProperty, bnd);
+
+            bnd = new Binding();
+            bnd.Source = NavPlotModel;
+            bnd.Path = new PropertyPath("CursorPosition");
+            bnd.Mode = BindingMode.OneWay;
+            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.CursorAuxValue, VisualElement.XProperty, bnd);
+
+            bnd = new Binding();
+            bnd.Source = NavPlotModel;
+            bnd.Path = new PropertyPath("CurrentPosition");
+            bnd.Mode = BindingMode.OneWay;
+            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.Current, VisualElement.XProperty, bnd);
+
+            bnd = new Binding();
+            bnd.Source = NavPlotModel;
+            bnd.Path = new PropertyPath("MaxY1AxisValue");
+            bnd.Mode = BindingMode.OneWay;
+            bnd.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            BindingOperations.SetBinding(MainNavPlot.Current, VisualElement.YProperty, bnd); 
+
+            #endregion
 
             MainNavPlot.Chart.UpdaterTick += Chart_UpdaterTick;
 
@@ -1370,23 +1405,23 @@ namespace LionRiver
         {
             double deltaT = NavPlotModel.MaxXAxisValue - NavPlotModel.MinXAxisValue;
 
-            NavPlotModel.CurrentValue += deltaT * FwdBackSlider.Value / 2000;
+            NavPlotModel.CurrentPosition += deltaT * FwdBackSlider.Value / 2000;
 
             double lim = NavPlotModel.MinXAxisValue + 0.8 * deltaT;
 
-            if (NavPlotModel.CurrentValue > lim)
+            if (NavPlotModel.CurrentPosition > lim)
             {
-                NavPlotModel.MinXAxisValue = (NavPlotModel.CurrentValue - 0.8 * deltaT);
-                NavPlotModel.MaxXAxisValue = (NavPlotModel.CurrentValue + 0.2 * deltaT);
+                NavPlotModel.MinXAxisValue = (NavPlotModel.CurrentPosition - 0.8 * deltaT);
+                NavPlotModel.MaxXAxisValue = (NavPlotModel.CurrentPosition + 0.2 * deltaT);
             }
 
             if (PlotCenterButton.IsChecked == true)
             {
-                NavPlotModel.MaxXAxisValue = NavPlotModel.CurrentValue + deltaT / 2;
-                NavPlotModel.MinXAxisValue = NavPlotModel.CurrentValue - deltaT / 2;
+                NavPlotModel.MaxXAxisValue = NavPlotModel.CurrentPosition + deltaT / 2;
+                NavPlotModel.MinXAxisValue = NavPlotModel.CurrentPosition - deltaT / 2;
             }
 
-            DateTime dt = new DateTime((long)NavPlotModel.CurrentValue);
+            DateTime dt = new DateTime((long)NavPlotModel.CurrentPosition);
             UpdateFleet(dt);
 
             if (UpdatePlotResolutionTimer.IsEnabled == false)
@@ -1397,7 +1432,7 @@ namespace LionRiver
         {
             PlotPanTimer.Stop();
 
-            DateTime dt = new DateTime((long)NavPlotModel.CurrentValue);
+            DateTime dt = new DateTime((long)NavPlotModel.CurrentPosition);
             UpdateFleet(dt);
         }
 
@@ -3438,7 +3473,7 @@ namespace LionRiver
 
             if (PlayButton.IsChecked == false)
             {
-                DateTime dt = new DateTime((long)NavPlotModel.CurrentValue);
+                DateTime dt = new DateTime((long)NavPlotModel.CurrentPosition);
                 UpdateFleet(dt);
             }
         }
@@ -3530,11 +3565,11 @@ namespace LionRiver
             else
                 dt = DateTime.Now;
 
-            NavPlotModel.CurrentValue = dt.Ticks;
+            NavPlotModel.CurrentPosition = dt.Ticks;
 
             double deltaT = NavPlotModel.MaxXAxisValue - NavPlotModel.MinXAxisValue;
-            NavPlotModel.MinXAxisValue = (NavPlotModel.CurrentValue - 0.8 * deltaT);
-            NavPlotModel.MaxXAxisValue = (NavPlotModel.CurrentValue + 0.2 * deltaT);
+            NavPlotModel.MinXAxisValue = (NavPlotModel.CurrentPosition - 0.8 * deltaT);
+            NavPlotModel.MaxXAxisValue = (NavPlotModel.CurrentPosition + 0.2 * deltaT);
 
             UpdateTracks(new DateTime((long)NavPlotModel.MinXAxisValue), dt, Track.MaxLength);
 
@@ -3599,7 +3634,52 @@ namespace LionRiver
             var pos = e.GetPosition(MainNavPlot.Chart);
             var point = MainNavPlot.Chart.ConvertToChartValues(pos);
 
-            NavPlotModel.CursorValue = point.X;
+            NavPlotModel.CursorPosition = point.X;
+
+            DateTime dt = new DateTime((long)NavPlotModel.CursorPosition);
+
+            var v1 = (from x in MainPlotValues
+                         where x.DateTime < dt
+                         orderby x.DateTime
+                         select x).LastOrDefault();
+
+            if (v1 != null)
+            {
+                var i = MainPlotValues.IndexOf(v1);
+
+                if (i != MainPlotValues.Count() - 1 && v1.Value != null)
+                {
+                    var v2 = MainPlotValues[i + 1];
+                    NavPlotModel.CursorMainValue = (double)(v1.Value + v2.Value) / 2;
+                }
+                else
+                    NavPlotModel.CursorMainValue = double.NaN;
+            }
+            else
+                NavPlotModel.CursorMainValue = double.NaN;
+
+
+            v1 = (from x in AuxPlotValues
+                      where x.DateTime < dt
+                      orderby x.DateTime
+                      select x).LastOrDefault();
+
+
+            if (v1 != null)
+            {
+                var i = AuxPlotValues.IndexOf(v1);
+
+                if (i != AuxPlotValues.Count() - 1 && v1.Value != null)
+                {
+                    var v2 = AuxPlotValues[i + 1];
+                    NavPlotModel.CursorAuxValue = (double)(v1.Value + v2.Value) / 2;
+                }
+                else
+                    NavPlotModel.CursorAuxValue = double.NaN;
+            }
+            else
+                NavPlotModel.CursorAuxValue = double.NaN;
+            
 
             if (mouseHandlingMode == MouseHandlingMode.SelectingPlotRange)
             {
@@ -3630,7 +3710,7 @@ namespace LionRiver
 
                 if (PlotCenterButton.IsChecked == true)
                 {
-                    NavPlotModel.CurrentValue = (NavPlotModel.MinXAxisValue + NavPlotModel.MaxXAxisValue) / 2;
+                    NavPlotModel.CurrentPosition = (NavPlotModel.MinXAxisValue + NavPlotModel.MaxXAxisValue) / 2;
 
                     if (PlotPanTimer.IsEnabled == false)
                         PlotPanTimer.Start();
@@ -3695,14 +3775,14 @@ namespace LionRiver
                         NavPlotModel.MinXAxisValue = point.X - deltaT / 2;
                     }
 
-                    NavPlotModel.CurrentValue = point.X;
+                    NavPlotModel.CurrentPosition = point.X;
 
                     if (PlotPanTimer.IsEnabled == false)
                         PlotPanTimer.Start();
                 }
                 else
                 {
-                    NavPlotModel.CursorValue = point.X;
+                    NavPlotModel.CursorPosition = point.X;
                     NavPlotModel.CursorVisible = Visibility.Visible;
 
                     mouseHandlingMode = MouseHandlingMode.None;
@@ -3724,9 +3804,9 @@ namespace LionRiver
 
 
             if (PlotCenterButton.IsChecked == true || PlayButton.IsChecked == true)
-                zoomPos = NavPlotModel.CurrentValue;
+                zoomPos = NavPlotModel.CurrentPosition;
             else
-                zoomPos = NavPlotModel.CursorValue;
+                zoomPos = NavPlotModel.CursorPosition;
 
             double deltaT1 = zoomPos - NavPlotModel.MinXAxisValue;
             double deltaT2 = zoomPos - NavPlotModel.MaxXAxisValue;
@@ -3751,7 +3831,7 @@ namespace LionRiver
             if (PlotCenterButton.IsChecked == true)
             {
                 var point = MainNavPlot.Chart.ConvertToChartValues(e.GetPosition(MainNavPlot.Chart));
-                NavPlotModel.CursorValue = point.X;
+                NavPlotModel.CursorPosition = point.X;
             }
 
             UpdatePlotResolutionTimer.Start();
@@ -3772,8 +3852,8 @@ namespace LionRiver
         {
             double deltaT = NavPlotModel.MaxXAxisValue - NavPlotModel.MinXAxisValue;
 
-            NavPlotModel.MaxXAxisValue = NavPlotModel.CurrentValue + deltaT / 2;
-            NavPlotModel.MinXAxisValue = NavPlotModel.CurrentValue - deltaT / 2;
+            NavPlotModel.MaxXAxisValue = NavPlotModel.CurrentPosition + deltaT / 2;
+            NavPlotModel.MinXAxisValue = NavPlotModel.CurrentPosition - deltaT / 2;
 
             PlayButton.IsChecked = false;
         }
@@ -4389,21 +4469,21 @@ namespace LionRiver
 
                     boat.Heading = heading;
 
-                    NavPlotModel.CurrentValue = POS.GetLastVal(0).Time.Ticks;
+                    NavPlotModel.CurrentPosition = POS.GetLastVal(0).Time.Ticks;
 
                     double deltaT = NavPlotModel.MaxXAxisValue - NavPlotModel.MinXAxisValue;
                     double lim = NavPlotModel.MinXAxisValue + 0.8 * deltaT;
 
-                    if (NavPlotModel.CurrentValue > lim)
+                    if (NavPlotModel.CurrentPosition > lim)
                     {
-                        NavPlotModel.MinXAxisValue = (NavPlotModel.CurrentValue - 0.8 * deltaT);
-                        NavPlotModel.MaxXAxisValue = (NavPlotModel.CurrentValue + 0.2 * deltaT);
+                        NavPlotModel.MinXAxisValue = (NavPlotModel.CurrentPosition - 0.8 * deltaT);
+                        NavPlotModel.MaxXAxisValue = (NavPlotModel.CurrentPosition + 0.2 * deltaT);
                     }
 
-                    if (NavPlotModel.CurrentValue < NavPlotModel.MinXAxisValue)
+                    if (NavPlotModel.CurrentPosition < NavPlotModel.MinXAxisValue)
                     {
-                        NavPlotModel.MinXAxisValue = (NavPlotModel.CurrentValue);
-                        NavPlotModel.MaxXAxisValue = (NavPlotModel.CurrentValue + deltaT);
+                        NavPlotModel.MinXAxisValue = (NavPlotModel.CurrentPosition);
+                        NavPlotModel.MaxXAxisValue = (NavPlotModel.CurrentPosition + deltaT);
                     }
 
                     if (mapOrientationMode == MapOrientationMode.CourseUp)

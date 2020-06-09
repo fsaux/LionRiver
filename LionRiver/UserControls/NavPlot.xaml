@@ -13,6 +13,7 @@
         <local:CenterTextboxConverter x:Key="CenterTextboxConverter" />
         <local:TopTextboxConverter x:Key="TopTextboxConverter" />
         <local:XValuetoDateConverter x:Key="XValuetoDateConverter" />
+        <local:DoubleToVisConverter x:Key="DoubleToVisConverter" /> 
         
         <Style x:Key="CenteredTextBlock" TargetType="{x:Type TextBlock}">
             <Setter Property="Margin">
@@ -55,6 +56,7 @@
 
                 <lvc:Axis Name="myXaxis"
                           LabelFormatter="{Binding XFormatter}"
+                          IsMerged="True"
                           MinValue="{Binding MinXAxisValue}" 
                           MaxValue="{Binding MaxXAxisValue}">
 
@@ -84,8 +86,8 @@
                                 <SolidColorBrush Color="Gray" Opacity=".4"></SolidColorBrush>
                             </lvc:AxisSection.Fill>
                         </lvc:AxisSection>
-                        <lvc:AxisSection Value="{Binding CursorValue}" StrokeThickness="2" Stroke="DarkGoldenrod" Visibility="{Binding CursorVisible}"/>
-                        <lvc:AxisSection Value="{Binding CurrentValue}" StrokeThickness="2" Stroke="Green"/>
+                        <lvc:AxisSection Value="{Binding CursorPosition}" StrokeThickness="1" StrokeDashArray="1 4" Stroke="DarkGoldenrod" Visibility="{Binding CursorVisible}"/>
+                        <lvc:AxisSection Value="{Binding CurrentPosition}" StrokeThickness="2" Stroke="Green"/>
                     </lvc:Axis.Sections>
 
                 </lvc:Axis>
@@ -118,15 +120,27 @@
 
             </lvc:CartesianChart.AxisY>
 
-
-
             <lvc:CartesianChart.VisualElements>
+
+                <lvc:VisualElement  x:Name="Current" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Bottom" >
+                    <lvc:VisualElement.UIElement>
+                        <TextBlock
+                                Text="{Binding CurrentPosition, Converter={StaticResource XValuetoDateConverter}}"
+                                FontSize="12"
+                                Foreground="Green" 
+                                Background="Black"
+                                Padding="2,0,2,0">
+                        </TextBlock>
+                    </lvc:VisualElement.UIElement>
+                </lvc:VisualElement>
 
                 <lvc:VisualElement  x:Name="Cursor"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top">
                     <lvc:VisualElement.UIElement>
-                        <TextBlock Text="{Binding CursorValue, Converter={StaticResource XValuetoDateConverter}}"
+                        <TextBlock Text="{Binding CursorPosition, Converter={StaticResource XValuetoDateConverter}}"
                                    Visibility="{Binding CursorVisible}"
                                    FontSize="12"
                                    Foreground="DarkGoldenrod" 
@@ -136,17 +150,43 @@
                     </lvc:VisualElement.UIElement>
                 </lvc:VisualElement>
 
-                <lvc:VisualElement  x:Name="Current" 
-                                    HorizontalAlignment="Center" 
-                                    VerticalAlignment="Bottom" >
+                <lvc:VisualElement  x:Name="CursorMainValue"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    AxisY="0"
+                                    Margin="2">
                     <lvc:VisualElement.UIElement>
-                        <TextBlock
-                                Text="{Binding CurrentValue, Converter={StaticResource XValuetoDateConverter}}"
-                                FontSize="12"
-                                Foreground="Green" 
-                                Background="Black"
-                                Padding="2,0,2,0">
-                        </TextBlock>
+                        <Grid Visibility="{Binding CursorVisible}">
+                            <Border  Visibility="{Binding CursorMainValue, Converter={StaticResource DoubleToVisConverter}}"
+                                     Background="Black" BorderBrush="DodgerBlue" BorderThickness="1"
+                                     Margin="2">
+                                <TextBlock Text="{Binding CursorMainValue}"
+                                   FontSize="12"
+                                   Foreground="DodgerBlue" 
+                                   Padding="2">
+                                </TextBlock>
+                            </Border>
+                        </Grid>
+                    </lvc:VisualElement.UIElement>
+                </lvc:VisualElement>
+
+                <lvc:VisualElement  x:Name="CursorAuxValue"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    AxisY="1"
+                                    Margin="2">
+                    <lvc:VisualElement.UIElement>
+                        <Grid Visibility="{Binding CursorVisible}">
+                            <Border  Visibility="{Binding CursorAuxValue, Converter={StaticResource DoubleToVisConverter}}"
+                                     Background="Black" BorderBrush="MediumVioletRed" BorderThickness="1"
+                                     Margin="2">
+                                <TextBlock Text="{Binding CursorAuxValue}"
+                                   FontSize="12"
+                                   Foreground="MediumVioletRed" 
+                                   Padding="2">
+                                </TextBlock>
+                            </Border>
+                        </Grid>
                     </lvc:VisualElement.UIElement>
                 </lvc:VisualElement>
 

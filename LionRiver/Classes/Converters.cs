@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Globalization;
 using MapControl;
 using LiveCharts;
+using Xceed.Wpf.Toolkit.Primitives;
 
 namespace LionRiver
 {
@@ -325,5 +326,31 @@ namespace LionRiver
             throw new NotImplementedException();
         }
     }
+
+    public class DoubleToVisConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            
+            if (value != null)
+            {
+                double val = (double)value;
+
+                if (double.IsNaN(val))
+                    return Visibility.Hidden;
+                else
+                    return Visibility.Visible;
+            }
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
 
 }
