@@ -343,6 +343,8 @@
     <Resource Include="Images\echo-dot.png" />
     <Resource Include="Images\mark.png" />
     <Resource Include="Images\interface.png" />
+    <Resource Include="Images\Hamburger.png" />
+    <Resource Include="Hamburger.png" />
     <Content Include="X64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
