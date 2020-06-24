@@ -40,35 +40,36 @@
 
     </Window.Resources>
 
-    <Border Background="#FF6A6C97" CornerRadius="10" MouseLeftButtonDown="Border_MouseLeftButtonDown" >
+    <Border Background="{StaticResource LionViolet}" CornerRadius="10" MouseLeftButtonDown="Border_MouseLeftButtonDown" >
 
-            <Grid Height="Auto"  Width="Auto" VerticalAlignment="Top" Margin="3,3,3,10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
+        <Grid Height="Auto"  Width="Auto" VerticalAlignment="Top" Margin="3,3,3,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
 
-                <Image Stretch="None" HorizontalAlignment="Right" MouseLeftButtonDown="Image_MouseLeftButtonDown" Source="/LionRiver;component/Images/Mathematic-Multiply2-icon.png" />
+            <Image Stretch="None" HorizontalAlignment="Right" MouseLeftButtonDown="Image_MouseLeftButtonDown" Source="/LionRiver;component/Images/Mathematic-Multiply2-icon.png" />
 
-                <DockPanel Grid.Row="1" Height="Auto" Width="Auto" Background="{x:Null}" LastChildFill="False" VerticalAlignment="Top">
-                <Button Content="Load"  Margin="2" IsEnabled="False"/>
-                <Button Command="local:CommandLibrary.AddMark" Content="Add"  Margin="2"/>
-                <Button Content="New"  Margin="2" IsEnabled="False"/>
+            <DockPanel Grid.Row="1" Height="Auto" Width="Auto" Background="{x:Null}" LastChildFill="False" VerticalAlignment="Top">
+                <Button x:Name="LoadButton" Content="Load" Margin="2"/>
+                <Button x:Name="SaveButton" Content="Save" Margin="2"/>
+                <Button Command="local:CommandLibrary.AddMark" Content="Add"  Margin="2" DockPanel.Dock="Right"/>
             </DockPanel>
 
+
             <DataGrid
-            Grid.Row="2"
-            ItemsSource="{Binding}"
-            RowStyle="{StaticResource DefaultRowStyle}"
-            ColumnHeaderStyle="{StaticResource ColumnHeaderStyle}"
-            AutoGenerateColumns="False" VerticalGridLinesBrush="Silver"
-            Foreground="Silver"
-            Background="{x:Null}"
-            HorizontalGridLinesBrush="Silver"  Name="DataGrid1" BorderBrush="Silver" CanUserResizeRows="False" CanUserSortColumns="False" 
-            GridLinesVisibility="All" HeadersVisibility="Column" HorizontalAlignment="Stretch" 
-            Margin="2" BorderThickness="2" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" 
-            VerticalContentAlignment="Stretch">
+                Grid.Row="2"
+                ItemsSource="{Binding}"
+                RowStyle="{StaticResource DefaultRowStyle}"
+                ColumnHeaderStyle="{StaticResource ColumnHeaderStyle}"
+                AutoGenerateColumns="False" VerticalGridLinesBrush="Silver"
+                Foreground="Silver"
+                Background="{x:Null}"
+                HorizontalGridLinesBrush="Silver"  Name="DataGrid1" BorderBrush="Silver" CanUserResizeRows="False" CanUserSortColumns="False" 
+                GridLinesVisibility="All" HeadersVisibility="Column" HorizontalAlignment="Stretch" 
+                Margin="2" BorderThickness="2" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" 
+                VerticalContentAlignment="Stretch">
 
                 <DataGrid.Columns>
                     <DataGridTextColumn ElementStyle="{StaticResource CellStyle}" Header="Name"  Binding="{Binding Name}" CanUserSort="False" MinWidth="60" />
@@ -79,10 +80,6 @@
                 </DataGrid.Columns>
 
             </DataGrid>
-
-
         </Grid>
-
     </Border>
-
 </Window>

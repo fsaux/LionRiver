@@ -41,6 +41,8 @@
                 <GradientStop Color="#FF1A9920" Offset="1"/>
             </LinearGradientBrush>
 
+            <SolidColorBrush x:Key="LionViolet" Color="#FF708BD4"/>
+
             <DataTemplate x:Key="RedBackground">
                 <Grid>
                     <TextBlock Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" Text="{Binding}"/>
@@ -177,7 +179,7 @@
                                 </VisualStateManager.VisualStateGroups>
                                 <Grid>
 
-                                    <Border x:Name="ToggleBorder" BorderBrush="Black" BorderThickness="2" CornerRadius="4" Background="#FF708BD4" />
+                                    <Border x:Name="ToggleBorder" BorderBrush="Black" BorderThickness="2" CornerRadius="4" Background="{StaticResource LionViolet}" />
 
                                     <ContentPresenter Content="{TemplateBinding Content}"
                                           ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -625,7 +627,7 @@
                                                                     </VisualStateGroup>
                                                                 </VisualStateManager.VisualStateGroups>
                                                                 <Grid>
-                                                                    <Border x:Name="ToggleBorder" BorderBrush="Black" BorderThickness="2" CornerRadius="4" Background="#FF708BD4" />
+                                                                    <Border x:Name="ToggleBorder" BorderBrush="Black" BorderThickness="2" CornerRadius="4" Background="{StaticResource LionViolet}" />
                                                                     <ContentPresenter Content="{TemplateBinding Content}"
                                                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
                                                                                       Margin="{TemplateBinding Padding}"

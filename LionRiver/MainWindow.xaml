@@ -515,33 +515,21 @@
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="{Binding RowHeight1, Mode=TwoWay, Source={x:Static p:Settings.Default}}"/>
         </Grid.RowDefinitions>
 
-        <ToolBarPanel Grid.Row="0" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="MainMenuPanel" VerticalAlignment="Stretch" Width="Auto">
+        <!--<ToolBarPanel Grid.Row="0" Height="Auto" HorizontalAlignment="Stretch" Margin="0" x:Name="MainMenuPanel" VerticalAlignment="Stretch" Width="Auto">
             <Menu Height="23" x:Name="menu1" Width="Auto">
                 <MenuItem  Header="File">
-                    <MenuItem Header="Load Waypoint/Route" Click="GPXLoadButton_Click" />
-                    <MenuItem Header="Load Polar" Click="MenuItem_Polar_Click" />
-                    <MenuItem Header="Load Wind Grib" Click="GribWindLoadButton_Click" />
-                    <MenuItem Header="Load Current Grib" Click="GribCurrentLoadButton_Click"/>
                     <MenuItem Header="Replay Log" Click="ReplayLogButton_Click"/>
                     <Separator />
-                    <MenuItem Header="Save Waypoint/Route" Click="GPXSaveButton_Click"/>
-                    <MenuItem Header="Save Track" />
-                    <Separator />
-                    <MenuItem Header="Setup" Click="MenuItem_Setup_Click"/>
-                </MenuItem>
-                <MenuItem Header="Course" >
-                    <MenuItem Header="Windward-Leeward" Click="MenuItem_WLCourseSetup_Click"  />
                 </MenuItem>
             </Menu>
-        </ToolBarPanel>
+        </ToolBarPanel>-->
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="0">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -596,7 +584,6 @@
                     </local:MarkItemsControl>
 
                     <local:MeasureControl x:Name="mapMeasureControl" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,50,0,50" Visibility="Hidden"/>
-                    <!--<local:RouteReplayControl x:Name="mapRouteReplayControl" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,50,0,50" Visibility="Hidden" Panel.ZIndex="40"/>-->
 
                     <map:MapItem Name="mainBoat" Style="{StaticResource BoatItemStyle}"
                                  PreviewMouseLeftButtonDown="Boat_PreviewMouseLeftButtonDown"
@@ -658,15 +645,54 @@
 
                 </Grid>
 
-                <Expander HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ExpanderMenuStyle}" Margin="0,5,0,0">
+                <Expander ExpandDirection="Down" HorizontalAlignment="Left" VerticalAlignment="Stretch" Style="{StaticResource ExpanderMenuStyle}" Margin="0,5,0,0">
                     <Expander.Header>
                         <Border Padding="4">
                             <Image Source="Images/Hamburger.png" Stretch="Fill" HorizontalAlignment="Center"  Margin="2" ToolTip="Main Menu" Width="26" Height="26"/>
                         </Border>
                     </Expander.Header>
-                </Expander>
-                
 
+                    <WrapPanel Orientation="Vertical" Margin="0,0,0,100">
+                        
+                        <ToggleButton  Name="MarkButton" Checked="MarkButton_Checked" Unchecked="MarkButton_Unchecked" Style="{StaticResource MainToggleButton}" Margin="1,2" VerticalAlignment="Top">
+                            <ToggleButton.Content>
+                                <Image Source="Images/Maps-and-Geolocation-Marker-icon.png" Stretch="None" Margin="2" ToolTip="Marks"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+
+                        <ToggleButton  Name="RouteButton" Checked="RouteButton_Checked" Unchecked="RouteButton_Unchecked" Style="{StaticResource MainToggleButton}" Margin="1,2" VerticalAlignment="Top">
+                            <ToggleButton.Content>
+                                <Image Source="Images/Maps-and-Geolocation-Polyline-icon.png" Stretch="None" Margin="2" ToolTip="Routes"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+
+                        <ToggleButton  Name="RouteCalcButton"  Style="{StaticResource MainToggleButton}" Margin="1,2"  Checked="RouteCalcButton_Checked" Unchecked="RouteCalcButton_Unchecked" VerticalAlignment="Top" >
+                            <ToggleButton.Content>
+                                <Image Source="Images/Numbers-2-icon.png" Stretch="None" Margin="2" ToolTip="Weather routing"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+
+                        <ToggleButton  Name="GribButton"  Style="{StaticResource MainToggleButton}" Margin="1,2"  Checked="GribButton_Checked" Unchecked="GribButton_Unchecked" VerticalAlignment="Top" >
+                            <ToggleButton.Content>
+                                <Image Source="Images/Weather-Partly-cloudy-day-icon.png" Stretch="None" Margin="2" ToolTip="Grib"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+
+                        <ToggleButton  Name="SettingsButton"  Style="{StaticResource MainToggleButton}" Margin="1,2"   VerticalAlignment="Top" Checked="SettingsButton_Checked">
+                            <ToggleButton.Content>
+                                <Image Source="Images/settings.png" Stretch="Fill" Margin="2" Width="28" Height="28" ToolTip="Settings"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+
+                        <ToggleButton  Name="ReplayButton"  Style="{StaticResource MainToggleButton}" Margin="1,2"  VerticalAlignment="Top" Checked="ReplayButton_Checked" >
+                            <ToggleButton.Content>
+                                <Image Source="Images/replay.png" Stretch="Fill" Margin="2" Width="28" Height="28" ToolTip="Replay"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+
+                    </WrapPanel>
+                        
+                </Expander>
 
                 <DockPanel Height="Auto" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Bottom" Width="Auto" Panel.ZIndex="1" LastChildFill="False" Background="{x:Null}">
 
@@ -682,24 +708,11 @@
                         </ToggleButton.Content>
                     </ToggleButton>
 
-                    <ToggleButton  Name="MarkButton" Checked="MarkButton_Checked" Unchecked="MarkButton_Unchecked" Style="{StaticResource MainToggleButton}" Margin="2" VerticalAlignment="Top">
-                        <ToggleButton.Content>
-                            <Image Source="Images/Maps-and-Geolocation-Marker-icon.png" Stretch="None" Margin="2" ToolTip="Marks"/>
-                        </ToggleButton.Content>
-                    </ToggleButton>
-
-                    <ToggleButton  Name="RouteButton" Checked="RouteButton_Checked" Unchecked="RouteButton_Unchecked" Style="{StaticResource MainToggleButton}" Margin="2" VerticalAlignment="Top">
-                        <ToggleButton.Content>
-                            <Image Source="Images/Maps-and-Geolocation-Polyline-icon.png" Stretch="None" Margin="2" ToolTip="Routes"/>
-                        </ToggleButton.Content>
-                    </ToggleButton>
-
                     <ToggleButton  Name="MeasureButton" Style="{StaticResource MainToggleButton}" Margin="2" Checked="MeasureButton_Checked" Unchecked="MeasureButton_Unchecked" VerticalAlignment="Top">
                         <ToggleButton.Content>
                             <Image Source="Images/Very-Basic-Ruler-icon.png" Stretch="None" Margin="2" ToolTip="Measure"/>
                         </ToggleButton.Content>
                     </ToggleButton>
-
 
                 </DockPanel>
 
@@ -708,18 +721,6 @@
                     <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="PlayButton_Checked" VerticalAlignment="Top">
                         <ToggleButton.Content>
                             <Image  Source="Images/iconfinder_icon-play_211876.png" Stretch="Fill" Margin="2" ToolTip="Play" Width="28" Height="28"/>
-                        </ToggleButton.Content>
-                    </ToggleButton>
-
-                    <ToggleButton  Name="RouteCalcButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="RouteCalcButton_Checked" Unchecked="RouteCalcButton_Unchecked" VerticalAlignment="Top" >
-                        <ToggleButton.Content>
-                            <Image Source="Images/Numbers-2-icon.png" Stretch="None" Margin="2" ToolTip="Route Calculation"/>
-                        </ToggleButton.Content>
-                    </ToggleButton>
-
-                    <ToggleButton  Name="GribButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="GribButton_Checked" Unchecked="GribButton_Unchecked" VerticalAlignment="Top" >
-                        <ToggleButton.Content>
-                            <Image Source="Images/Weather-Partly-cloudy-day-icon.png" Stretch="None" Margin="2" ToolTip="Grib"/>
                         </ToggleButton.Content>
                     </ToggleButton>
 
@@ -779,9 +780,9 @@
 
         </Grid>
 
-        <GridSplitter Grid.Row="2" Grid.RowSpan="1" Height="6" HorizontalAlignment="Stretch" Margin="0" x:Name="gridSplitter3" VerticalAlignment="Stretch" Width="Auto" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows" Background="Black" />
+        <GridSplitter Grid.Row="1" Grid.RowSpan="1" Height="6" HorizontalAlignment="Stretch" Margin="0" x:Name="gridSplitter3" VerticalAlignment="Stretch" Width="Auto" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows" Background="Black" />
         
-        <Grid x:Name="TransportGrid" Grid.Row="3">
+        <Grid x:Name="TransportGrid" Grid.Row="2">
 
                 <mycontrols:NavPlot  x:Name="MainNavPlot"
                                          MouseEnter="MainNavPlot_MouseEnter"

@@ -345,6 +345,8 @@
     <Resource Include="Images\interface.png" />
     <Resource Include="Images\Hamburger.png" />
     <Resource Include="Hamburger.png" />
+    <Resource Include="Images\settings.png" />
+    <Resource Include="Images\replay.png" />
     <Content Include="X64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

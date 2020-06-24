@@ -15,7 +15,7 @@
         <local:CheckToVisConverter x:Key="visToCheckConverter" />
     </Window.Resources>
     
-    <Border Background="#FF6A6C97" CornerRadius="10" MouseLeftButtonDown="Border_MouseLeftButtonDown">
+    <Border Background="{StaticResource LionViolet}" CornerRadius="10" MouseLeftButtonDown="Border_MouseLeftButtonDown">
         <Grid Height="Auto"  Width="432" VerticalAlignment="Top" Margin="3,3,3,3">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -23,18 +23,20 @@
             <RowDefinition />
             <RowDefinition />
             </Grid.RowDefinitions>
-                
-         <DockPanel Grid.Row="1" Height="Auto" Width="Auto" Background="{x:Null}" LastChildFill="False">
-             <Button x:Name="LoadButton" Content="Load"  Margin="2" />
-             <ComboBox x:Name="RouteListComboBox" Width="120" Margin="2"
+
+            <DockPanel Grid.Row="1" Height="Auto" Width="Auto" Background="{x:Null}" LastChildFill="False">
+                <Button x:Name="LoadButton" Content="Load"  Margin="2" />
+                <Button x:Name="SaveButton" Content="Save"  Margin="2" />
+                <ComboBox x:Name="RouteListComboBox" Width="120" Margin="2"
                        ItemsSource="{Binding}"
-                       DisplayMemberPath="Name" SelectionChanged="RouteListComboBox_SelectionChanged" Visibility="Visible" />             
-             <TextBox Name="RenameTextBox"  Width="120" Visibility="Collapsed" PreviewKeyDown="RenameTextBox_PreviewKeyDown"/>             
-             <Button Content="New"  Margin="2" Command="local:CommandLibrary.NewRoute" />
-             <Button Content="Rename"  Name="RenameButton" Margin="2" IsEnabled="False" Click="RenameButton_Click"  />
-             <Button Content="Reverse"  Margin="2" Command="local:CommandLibrary.ReverseRoute" />
-             <Button Content="Delete"  Margin="2" Command="local:CommandLibrary.DeleteRoute" />
+                       DisplayMemberPath="Name" SelectionChanged="RouteListComboBox_SelectionChanged" Visibility="Visible" />
+                <TextBox Name="RenameTextBox"  Width="120" Visibility="Collapsed" PreviewKeyDown="RenameTextBox_PreviewKeyDown"/>
+                <Button Content="Delete"  Margin="2" Command="local:CommandLibrary.DeleteRoute"  DockPanel.Dock="Right"/>
+                <Button Content="Reverse"  Margin="2" Command="local:CommandLibrary.ReverseRoute" DockPanel.Dock="Right"/>
+                <Button Content="Rename"  Name="RenameButton" Margin="2" IsEnabled="False" Click="RenameButton_Click" DockPanel.Dock="Right" />
+                <Button Content="New"  Margin="2" Command="local:CommandLibrary.NewRoute" DockPanel.Dock="Right" />
             </DockPanel>
+
 
             <DockPanel Grid.Row="3" Height="Auto" Width="Auto" Background="{x:Null}" LastChildFill="False" Margin="0,3,0,3">
                 <Button Content="Activate"  Margin="2" Command="local:CommandLibrary.ActivateRoute" CommandParameter="{Binding ElementName=RouteListComboBox}"/>

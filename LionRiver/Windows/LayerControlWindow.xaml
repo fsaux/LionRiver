@@ -10,7 +10,7 @@
         Title="Layer Control" SizeToContent="WidthAndHeight" ResizeMode="NoResize" 
         ShowInTaskbar="False" Topmost="True" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
 
-    <Border Background="#FF6A6C97" CornerRadius="10" MouseLeftButtonDown="Border_MouseLeftButtonDown" Width="320">
+    <Border Background="{StaticResource LionViolet}" CornerRadius="10" MouseLeftButtonDown="Border_MouseLeftButtonDown" Width="320">
         <Grid Height="Auto"  Width="auto" VerticalAlignment="Top" Margin="3,3,3,3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

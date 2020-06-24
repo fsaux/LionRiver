@@ -534,9 +534,12 @@ namespace LionRiver
 
             routeControl.RouteCtrlHd += new RouteCtrlEventHandler(RouteCtrlCommandReceived);
             marksControl.MarkCtrlHd += new MarkCtrlEventHandler(MarkCtrlCommandReceived);
+            marksControl.LoadButton.Click += new RoutedEventHandler(GPXLoadButton_Click);
+            marksControl.SaveButton.Click += new RoutedEventHandler(GPXSaveButton_Click);
             layerControl.LayerCtrlHd += new LayerControlWindow.LayerCtrlEventHandler(LayerCtrlCommandReceived);
 
             routeControl.LoadButton.Click += new RoutedEventHandler(GPXLoadButton_Click);
+            routeControl.SaveButton.Click += new RoutedEventHandler(GPXSaveButton_Click);
             routeControl.RouteListComboBox.DataContext = routeList;
 
             var GPXFile = Properties.Settings.Default.LastGPXFile;
@@ -556,6 +559,8 @@ namespace LionRiver
 
             gribControl.GribSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(GribSlider_ValueChanged);
             gribControl.NowButton.Click += new RoutedEventHandler(GribNowButton_Click);
+            gribControl.LoadWind.Click += new RoutedEventHandler(GribWindLoadButton_Click);
+            gribControl.LoadCurrent.Click += new RoutedEventHandler(GribCurrentLoadButton_Click);
             gribControl.DisplayWind.Checked += new RoutedEventHandler(GribDisplay_Checked);
             gribControl.DisplayWind.Unchecked += new RoutedEventHandler(GribDisplay_Checked);
             gribControl.DisplayCurrent.Checked += new RoutedEventHandler(GribDisplay_Checked);
@@ -1929,58 +1934,6 @@ namespace LionRiver
                 ShortNavTimer.Interval = new TimeSpan(0, 0, 0, 0, 80);
             }
 
-        }
-
-        private void MenuItem_Setup_Click(object sender, RoutedEventArgs e)
-        {
-
-            SetupWindow SetupWindow1 = new SetupWindow();
-
-            Nullable<bool> result = SetupWindow1.ShowDialog();
-
-            if (result == true)
-            {
-
-                SerialPort1.Close();
-                InitializeSerialPort1();
-                DataReceiverStatus1.Result = RxTxResult.NoRxData;
-
-                SerialPort2.Close();
-                InitializeSerialPort2();
-                DataReceiverStatus2.Result = RxTxResult.NoRxData;
-
-                SerialPort3.Close();
-                InitializeSerialPort3();
-                DataReceiverStatus3.Result = RxTxResult.NoRxData;
-
-                SerialPort4.Close();
-                InitializeSerialPort4();
-                DataReceiverStatus4.Result = RxTxResult.NoRxData;
-
-                MapLayer1.TileSource = new TileSource();
-                MapLayer1.TileSource.UriFormat = "file:\\" + Properties.Settings.Default.Layer1Directory + "\\{z}\\{x}\\{v}.png";
-                MapLayer1.Opacity = Properties.Settings.Default.Layer1Opacity;
-                MapLayer1.MaxZoomLevel = 18;
-
-                MapLayer2.TileSource = new TileSource();
-                MapLayer2.TileSource.UriFormat = "file://" + Properties.Settings.Default.Layer2Directory + "/{z}/{x}/{v}.png";
-                MapLayer2.Opacity = Properties.Settings.Default.Layer2Opacity;
-                MapLayer2.MaxZoomLevel = 18;
-
-                if (LogFile != null)
-                    LogFile.Close();
-
-                try
-                {
-                    LogFile = new StreamWriter(Properties.Settings.Default.LogFile, true);   // Append to existing LogFile
-                    LogFile.AutoFlush = true;
-                    LogFile.WriteLine("");
-                    logging = false;
-                }
-                catch { logging = false; }
-
-                SendPTAKheaders();
-            }
         }
 
         private void MenuItem_WLCourseSetup_Click(object sender, RoutedEventArgs e)
@@ -3592,6 +3545,87 @@ namespace LionRiver
             MapGrid.Children.Remove(routeCalculationControl);
         }
 
+        private void SettingsButton_Checked(object sender, RoutedEventArgs e)
+        {
+            SetupWindow SetupWindow1 = new SetupWindow();
+
+            Nullable<bool> result = SetupWindow1.ShowDialog();
+
+            if (result == true)
+            {
+
+                SerialPort1.Close();
+                InitializeSerialPort1();
+                DataReceiverStatus1.Result = RxTxResult.NoRxData;
+
+                SerialPort2.Close();
+                InitializeSerialPort2();
+                DataReceiverStatus2.Result = RxTxResult.NoRxData;
+
+                SerialPort3.Close();
+                InitializeSerialPort3();
+                DataReceiverStatus3.Result = RxTxResult.NoRxData;
+
+                SerialPort4.Close();
+                InitializeSerialPort4();
+                DataReceiverStatus4.Result = RxTxResult.NoRxData;
+
+                MapLayer1.TileSource = new TileSource();
+                MapLayer1.TileSource.UriFormat = "file:\\" + Properties.Settings.Default.Layer1Directory + "\\{z}\\{x}\\{v}.png";
+                MapLayer1.Opacity = Properties.Settings.Default.Layer1Opacity;
+                MapLayer1.MaxZoomLevel = 18;
+
+                MapLayer2.TileSource = new TileSource();
+                MapLayer2.TileSource.UriFormat = "file://" + Properties.Settings.Default.Layer2Directory + "/{z}/{x}/{v}.png";
+                MapLayer2.Opacity = Properties.Settings.Default.Layer2Opacity;
+                MapLayer2.MaxZoomLevel = 18;
+
+                if (LogFile != null)
+                    LogFile.Close();
+
+                try
+                {
+                    LogFile = new StreamWriter(Properties.Settings.Default.LogFile, true);   // Append to existing LogFile
+                    LogFile.AutoFlush = true;
+                    LogFile.WriteLine("");
+                    logging = false;
+                }
+                catch { logging = false; }
+
+                SendPTAKheaders();
+            }
+
+            SettingsButton.IsChecked = false;
+        }
+
+        private void ReplayButton_Checked(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+            dlg.Title = "Replay Log";
+            dlg.Filter = "Log files|*.log";
+            if (Properties.Settings.Default.LogFile != "")
+                dlg.InitialDirectory = System.IO.Path.GetDirectoryName(Properties.Settings.Default.LogFile);
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                // Read Log
+                string filename = dlg.FileName;
+                if (logging)
+                {
+                    LogFile.Close();
+                    logging = false;
+                }
+
+                replayLog = true;
+                ReplayFile = new StreamReader(filename);
+
+                ShortNavTimer.Interval = new TimeSpan(0, 0, 0, 0, 80);
+            }
+
+        }
+
         private void PlayButton_Checked(object sender, RoutedEventArgs e)
         {
             DateTime dt;
@@ -4433,6 +4467,8 @@ namespace LionRiver
                 }
             }
         }
+
+
 
         private void RouteClearResultsButton_Click(object sender, RoutedEventArgs e)
         {

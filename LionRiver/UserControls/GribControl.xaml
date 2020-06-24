@@ -22,10 +22,12 @@
         </Style>
     </UserControl.Resources>
 
-    <StackPanel Height="Auto" VerticalAlignment="Bottom" Margin="0,0,0,10">
+    <StackPanel Height="Auto" VerticalAlignment="Bottom" Margin="0,0,0,50">
         <!--<CheckBox Content="Wind" Name="GribWindCheck" Margin="5,0,5,5" IsChecked="True" IsEnabled="False" Foreground="Lime" />-->                 
         <DockPanel     Margin="5" LastChildFill="True">
-            <Button Name="NowButton" Content="Now"  Margin="2" IsTabStop="False" VerticalAlignment="Top" />
+            <Button Name="NowButton" Content="Now"  Margin="2" IsTabStop="False" VerticalAlignment="Top" DockPanel.Dock="Right"/>
+            <Button Name="LoadWind" Content="Load Wind"  Margin="2" IsTabStop="False" VerticalAlignment="Top" />
+            <Button Name="LoadCurrent" Content="Load Current"  Margin="2" IsTabStop="False" VerticalAlignment="Top" />
             <CheckBox Name="DisplayWind" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2" />
             <TextBlock Text="Wind" VerticalAlignment="Center" Margin="2" Foreground="White"/>
             <CheckBox Name="DisplayCurrent" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2" />
