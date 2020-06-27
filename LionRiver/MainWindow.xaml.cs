@@ -435,12 +435,12 @@ namespace LionRiver
 
             this.Title = "LionRiver " + GetRunningVersion().ToString();
 
-            StartupWdw = new StartUpWindow();
-            StartupWdw.Show();
+            //StartupWdw = new StartUpWindow();
+            //StartupWdw.Show();
 
             MainWindow_Initialize();
 
-            StartupWdw.Close();
+            //StartupWdw.Close();
         }
 
         private void MainWindow_Initialize()
