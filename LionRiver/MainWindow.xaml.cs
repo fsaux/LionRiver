@@ -458,7 +458,6 @@ namespace LionRiver
                     NavPolar.Load(sr);
                     sr.Close();
                     NavPolar.IsLoaded = true;
-                    SendPTAKheaders();
                 }
                 catch
                 { NavPolar.IsLoaded = false; }
@@ -3591,6 +3590,21 @@ namespace LionRiver
                     logging = false;
                 }
                 catch { logging = false; }
+
+                string pfilename = Properties.Settings.Default.PolarFile;
+
+                if (pfilename != "")
+                {
+                    try
+                    {
+                        StreamReader sr = new StreamReader(pfilename);
+                        NavPolar.Load(sr);
+                        sr.Close();
+                        NavPolar.IsLoaded = true;
+                    }
+                    catch
+                    { NavPolar.IsLoaded = false; }
+                }
 
                 SendPTAKheaders();
             }

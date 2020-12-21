@@ -597,6 +597,7 @@ namespace LionRiver
             {
 
                 message = "IIDPT,"+DPT.Val.ToString("0.#")+",0";
+                //message = "IIDPT,25.4,0";
 
                 int checksum = 0;
 
@@ -640,7 +641,7 @@ namespace LionRiver
                 else
                     cd = "S";
 
-                string lat = deg.ToString("000")+min.ToString("00.###")+","+cd;
+                string lat = deg.ToString("#")+min.ToString("00.####")+","+cd;
 
                 deg = Math.Abs(Math.Truncate(LON.Val));
                 min = (Math.Abs(LON.Val) - deg) * 60;
@@ -650,7 +651,7 @@ namespace LionRiver
                 else
                     cd = "W";
 
-                string lon = deg.ToString("000")+min.ToString("00.###")+","+cd;
+                string lon = deg.ToString("#")+min.ToString("00.####")+","+cd;
 
                 if (MVAR.Val > 0)
                     cd = "E";
@@ -668,6 +669,8 @@ namespace LionRiver
                     checksum ^= Convert.ToByte(c);
 
                 message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
+
+                //message = "$GPRMC,201805,A,3430.6777,S,05828.3632,W,000.0,296.2,211220,008.1,W*67\r\n";
 
                 if (Properties.Settings.Default.NavSentence.OutPort1)
                     if (SerialPort1.IsOpen)
