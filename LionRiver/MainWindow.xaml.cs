@@ -466,11 +466,12 @@ namespace LionRiver
             #endregion
 
             #region Mapping
-            string GDAL_HOME = Directory.GetCurrentDirectory();
-            GDAL_HOME += @"\GDAL";
-            string path = Environment.GetEnvironmentVariable("PATH");
-            path += ";" + GDAL_HOME;
-            SetEnvironmentVariable("PATH", path);
+
+            //string GDAL_HOME = Directory.GetCurrentDirectory();
+            //GDAL_HOME += @"\gdal";
+            //string path = Environment.GetEnvironmentVariable("PATH");
+            //path += ";" + GDAL_HOME;
+            //SetEnvironmentVariable("PATH", path);
 
             //GdalEnvironment.SetupEnvironment(GDAL_HOME);
             //Gdal.AllRegister();

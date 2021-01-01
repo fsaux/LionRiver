@@ -20,7 +20,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <PublishUrl>C:\Users\fsaux\Desktop\LRiver\</PublishUrl>
+    <PublishUrl>C:\Users\fsu\Desktop\LR\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -30,7 +30,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>7</ApplicationRevision>
+    <ApplicationRevision>13</ApplicationRevision>
     <ApplicationVersion>2.3.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -94,6 +94,28 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
@@ -350,6 +372,128 @@
     <Resource Include="Images\LR.png" />
     <Resource Include="Windows\LR.png" />
     <Resource Include="LR.png" />
+    <Resource Include="GDAL\data\bag_template.xml" />
+    <Resource Include="GDAL\data\gdalicon.png" />
+    <Content Include="GDAL\data\GDALLogoBW.svg" />
+    <Content Include="GDAL\data\GDALLogoColor.svg" />
+    <Content Include="GDAL\data\GDALLogoGS.svg" />
+    <Resource Include="GDAL\data\gmlasconf.xml" />
+    <Resource Include="GDAL\data\gml_registry.xml" />
+    <Resource Include="GDAL\data\nitf_spec.xml" />
+    <Resource Include="GDAL\data\pci_datum.txt" />
+    <Resource Include="GDAL\data\pci_ellips.txt" />
+    <Resource Include="GDAL\data\pds4_template.xml" />
+    <Resource Include="GDAL\data\vdv452.xml" />
+    <Resource Include="GDAL\license.txt" />
+    <Content Include="GDAL\share\nad.lst" />
+    <Content Include="GDAL\x64\expat.dll" />
+    <Content Include="GDAL\x64\freexl.dll" />
+    <Content Include="GDAL\x64\gdal204.dll" />
+    <Content Include="GDAL\x64\gdalconst_wrap.dll" />
+    <Content Include="GDAL\x64\gdal_wrap.dll" />
+    <Content Include="GDAL\x64\geos.dll" />
+    <Content Include="GDAL\x64\geos_c.dll" />
+    <Content Include="GDAL\x64\iconv.dll" />
+    <Content Include="GDAL\x64\libcurl.dll" />
+    <Content Include="GDAL\x64\libeay32.dll" />
+    <Content Include="GDAL\x64\libmysql.dll" />
+    <Content Include="GDAL\x64\libpq.dll" />
+    <Content Include="GDAL\x64\libxml2.dll" />
+    <Content Include="GDAL\x64\msvcp140.dll" />
+    <Content Include="GDAL\x64\ogr_wrap.dll" />
+    <Content Include="GDAL\x64\openjp2.dll" />
+    <Content Include="GDAL\x64\osr_wrap.dll" />
+    <Content Include="GDAL\x64\plugins\cfitsio.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_BAG.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_ECW_JP2ECW.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_FITS.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_GMT.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_HDF4.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_HDF4Image.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_HDF5.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_HDF5Image.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_KEA.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_MG4Lidar.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_MrSID.dll" />
+    <Content Include="GDAL\x64\plugins\gdal_netCDF.dll" />
+    <Content Include="GDAL\x64\plugins\hdf5.dll" />
+    <Content Include="GDAL\x64\plugins\hdf5_cpp.dll" />
+    <Content Include="GDAL\x64\plugins\hdf5_hl.dll" />
+    <Content Include="GDAL\x64\plugins\hdfdll.dll" />
+    <Content Include="GDAL\x64\plugins\libecwj2.dll" />
+    <Content Include="GDAL\x64\plugins\libkea.dll" />
+    <Content Include="GDAL\x64\plugins\libpq.dll" />
+    <Content Include="GDAL\x64\plugins\lti_dsdk_9.5.dll" />
+    <Content Include="GDAL\x64\plugins\lti_lidar_dsdk_1.1.dll" />
+    <Content Include="GDAL\x64\plugins\mfhdfdll.dll" />
+    <Content Include="GDAL\x64\plugins\netcdf.dll" />
+    <Content Include="GDAL\x64\plugins\ogr_AmigoCloud.dll" />
+    <Content Include="GDAL\x64\plugins\ogr_MSSQLSpatial.dll" />
+    <Content Include="GDAL\x64\plugins\ogr_PG.dll" />
+    <Content Include="GDAL\x64\plugins\szip.dll" />
+    <Content Include="GDAL\x64\plugins\tbb.dll" />
+    <Content Include="GDAL\x64\plugins\xdrdll.dll" />
+    <Content Include="GDAL\x64\proj.dll" />
+    <Content Include="GDAL\x64\spatialite.dll" />
+    <Content Include="GDAL\x64\sqlite3.dll" />
+    <Content Include="GDAL\x64\ssleay32.dll" />
+    <Content Include="GDAL\x64\vcruntime140.dll" />
+    <Content Include="GDAL\x64\xerces-c_3_2.dll" />
+    <Content Include="GDAL\x64\zlib1.dll" />
+    <Content Include="GDAL\x86\expat.dll" />
+    <Content Include="GDAL\x86\freexl.dll" />
+    <Content Include="GDAL\x86\gdal204.dll" />
+    <Content Include="GDAL\x86\gdalconst_wrap.dll" />
+    <Content Include="GDAL\x86\gdal_wrap.dll" />
+    <Content Include="GDAL\x86\geos.dll" />
+    <Content Include="GDAL\x86\geos_c.dll" />
+    <Content Include="GDAL\x86\iconv.dll" />
+    <Content Include="GDAL\x86\libcurl.dll" />
+    <Content Include="GDAL\x86\libeay32.dll" />
+    <Content Include="GDAL\x86\libmysql.dll" />
+    <Content Include="GDAL\x86\libpq.dll" />
+    <Content Include="GDAL\x86\libxml2.dll" />
+    <Content Include="GDAL\x86\msvcp140.dll" />
+    <Content Include="GDAL\x86\ogr_wrap.dll" />
+    <Content Include="GDAL\x86\openjp2.dll" />
+    <Content Include="GDAL\x86\osr_wrap.dll" />
+    <Content Include="GDAL\x86\plugins\cfitsio.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_BAG.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_ECW_JP2ECW.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_FITS.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_GMT.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_HDF4.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_HDF4Image.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_HDF5.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_HDF5Image.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_KEA.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_MG4Lidar.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_MrSID.dll" />
+    <Content Include="GDAL\x86\plugins\gdal_netCDF.dll" />
+    <Content Include="GDAL\x86\plugins\hdf5.dll" />
+    <Content Include="GDAL\x86\plugins\hdf5_cpp.dll" />
+    <Content Include="GDAL\x86\plugins\hdf5_hl.dll" />
+    <Content Include="GDAL\x86\plugins\hdfdll.dll" />
+    <Content Include="GDAL\x86\plugins\libecwj2.dll" />
+    <Content Include="GDAL\x86\plugins\libkea.dll" />
+    <Content Include="GDAL\x86\plugins\libpq.dll" />
+    <Content Include="GDAL\x86\plugins\lti_dsdk_9.5.dll" />
+    <Content Include="GDAL\x86\plugins\lti_lidar_dsdk_1.1.dll" />
+    <Content Include="GDAL\x86\plugins\mfhdfdll.dll" />
+    <Content Include="GDAL\x86\plugins\netcdf.dll" />
+    <Content Include="GDAL\x86\plugins\ogr_AmigoCloud.dll" />
+    <Content Include="GDAL\x86\plugins\ogr_MSSQLSpatial.dll" />
+    <Content Include="GDAL\x86\plugins\ogr_PG.dll" />
+    <Content Include="GDAL\x86\plugins\szip.dll" />
+    <Content Include="GDAL\x86\plugins\tbb.dll" />
+    <Content Include="GDAL\x86\plugins\xdrdll.dll" />
+    <Content Include="GDAL\x86\proj.dll" />
+    <Content Include="GDAL\x86\spatialite.dll" />
+    <Content Include="GDAL\x86\sqlite3.dll" />
+    <Content Include="GDAL\x86\ssleay32.dll" />
+    <Content Include="GDAL\x86\vcruntime140.dll" />
+    <Content Include="GDAL\x86\xerces-c_3_2.dll" />
+    <Content Include="GDAL\x86\zlib1.dll" />
     <Content Include="X64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -367,6 +511,125 @@
     <Content Include="Databases\LionRiver.sqlite">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="GDAL\data\compdcs.csv" />
+    <None Include="GDAL\data\coordinate_axis.csv" />
+    <None Include="GDAL\data\cubewerx_extra.wkt" />
+    <None Include="GDAL\data\datum_shift.csv" />
+    <None Include="GDAL\data\default.rsc" />
+    <None Include="GDAL\data\ecw_cs.wkt" />
+    <None Include="GDAL\data\eedaconf.json" />
+    <None Include="GDAL\data\ellipsoid.csv" />
+    <None Include="GDAL\data\epsg.wkt" />
+    <None Include="GDAL\data\esri_epsg.wkt" />
+    <None Include="GDAL\data\esri_extra.wkt" />
+    <None Include="GDAL\data\esri_StatePlane_extra.wkt" />
+    <None Include="GDAL\data\esri_Wisconsin_extra.wkt" />
+    <None Include="GDAL\data\gcs.csv" />
+    <None Include="GDAL\data\gcs.override.csv" />
+    <None Include="GDAL\data\gdalvrt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="GDAL\data\gdal_datum.csv" />
+    <None Include="GDAL\data\geoccs.csv" />
+    <None Include="GDAL\data\gmlasconf.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="GDAL\data\gt_datum.csv" />
+    <None Include="GDAL\data\gt_ellips.csv" />
+    <None Include="GDAL\data\header.dxf" />
+    <None Include="GDAL\data\inspire_cp_BasicPropertyUnit.gfs" />
+    <None Include="GDAL\data\inspire_cp_CadastralBoundary.gfs" />
+    <None Include="GDAL\data\inspire_cp_CadastralParcel.gfs" />
+    <None Include="GDAL\data\inspire_cp_CadastralZoning.gfs" />
+    <None Include="GDAL\data\jpfgdgml_AdmArea.gfs" />
+    <None Include="GDAL\data\jpfgdgml_AdmBdry.gfs" />
+    <None Include="GDAL\data\jpfgdgml_AdmPt.gfs" />
+    <None Include="GDAL\data\jpfgdgml_BldA.gfs" />
+    <None Include="GDAL\data\jpfgdgml_BldL.gfs" />
+    <None Include="GDAL\data\jpfgdgml_Cntr.gfs" />
+    <None Include="GDAL\data\jpfgdgml_CommBdry.gfs" />
+    <None Include="GDAL\data\jpfgdgml_CommPt.gfs" />
+    <None Include="GDAL\data\jpfgdgml_Cstline.gfs" />
+    <None Include="GDAL\data\jpfgdgml_ElevPt.gfs" />
+    <None Include="GDAL\data\jpfgdgml_GCP.gfs" />
+    <None Include="GDAL\data\jpfgdgml_LeveeEdge.gfs" />
+    <None Include="GDAL\data\jpfgdgml_RailCL.gfs" />
+    <None Include="GDAL\data\jpfgdgml_RdArea.gfs" />
+    <None Include="GDAL\data\jpfgdgml_RdASL.gfs" />
+    <None Include="GDAL\data\jpfgdgml_RdCompt.gfs" />
+    <None Include="GDAL\data\jpfgdgml_RdEdg.gfs" />
+    <None Include="GDAL\data\jpfgdgml_RdMgtBdry.gfs" />
+    <None Include="GDAL\data\jpfgdgml_RdSgmtA.gfs" />
+    <None Include="GDAL\data\jpfgdgml_RvrMgtBdry.gfs" />
+    <None Include="GDAL\data\jpfgdgml_SBAPt.gfs" />
+    <None Include="GDAL\data\jpfgdgml_SBArea.gfs" />
+    <None Include="GDAL\data\jpfgdgml_SBBdry.gfs" />
+    <None Include="GDAL\data\jpfgdgml_WA.gfs" />
+    <None Include="GDAL\data\jpfgdgml_WL.gfs" />
+    <None Include="GDAL\data\jpfgdgml_WStrA.gfs" />
+    <None Include="GDAL\data\jpfgdgml_WStrL.gfs" />
+    <None Include="GDAL\data\netcdf_config.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="GDAL\data\nitf_spec.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="GDAL\data\ogrvrt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="GDAL\data\osmconf.ini" />
+    <None Include="GDAL\data\ozi_datum.csv" />
+    <None Include="GDAL\data\ozi_ellips.csv" />
+    <None Include="GDAL\data\pcs.csv" />
+    <None Include="GDAL\data\pcs.override.csv" />
+    <None Include="GDAL\data\plscenesconf.json" />
+    <None Include="GDAL\data\prime_meridian.csv" />
+    <None Include="GDAL\data\projop_wparm.csv" />
+    <None Include="GDAL\data\ruian_vf_ob_v1.gfs" />
+    <None Include="GDAL\data\ruian_vf_st_uvoh_v1.gfs" />
+    <None Include="GDAL\data\ruian_vf_st_v1.gfs" />
+    <None Include="GDAL\data\ruian_vf_v1.gfs" />
+    <None Include="GDAL\data\s57agencies.csv" />
+    <None Include="GDAL\data\s57attributes.csv" />
+    <None Include="GDAL\data\s57expectedinput.csv" />
+    <None Include="GDAL\data\s57objectclasses.csv" />
+    <None Include="GDAL\data\seed_2d.dgn" />
+    <None Include="GDAL\data\seed_3d.dgn" />
+    <None Include="GDAL\data\stateplane.csv" />
+    <None Include="GDAL\data\trailer.dxf" />
+    <None Include="GDAL\data\unit_of_measure.csv" />
+    <None Include="GDAL\data\vdv452.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="GDAL\data\vertcs.csv" />
+    <None Include="GDAL\data\vertcs.override.csv" />
+    <None Include="GDAL\GDALLicense.rtf" />
+    <None Include="GDAL\GISInternalsLicense.rtf" />
+    <None Include="GDAL\share\alaska" />
+    <None Include="GDAL\share\conus" />
+    <None Include="GDAL\share\epsg" />
+    <None Include="GDAL\share\esri" />
+    <None Include="GDAL\share\esri.extra" />
+    <None Include="GDAL\share\GL27" />
+    <None Include="GDAL\share\hawaii" />
+    <None Include="GDAL\share\IGNF" />
+    <None Include="GDAL\share\MD" />
+    <None Include="GDAL\share\nad27" />
+    <None Include="GDAL\share\nad83" />
+    <None Include="GDAL\share\ntf_r93.gsb" />
+    <None Include="GDAL\share\ntv1_can.dat" />
+    <None Include="GDAL\share\null" />
+    <None Include="GDAL\share\nzgd2kgrid0005.gsb" />
+    <None Include="GDAL\share\other.extra" />
+    <None Include="GDAL\share\proj_def.dat" />
+    <None Include="GDAL\share\prvi" />
+    <None Include="GDAL\share\stgeorge" />
+    <None Include="GDAL\share\stlrnc" />
+    <None Include="GDAL\share\stpaul" />
+    <None Include="GDAL\share\TN" />
+    <None Include="GDAL\share\WI" />
+    <None Include="GDAL\share\WO" />
+    <None Include="GDAL\share\world" />
     <None Include="LionRiver_TemporaryKey.pfx" />
     <EntityDeploy Include="Model1.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
