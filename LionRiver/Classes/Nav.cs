@@ -553,11 +553,13 @@ namespace LionRiver
 
                     double xx = DSTLYLp.Val / TGTSOGp.Val * 3600 / 1852;
                     if (xx > Int64.MaxValue) xx = Int64.MaxValue;
+                    if (xx < Int64.MinValue) xx = Int64.MinValue;
                     TTGLYLp.Val = TimeSpan.FromSeconds(xx);
                     TTGLYLp.SetValid(now);
 
                     xx = DSTLYLs.Val / TGTSOGs.Val * 3600 / 1852;
                     if (xx > Int64.MaxValue) xx = Int64.MaxValue;
+                    if (xx < Int64.MinValue) xx = Int64.MinValue;
                     TTGLYLs.Val = TimeSpan.FromSeconds(xx);
                     TTGLYLs.SetValid(now);
                 }
@@ -673,6 +675,7 @@ namespace LionRiver
                 {
                     double xx = measureResult.DST / vmc;
                     if (xx > Int64.MaxValue) xx = Int64.MaxValue;
+                    if (xx < Int64.MinValue) xx = Int64.MinValue;
                     measureResult.TTG = TimeSpan.FromHours(xx);
                 }
                 else

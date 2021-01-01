@@ -478,10 +478,10 @@ namespace LionRiver
         {
             try
             {
-                if (port == 0) SerialPort1.WriteLine(msg);
-                if (port == 1) SerialPort2.WriteLine(msg);
-                if (port == 2) SerialPort3.WriteLine(msg);
-                if (port == 3) SerialPort4.WriteLine(msg);
+                if (port == 1) SerialPort1.WriteLine(msg);
+                if (port == 2) SerialPort2.WriteLine(msg);
+                if (port == 3) SerialPort3.WriteLine(msg);
+                if (port == 4) SerialPort4.WriteLine(msg);
             }
             catch
             {
@@ -670,7 +670,7 @@ namespace LionRiver
 
                 message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
 
-                //message = "$GPRMC,201805,A,3430.6777,S,05828.3632,W,000.0,296.2,211220,008.1,W*67\r\n";
+                //message = "$GPRMC,173933,A,3430.6759,S,05828.3633,W,000.1,173.3,291220,008.1,W*68\r\n";
 
                 if (Properties.Settings.Default.NavSentence.OutPort1)
                     if (SerialPort1.IsOpen)
