@@ -4532,7 +4532,7 @@ namespace LionRiver
             replayBoat.Heading = v.BRG;
             replayBoat.WindDirection = v.TWD;
             replayBoat.WindSpeed = v.TWS;
-            replayBoat.CurrentDirection = v.SET;
+            replayBoat.CurrentDirection = v.SET + 180;
             replayBoat.CurrentSpeed = v.DRIFT;
             replayBoat.BoatSpeed = v.SPD;
             replayBoat.Time = v.Cost.ToLocalTime();
