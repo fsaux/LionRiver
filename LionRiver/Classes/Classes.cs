@@ -346,30 +346,49 @@ namespace LionRiver
             if (uvlist.Count() == 4) // We got all four vertices
             {
 
-                double x0 = v[i, j].Lon;
-                double x1 = v[i + 1, j].Lon;
-                double y0 = v[i, j].Lat;
+                //double x0 = v[i, j].Lon;
+                //double x1 = v[i + 1, j].Lon;
+                //double y0 = v[i, j].Lat;
+                //double y1 = v[i, j - 1].Lat;
+
+                //double u00 = v[i, j].u;
+                //double u10 = v[i + 1, j].u;
+                //double u01 = v[i, j - 1].u;
+                //double u11 = v[i + 1, j - 1].u;
+
+                //double ua = u00 + (u10 - u00) * (lon - x0) / (x1 - x0);
+                //double ub = u01 + (u11 - u01) * (lon - x0) / (x1 - x0);
+
+                //uv.u = ua + (ub - ua) * (lat - y0) / (y1 - y0);
+
+                //double v00 = v[i, j].v;
+                //double v10 = v[i + 1, j].v;
+                //double v01 = v[i, j - 1].v;
+                //double v11 = v[i + 1, j - 1].v;
+
+                //double va = v00 + (v10 - v00) * (lon - x0) / (x1 - x0);
+                //double vb = v01 + (v11 - v01) * (lon - x0) / (x1 - x0);
+
+                //uv.v = va + (vb - va) * (lat - y0) / (y1 - y0);
+
+                double x1 = v[i, j - 1].Lon;
+                double x2 = v[i + 1, j].Lon;
                 double y1 = v[i, j - 1].Lat;
+                double y2 = v[i + 1, j].Lat;
 
-                double u00 = v[i, j].u;
-                double u10 = v[i + 1, j].u;
-                double u01 = v[i, j - 1].u;
-                double u11 = v[i + 1, j - 1].u;
+                double u11 = v[i, j-1].u;
+                double u12 = v[i , j].u;
+                double u21 = v[i+1, j - 1].u;
+                double u22 = v[i + 1, j].u;
 
-                double ua = u00 + (u10 - u00) * (lon - x0) / (x1 - x0);
-                double ub = u01 + (u11 - u01) * (lon - x0) / (x1 - x0);
+                uv.u = (u11 * (x2 - lon) * (y2 - lat) + u21 * (lon - x1) * (y2 - lat) + u12 * (x2 - lon) * (lat - y1) + u22 * (lon - x1) * (lat - y1)) / ((x2 - x1) * (y2 - y1));
 
-                uv.u = ua + (ub - ua) * (lat - y0) / (y1 - y0);
+                double v11 = v[i, j - 1].v;
+                double v12 = v[i, j].v;
+                double v21 = v[i + 1, j - 1].v;
+                double v22 = v[i + 1, j].v;
 
-                double v00 = v[i, j].v;
-                double v10 = v[i + 1, j].v;
-                double v01 = v[i, j - 1].v;
-                double v11 = v[i + 1, j - 1].v;
-
-                double va = v00 + (v10 - v00) * (lon - x0) / (x1 - x0);
-                double vb = v01 + (v11 - v01) * (lon - x0) / (x1 - x0);
-
-                uv.v = va + (vb - va) * (lat - y0) / (y1 - y0);
+                uv.v = (v11 * (x2 - lon) * (y2 - lat) + v21 * (lon - x1) * (y2 - lat) + v12 * (x2 - lon) * (lat - y1) + v22 * (lon - x1) * (lat - y1)) / ((x2 - x1) * (y2 - y1));
 
                 return uv;
             }
