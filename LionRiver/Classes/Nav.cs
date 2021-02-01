@@ -552,14 +552,14 @@ namespace LionRiver
                     DSTLYLs.SetValid(now);
 
                     double xx = DSTLYLp.Val / TGTSOGp.Val * 3600 / 1852;
-                    if (xx > Int64.MaxValue) xx = Int64.MaxValue;
-                    if (xx < Int64.MinValue) xx = Int64.MinValue;
+                    if (xx > TimeSpan.MaxValue.TotalHours) xx = TimeSpan.MaxValue.TotalHours - 1;
+                    if (xx < TimeSpan.MinValue.TotalHours) xx = TimeSpan.MinValue.TotalHours + 1;
                     TTGLYLp.Val = TimeSpan.FromSeconds(xx);
                     TTGLYLp.SetValid(now);
 
                     xx = DSTLYLs.Val / TGTSOGs.Val * 3600 / 1852;
-                    if (xx > Int64.MaxValue) xx = Int64.MaxValue;
-                    if (xx < Int64.MinValue) xx = Int64.MinValue;
+                    if (xx > TimeSpan.MaxValue.TotalHours) xx = TimeSpan.MaxValue.TotalHours - 1;
+                    if (xx < TimeSpan.MinValue.TotalHours) xx = TimeSpan.MinValue.TotalHours + 1;
                     TTGLYLs.Val = TimeSpan.FromSeconds(xx);
                     TTGLYLs.SetValid(now);
                 }
@@ -674,8 +674,8 @@ namespace LionRiver
                 if (vmc != 0)
                 {
                     double xx = measureResult.DST / vmc;
-                    if (xx > Int64.MaxValue) xx = Int64.MaxValue;
-                    if (xx < Int64.MinValue) xx = Int64.MinValue;
+                    if (xx > TimeSpan.MaxValue.TotalHours) xx = TimeSpan.MaxValue.TotalHours-1;
+                    if (xx < TimeSpan.MinValue.TotalHours) xx = TimeSpan.MinValue.TotalHours+1;
                     measureResult.TTG = TimeSpan.FromHours(xx);
                 }
                 else
