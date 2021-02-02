@@ -373,9 +373,9 @@ namespace LionRiver
                     case "MWV":
                         if (port == Properties.Settings.Default.AppWindSentence.InPort)
                         {
-                            if (msg[2] == "R")
+                            try
                             {
-                                try
+                                if (msg[2] == "R")
                                 {
                                     awa = double.Parse(msg[1]);
                                     aws = double.Parse(msg[3]);
@@ -391,11 +391,12 @@ namespace LionRiver
                                     mwv_received = true;
                                     MarkDataReceivedOnNMEA(port);
                                 }
-                                catch (Exception)
-                                {
-                                    MarkErrorOnNMEA(port, "Bad MWV sentence");
-                                }
                             }
+                            catch (Exception)
+                            {
+                                MarkErrorOnNMEA(port, "Bad MWV sentence");
+                            }
+                            
                         }
                         break;
 
