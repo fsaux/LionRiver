@@ -5147,55 +5147,59 @@ namespace LionRiver
                 Dictionary<string, List<DateModel>> result = null;
 
                 if (Selector != null)
+                {
                     result = GetPlotValues(Selector.Name, logEntries, StartTime, EndTime);
 
-                if (result != null && result.Count() != 0)
-                {
-                    switch (Selector.Group)
+                    if (result != null && result.Count() != 0)
                     {
-                        case "A":
-                            MainPlotValues.Clear();
-                            MainPlotValues.AddRange(result["_single"]);
-                            break;
+                        switch (Selector.Group)
+                        {
+                            case "A":
+                                MainPlotValues.Clear();
+                                MainPlotValues.AddRange(result["_single"]);
+                                break;
 
-                        case "B":
-                            foreach(KeyValuePair<string,List<DateModel>> kvp in result)
-                            {
-                                MainFleetPlotValues[kvp.Key].Clear();
-                                MainFleetPlotValues[kvp.Key].AddRange(kvp.Value);
-                            }
-                            break;
+                            case "B":
+                                foreach (KeyValuePair<string, List<DateModel>> kvp in result)
+                                {
+                                    MainFleetPlotValues[kvp.Key].Clear();
+                                    MainFleetPlotValues[kvp.Key].AddRange(kvp.Value);
+                                }
+                                break;
+                        }
+                        NavPlotModel.MinY1AxisValue = Selector.MinValue;
+                        NavPlotModel.MaxY1AxisValue = Selector.MaxValue;
+                        NavPlotModel.Y1Formatter = Selector.Formatter;
                     }
-                    NavPlotModel.MinY1AxisValue = Selector.MinValue;
-                    NavPlotModel.MaxY1AxisValue = Selector.MaxValue;
-                    NavPlotModel.Y1Formatter = Selector.Formatter;
                 }
 
                 Selector = AuxPlotSelectionComboBox.SelectedItem as PlotSelector;
 
                 if (Selector != null)
+                {
                     result = GetPlotValues(Selector.Name, logEntries, StartTime, EndTime);
 
-                if (result != null && result.Count() != 0)
-                {
-                    switch (Selector.Group)
+                    if (result != null && result.Count() != 0)
                     {
-                        case "A":
-                            AuxPlotValues.Clear();
-                            AuxPlotValues.AddRange(result["_single"]);
-                            break;
+                        switch (Selector.Group)
+                        {
+                            case "A":
+                                AuxPlotValues.Clear();
+                                AuxPlotValues.AddRange(result["_single"]);
+                                break;
 
-                        case "B":
-                            foreach (KeyValuePair<string, List<DateModel>> kvp in result)
-                            {
-                                AuxFleetPlotValues[kvp.Key].Clear();
-                                AuxFleetPlotValues[kvp.Key].AddRange(kvp.Value);
-                            }
-                            break;
+                            case "B":
+                                foreach (KeyValuePair<string, List<DateModel>> kvp in result)
+                                {
+                                    AuxFleetPlotValues[kvp.Key].Clear();
+                                    AuxFleetPlotValues[kvp.Key].AddRange(kvp.Value);
+                                }
+                                break;
+                        }
+                        NavPlotModel.MinY2AxisValue = Selector.MinValue;
+                        NavPlotModel.MaxY2AxisValue = Selector.MaxValue;
+                        NavPlotModel.Y2Formatter = Selector.Formatter;
                     }
-                    NavPlotModel.MinY2AxisValue = Selector.MinValue;
-                    NavPlotModel.MaxY2AxisValue = Selector.MaxValue;
-                    NavPlotModel.Y2Formatter = Selector.Formatter;
                 }
             }
         }
