@@ -467,16 +467,6 @@ namespace LionRiver
 
             #region Mapping
 
-            //string GDAL_HOME = Directory.GetCurrentDirectory();
-            //GDAL_HOME += @"\gdal";
-            //string path = Environment.GetEnvironmentVariable("PATH");
-            //path += ";" + GDAL_HOME;
-            //SetEnvironmentVariable("PATH", path);
-
-            //GdalEnvironment.SetupEnvironment(GDAL_HOME);
-            //Gdal.AllRegister();
-            //Ogr.RegisterAll();
-
             GdalConfiguration.ConfigureGdal();
             GdalConfiguration.ConfigureOgr();
 
@@ -527,6 +517,42 @@ namespace LionRiver
             map.Children.Add(measureRange);
             this.mapMeasureControl.DataContext = measureResult;
 
+            bearingTargetsVisible = Properties.Settings.Default.TargetBearingsCheck;
+            laylinesVisible = Properties.Settings.Default.LaylinesCheck;
+
+            map.Children.Add(StbLaylineTo);
+            map.Children.Add(PrtLaylineTo);
+            map.Children.Add(StbLaylineFrom);
+            map.Children.Add(PrtLaylineFrom);
+            map.Children.Add(StbBearingTarget);
+            map.Children.Add(PrtBearingTarget);
+
+            StbLaylineTo.Stroke = Brushes.LimeGreen;
+            StbLaylineTo.StrokeThickness = 1;
+            //StbLaylineTo.StrokeDashArray = new DoubleCollection() { 1, 6 };
+
+            PrtLaylineTo.Stroke = Brushes.Red;
+            PrtLaylineTo.StrokeThickness = 1;
+            //PrtLaylineTo.StrokeDashArray = new DoubleCollection() { 1, 6 };
+
+            StbLaylineFrom.Stroke = Brushes.LimeGreen;
+            StbLaylineFrom.StrokeThickness = 1;
+            StbLaylineFrom.StrokeDashArray = new DoubleCollection() { 1, 6 };
+
+            PrtLaylineFrom.Stroke = Brushes.Red;
+            PrtLaylineFrom.StrokeThickness = 1;
+            PrtLaylineFrom.StrokeDashArray = new DoubleCollection() { 1, 6 };
+
+            StbBearingTarget.Stroke = Brushes.LimeGreen;
+            StbBearingTarget.StrokeThickness = 1;
+            //StbBearingTarget.StrokeDashArray = new DoubleCollection() { 1, 6 };
+
+            PrtBearingTarget.Stroke = Brushes.Red;
+            PrtBearingTarget.StrokeThickness = 1;
+            //PrtBearingTarget.StrokeDashArray = new DoubleCollection() { 1, 6 };
+
+            HitP.DataContext = HitPointPort;
+            HitS.DataContext = HitPointStbd;
 
             #endregion
 
@@ -877,47 +903,6 @@ namespace LionRiver
             #region Starting Line
             //map.Children.Add(lineBoatMark);
             //map.Children.Add(linePinMark);
-            #endregion
-
-            #region MapItems
-            bearingTargetsVisible = Properties.Settings.Default.TargetBearingsCheck;
-            laylinesVisible = Properties.Settings.Default.LaylinesCheck;
-
-            map.Children.Add(StbLaylineTo);
-            map.Children.Add(PrtLaylineTo);
-            map.Children.Add(StbLaylineFrom);
-            map.Children.Add(PrtLaylineFrom);
-            map.Children.Add(StbBearingTarget);
-            map.Children.Add(PrtBearingTarget);
-
-            StbLaylineTo.Stroke = Brushes.LimeGreen;
-            StbLaylineTo.StrokeThickness = 1;
-            //StbLaylineTo.StrokeDashArray = new DoubleCollection() { 1, 6 };
-
-            PrtLaylineTo.Stroke = Brushes.Red;
-            PrtLaylineTo.StrokeThickness = 1;
-            //PrtLaylineTo.StrokeDashArray = new DoubleCollection() { 1, 6 };
-
-            StbLaylineFrom.Stroke = Brushes.LimeGreen;
-            StbLaylineFrom.StrokeThickness = 1;
-            StbLaylineFrom.StrokeDashArray = new DoubleCollection() { 1, 6 };
-
-            PrtLaylineFrom.Stroke = Brushes.Red;
-            PrtLaylineFrom.StrokeThickness = 1;
-            PrtLaylineFrom.StrokeDashArray = new DoubleCollection() { 1, 6 };
-
-            StbBearingTarget.Stroke = Brushes.LimeGreen;
-            StbBearingTarget.StrokeThickness = 1;
-            //StbBearingTarget.StrokeDashArray = new DoubleCollection() { 1, 6 };
-
-            PrtBearingTarget.Stroke = Brushes.Red;
-            PrtBearingTarget.StrokeThickness = 1;
-            //PrtBearingTarget.StrokeDashArray = new DoubleCollection() { 1, 6 };
-
-            HitP.DataContext = HitPointPort;
-            HitS.DataContext = HitPointStbd;
-
-
             #endregion
 
             #region Timers
@@ -4142,7 +4127,7 @@ namespace LionRiver
 
         #endregion
 
-        #region Routing
+        #region Weather Routing
 
         public List<Vertex> RoutingGridGenerate(Location StartLocation, Location EndLocation, int size, out Vertex StartVertex, out Vertex EndVertex)
         {
