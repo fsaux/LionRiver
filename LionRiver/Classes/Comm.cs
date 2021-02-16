@@ -236,6 +236,7 @@ namespace LionRiver
         {
             if (message != "")
             {
+                message += "\n";
 
                 string[] msg=null;
                 string NMEASentence;
@@ -275,6 +276,21 @@ namespace LionRiver
 
                                 rmc_received = true;
                                 MarkDataReceivedOnNMEA(port);
+
+                                //Relay Out Sentence    
+
+                                if (Properties.Settings.Default.NavSentence.OutPort1)
+                                    if (SerialPort1.IsOpen)
+                                        WriteSerial(1, message);
+                                if (Properties.Settings.Default.NavSentence.OutPort2)
+                                    if (SerialPort2.IsOpen)
+                                        WriteSerial(2, message);
+                                if (Properties.Settings.Default.NavSentence.OutPort3)
+                                    if (SerialPort3.IsOpen)
+                                        WriteSerial(3, message);
+                                if (Properties.Settings.Default.NavSentence.OutPort4)
+                                    if (SerialPort4.IsOpen)
+                                        WriteSerial(4, message);
                             }
                             catch (Exception)
                             {
@@ -333,6 +349,21 @@ namespace LionRiver
                             }
 
                             MarkDataReceivedOnNMEA(port);
+
+                            //Relay Out Sentence 
+
+                            if (Properties.Settings.Default.HullSpeedSentence.OutPort1)
+                                if (SerialPort1.IsOpen)
+                                    WriteSerial(1, message);
+                            if (Properties.Settings.Default.HullSpeedSentence.OutPort2)
+                                if (SerialPort2.IsOpen)
+                                    WriteSerial(2, message);
+                            if (Properties.Settings.Default.HullSpeedSentence.OutPort3)
+                                if (SerialPort3.IsOpen)
+                                    WriteSerial(3, message);
+                            if (Properties.Settings.Default.HullSpeedSentence.OutPort4)
+                                if (SerialPort4.IsOpen)
+                                    WriteSerial(4, message);
                         }
                         break;
 
@@ -345,6 +376,21 @@ namespace LionRiver
 
                                 dpt_received = true;
                                 MarkDataReceivedOnNMEA(port);
+
+                                //Relay Out Sentence 
+
+                                if (Properties.Settings.Default.DepthSentence.OutPort1)
+                                    if (SerialPort1.IsOpen)
+                                        WriteSerial(1, message);
+                                if (Properties.Settings.Default.DepthSentence.OutPort2)
+                                    if (SerialPort2.IsOpen)
+                                        WriteSerial(2, message);
+                                if (Properties.Settings.Default.DepthSentence.OutPort3)
+                                    if (SerialPort3.IsOpen)
+                                        WriteSerial(3, message);
+                                if (Properties.Settings.Default.DepthSentence.OutPort4)
+                                    if (SerialPort4.IsOpen)
+                                        WriteSerial(4, message);
                             }
                             catch (Exception)
                             {
@@ -362,6 +408,21 @@ namespace LionRiver
 
                                 dpt_received = true;
                                 MarkDataReceivedOnNMEA(port);
+
+                                //Relay Out Sentence 
+
+                                if (Properties.Settings.Default.DepthSentence.OutPort1)
+                                    if (SerialPort1.IsOpen)
+                                        WriteSerial(1, message);
+                                if (Properties.Settings.Default.DepthSentence.OutPort2)
+                                    if (SerialPort2.IsOpen)
+                                        WriteSerial(2, message);
+                                if (Properties.Settings.Default.DepthSentence.OutPort3)
+                                    if (SerialPort3.IsOpen)
+                                        WriteSerial(3, message);
+                                if (Properties.Settings.Default.DepthSentence.OutPort4)
+                                    if (SerialPort4.IsOpen)
+                                        WriteSerial(4, message);
                             }
                             catch (Exception)
                             {
@@ -390,6 +451,21 @@ namespace LionRiver
 
                                     mwv_received = true;
                                     MarkDataReceivedOnNMEA(port);
+
+                                    //Relay Out Sentence 
+
+                                    if (Properties.Settings.Default.AppWindSentence.OutPort1)
+                                        if (SerialPort1.IsOpen)
+                                            WriteSerial(1, message);
+                                    if (Properties.Settings.Default.AppWindSentence.OutPort2)
+                                        if (SerialPort2.IsOpen)
+                                            WriteSerial(2, message);
+                                    if (Properties.Settings.Default.AppWindSentence.OutPort3)
+                                        if (SerialPort3.IsOpen)
+                                            WriteSerial(3, message);
+                                    if (Properties.Settings.Default.AppWindSentence.OutPort4)
+                                        if (SerialPort4.IsOpen)
+                                            WriteSerial(4, message);
                                 }
                             }
                             catch (Exception)
@@ -422,6 +498,21 @@ namespace LionRiver
 
                                 hdg_received = true;
                                 MarkDataReceivedOnNMEA(port);
+
+                                //Relay Out Sentence 
+
+                                if (Properties.Settings.Default.HeadingSentence.OutPort1)
+                                    if (SerialPort1.IsOpen)
+                                        WriteSerial(1, message);
+                                if (Properties.Settings.Default.HeadingSentence.OutPort2)
+                                    if (SerialPort2.IsOpen)
+                                        WriteSerial(2, message);
+                                if (Properties.Settings.Default.HeadingSentence.OutPort3)
+                                    if (SerialPort3.IsOpen)
+                                        WriteSerial(3, message);
+                                if (Properties.Settings.Default.HeadingSentence.OutPort4)
+                                    if (SerialPort4.IsOpen)
+                                        WriteSerial(4, message);
                             }
                             catch (Exception)
                             {
@@ -439,6 +530,21 @@ namespace LionRiver
 
                                 mtw_received = true;
                                 MarkDataReceivedOnNMEA(port);
+
+                                //Relay Out Sentence 
+
+                                if (Properties.Settings.Default.WaterTempSentence.OutPort1)
+                                    if (SerialPort1.IsOpen)
+                                        WriteSerial(1, message);
+                                if (Properties.Settings.Default.WaterTempSentence.OutPort2)
+                                    if (SerialPort2.IsOpen)
+                                        WriteSerial(2, message);
+                                if (Properties.Settings.Default.WaterTempSentence.OutPort3)
+                                    if (SerialPort3.IsOpen)
+                                        WriteSerial(3, message);
+                                if (Properties.Settings.Default.WaterTempSentence.OutPort4)
+                                    if (SerialPort4.IsOpen)
+                                        WriteSerial(4, message);
                             }
                             catch (Exception)
                             {
@@ -494,199 +600,229 @@ namespace LionRiver
         {
             string message;
 
-            // Build HDG Sentence ****************************************************************************************
+            // #CommRework - All primitive NMEA sentences are relayed inmeditely
 
-            if (HDT.IsValid())  // Implies MVAR is valid too
-            {
+            //// Build HDG Sentence ****************************************************************************************
 
-                string mv;
+            //if (HDT.IsValid())  // Implies MVAR is valid too
+            //{
 
-                if (MVAR.Val > 0)
-                    mv = "E";
-                else
-                    mv = "W";
+            //    string mv;
 
-                double hdg = (HDT.Val - MVAR.Val + 360) % 360;
+            //    if (MVAR.Val > 0)
+            //        mv = "E";
+            //    else
+            //        mv = "W";
 
-                message = "IIHDG," + hdg.ToString("0.#") + ",,," + Math.Abs(MVAR.Val).ToString("0.#") + "," + mv;
+            //    double hdg = (HDT.Val - MVAR.Val + 360) % 360;
 
-                int checksum = 0;
+            //    message = "IIHDG," + hdg.ToString("0.#") + ",,," + Math.Abs(MVAR.Val).ToString("0.#") + "," + mv;
 
-                foreach (char c in message)
-                    checksum ^= Convert.ToByte(c);
+            //    int checksum = 0;
 
-                message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
+            //    foreach (char c in message)
+            //        checksum ^= Convert.ToByte(c);
 
-                if (Properties.Settings.Default.HeadingSentence.OutPort1)
-                    if (SerialPort1.IsOpen)
-                        WriteSerial(1,message);
-                if (Properties.Settings.Default.HeadingSentence.OutPort2)
-                    if (SerialPort2.IsOpen)
-                        WriteSerial(2,message);
-                if (Properties.Settings.Default.HeadingSentence.OutPort3)
-                    if (SerialPort3.IsOpen)
-                        WriteSerial(3,message);
-                if (Properties.Settings.Default.HeadingSentence.OutPort4)
-                    if (SerialPort4.IsOpen)
-                        WriteSerial(4,message);
-            }
+            //    message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
 
-            // Build MWV Sentence ****************************************************************************************
+            //    if (Properties.Settings.Default.HeadingSentence.OutPort1)
+            //        if (SerialPort1.IsOpen)
+            //            WriteSerial(1,message);
+            //    if (Properties.Settings.Default.HeadingSentence.OutPort2)
+            //        if (SerialPort2.IsOpen)
+            //            WriteSerial(2,message);
+            //    if (Properties.Settings.Default.HeadingSentence.OutPort3)
+            //        if (SerialPort3.IsOpen)
+            //            WriteSerial(3,message);
+            //    if (Properties.Settings.Default.HeadingSentence.OutPort4)
+            //        if (SerialPort4.IsOpen)
+            //            WriteSerial(4,message);
+            //}
+
+            //// Build MWV Sentence ****************************************************************************************
             
-            if (AWA.IsValid())
-            {
+            //if (AWA.IsValid())
+            //{
 
-                message = "IIMWV," + ((AWA.Val+360)%360).ToString("0") + ",R," + AWS.Val.ToString("0.#") + ",N,A";
+            //    message = "IIMWV," + ((AWA.Val+360)%360).ToString("0") + ",R," + AWS.Val.ToString("0.#") + ",N,A";
 
-                int checksum = 0;
+            //    int checksum = 0;
 
-                foreach (char c in message)
-                    checksum ^= Convert.ToByte(c);
+            //    foreach (char c in message)
+            //        checksum ^= Convert.ToByte(c);
 
-                message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
+            //    message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
 
-                if (Properties.Settings.Default.AppWindSentence.OutPort1)
-                    if(SerialPort1.IsOpen)
-                        WriteSerial(1,message);
-                if (Properties.Settings.Default.AppWindSentence.OutPort2)
-                    if (SerialPort2.IsOpen)
-                        WriteSerial(2,message);
-                if (Properties.Settings.Default.AppWindSentence.OutPort3)
-                    if (SerialPort3.IsOpen)
-                        WriteSerial(3,message);
-                if (Properties.Settings.Default.AppWindSentence.OutPort4)
-                    if (SerialPort4.IsOpen)
-                        WriteSerial(4,message); 
-            }
+            //    if (Properties.Settings.Default.AppWindSentence.OutPort1)
+            //        if(SerialPort1.IsOpen)
+            //            WriteSerial(1,message);
+            //    if (Properties.Settings.Default.AppWindSentence.OutPort2)
+            //        if (SerialPort2.IsOpen)
+            //            WriteSerial(2,message);
+            //    if (Properties.Settings.Default.AppWindSentence.OutPort3)
+            //        if (SerialPort3.IsOpen)
+            //            WriteSerial(3,message);
+            //    if (Properties.Settings.Default.AppWindSentence.OutPort4)
+            //        if (SerialPort4.IsOpen)
+            //            WriteSerial(4,message); 
+            //}
 
-            // Build VHW Sentence ****************************************************************************************
+            //// Build VHW Sentence ****************************************************************************************
 
-            if (SPD.IsValid())
-            {
-                string hdg;
-                if (HDT.IsValid())
-                    hdg = HDT.Val.ToString("0") + ",T,,M,";
-                else
-                    hdg = ",T,,M,";
+            //if (SPD.IsValid())
+            //{
+            //    string hdg;
+            //    if (HDT.IsValid())
+            //        hdg = HDT.Val.ToString("0") + ",T,,M,";
+            //    else
+            //        hdg = ",T,,M,";
 
-                message = "IIVHW," + hdg + SPD.Val.ToString("0.##") + ",N,,K";
+            //    message = "IIVHW," + hdg + SPD.Val.ToString("0.##") + ",N,,K";
 
-                int checksum = 0;
+            //    int checksum = 0;
 
-                foreach (char c in message)
-                    checksum ^= Convert.ToByte(c);
+            //    foreach (char c in message)
+            //        checksum ^= Convert.ToByte(c);
 
-                message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
+            //    message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
 
-                if (Properties.Settings.Default.HullSpeedSentence.OutPort1)
-                    if (SerialPort1.IsOpen)
-                        WriteSerial(1,message);
-                if (Properties.Settings.Default.HullSpeedSentence.OutPort2)
-                    if (SerialPort2.IsOpen)
-                        WriteSerial(2,message);
-                if (Properties.Settings.Default.HullSpeedSentence.OutPort3)
-                    if (SerialPort3.IsOpen)
-                        WriteSerial(3,message);
-                if (Properties.Settings.Default.HullSpeedSentence.OutPort4)
-                    if (SerialPort4.IsOpen)
-                        WriteSerial(4,message);    
-            }
+            //    if (Properties.Settings.Default.HullSpeedSentence.OutPort1)
+            //        if (SerialPort1.IsOpen)
+            //            WriteSerial(1,message);
+            //    if (Properties.Settings.Default.HullSpeedSentence.OutPort2)
+            //        if (SerialPort2.IsOpen)
+            //            WriteSerial(2,message);
+            //    if (Properties.Settings.Default.HullSpeedSentence.OutPort3)
+            //        if (SerialPort3.IsOpen)
+            //            WriteSerial(3,message);
+            //    if (Properties.Settings.Default.HullSpeedSentence.OutPort4)
+            //        if (SerialPort4.IsOpen)
+            //            WriteSerial(4,message);    
+            //}
 
-            // Build DPT Sentence ****************************************************************************************
+            //// Build DPT Sentence ****************************************************************************************
 
-            if (DPT.IsValid())
-            {
+            //if (DPT.IsValid())
+            //{
 
-                message = "IIDPT,"+DPT.Val.ToString("0.#")+",0";
-                //message = "IIDPT,25.4,0";
+            //    message = "IIDPT,"+DPT.Val.ToString("0.#")+",0";
+            //    //message = "IIDPT,25.4,0";
 
-                int checksum = 0;
+            //    int checksum = 0;
 
-                foreach (char c in message)
-                    checksum ^= Convert.ToByte(c);
+            //    foreach (char c in message)
+            //        checksum ^= Convert.ToByte(c);
 
-                message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
+            //    message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
 
-                if (Properties.Settings.Default.DepthSentence.OutPort1)
-                    if (SerialPort1.IsOpen)
-                        WriteSerial(1,message);
-                if (Properties.Settings.Default.DepthSentence.OutPort2)
-                    if (SerialPort2.IsOpen)
-                        WriteSerial(2,message);
-                if (Properties.Settings.Default.DepthSentence.OutPort3)
-                    if (SerialPort3.IsOpen)
-                        WriteSerial(3,message);
-                if (Properties.Settings.Default.DepthSentence.OutPort4)
-                    if (SerialPort4.IsOpen)
-                        WriteSerial(4,message); 
-            }
-
-            // Build RMC Sentence ****************************************************************************************
-
-            if (COG.IsValid())   // Implies SOG, LAT and LON are also valid
-            {
-
-                DateTime UTC = DateTime.UtcNow;
-
-                string hms = UTC.Hour.ToString("00") + UTC.Minute.ToString("00") + UTC.Second.ToString("00");
-                string date = UTC.Date.Day.ToString("00") + UTC.Date.Month.ToString("00") + UTC.Date.Year.ToString().Substring(2, 2);
-
-                double deg, min;
-                string cd;
+            //    if (Properties.Settings.Default.DepthSentence.OutPort1)
+            //        if (SerialPort1.IsOpen)
+            //            WriteSerial(1,message);
+            //    if (Properties.Settings.Default.DepthSentence.OutPort2)
+            //        if (SerialPort2.IsOpen)
+            //            WriteSerial(2,message);
+            //    if (Properties.Settings.Default.DepthSentence.OutPort3)
+            //        if (SerialPort3.IsOpen)
+            //            WriteSerial(3,message);
+            //    if (Properties.Settings.Default.DepthSentence.OutPort4)
+            //        if (SerialPort4.IsOpen)
+            //            WriteSerial(4,message); 
+            //}
  
-                deg = Math.Abs(Math.Truncate(LAT.Val));
-                min = (Math.Abs(LAT.Val) - deg) * 60;
+            //// Build RMC Sentence ****************************************************************************************
 
-                if (LAT.Val > 0)
-                    cd = "N";
-                else
-                    cd = "S";
+            //if (COG.IsValid())   // Implies SOG, LAT and LON are also valid
+            //{
 
-                string lat = deg.ToString("#")+min.ToString("00.####")+","+cd;
+            //    DateTime UTC = DateTime.UtcNow;
 
-                deg = Math.Abs(Math.Truncate(LON.Val));
-                min = (Math.Abs(LON.Val) - deg) * 60;
+            //    string hms = UTC.Hour.ToString("00") + UTC.Minute.ToString("00") + UTC.Second.ToString("00");
+            //    string date = UTC.Date.Day.ToString("00") + UTC.Date.Month.ToString("00") + UTC.Date.Year.ToString().Substring(2, 2);
 
-                if (LON.Val > 0)
-                    cd = "E";
-                else
-                    cd = "W";
+            //    double deg, min;
+            //    string cd;
+ 
+            //    deg = Math.Abs(Math.Truncate(LAT.Val));
+            //    min = (Math.Abs(LAT.Val) - deg) * 60;
 
-                string lon = deg.ToString("#")+min.ToString("00.####")+","+cd;
+            //    if (LAT.Val > 0)
+            //        cd = "N";
+            //    else
+            //        cd = "S";
 
-                if (MVAR.Val > 0)
-                    cd = "E";
-                else
-                    cd = "W";
+            //    string lat = deg.ToString("#")+min.ToString("00.####")+","+cd;
 
-                double cog = (COG.Val + 360) % 360;
+            //    deg = Math.Abs(Math.Truncate(LON.Val));
+            //    min = (Math.Abs(LON.Val) - deg) * 60;
 
-                message = "IIRMC," + hms + ",A," + lat + "," + lon + "," + SOG.Val.ToString("#.##") + "," + cog.ToString("0.#") + ","
-                    + date + "," + Math.Abs(MVAR.Val).ToString("0.#") + "," + cd + ",A";
+            //    if (LON.Val > 0)
+            //        cd = "E";
+            //    else
+            //        cd = "W";
 
-                int checksum = 0;
+            //    string lon = deg.ToString("#")+min.ToString("00.####")+","+cd;
 
-                foreach (char c in message)
-                    checksum ^= Convert.ToByte(c);
+            //    if (MVAR.Val > 0)
+            //        cd = "E";
+            //    else
+            //        cd = "W";
 
-                message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
+            //    double cog = (COG.Val + 360) % 360;
 
-                //message = "$GPRMC,173933,A,3430.6759,S,05828.3633,W,000.1,173.3,291220,008.1,W*68\r\n";
+            //    message = "IIRMC," + hms + ",A," + lat + "," + lon + "," + SOG.Val.ToString("#.##") + "," + cog.ToString("0.#") + ","
+            //        + date + "," + Math.Abs(MVAR.Val).ToString("0.#") + "," + cd + ",A";
 
-                if (Properties.Settings.Default.NavSentence.OutPort1)
-                    if (SerialPort1.IsOpen)
-                        WriteSerial(1,message);
-                if (Properties.Settings.Default.NavSentence.OutPort2)
-                    if (SerialPort2.IsOpen)
-                        WriteSerial(2,message);
-                if (Properties.Settings.Default.NavSentence.OutPort3)
-                    if (SerialPort3.IsOpen)
-                        WriteSerial(3,message);
-                if (Properties.Settings.Default.NavSentence.OutPort4)
-                    if (SerialPort4.IsOpen)
-                        WriteSerial(4,message); 
-            }
+            //    int checksum = 0;
 
+            //    foreach (char c in message)
+            //        checksum ^= Convert.ToByte(c);
+
+            //    message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
+
+            //    //message = "$GPRMC,173933,A,3430.6759,S,05828.3633,W,000.1,173.3,291220,008.1,W*68\r\n";
+
+            //    if (Properties.Settings.Default.NavSentence.OutPort1)
+            //        if (SerialPort1.IsOpen)
+            //            WriteSerial(1,message);
+            //    if (Properties.Settings.Default.NavSentence.OutPort2)
+            //        if (SerialPort2.IsOpen)
+            //            WriteSerial(2,message);
+            //    if (Properties.Settings.Default.NavSentence.OutPort3)
+            //        if (SerialPort3.IsOpen)
+            //            WriteSerial(3,message);
+            //    if (Properties.Settings.Default.NavSentence.OutPort4)
+            //        if (SerialPort4.IsOpen)
+            //            WriteSerial(4,message); 
+            //}
+
+            //// Build MTW Sentence ****************************************************************************************
+
+            //if (TEMP.IsValid())
+            //{
+
+            //    message = "IIMTW," + TEMP.Val.ToString("0.#") + ",C";
+
+            //    int checksum = 0;
+
+            //    foreach (char c in message)
+            //        checksum ^= Convert.ToByte(c);
+
+            //    message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
+
+            //    if (Properties.Settings.Default.WaterTempSentence.OutPort1)
+            //        if (SerialPort1.IsOpen)
+            //            WriteSerial(1,message);
+            //    if (Properties.Settings.Default.WaterTempSentence.OutPort2)
+            //        if (SerialPort2.IsOpen)
+            //            WriteSerial(2,message);
+            //    if (Properties.Settings.Default.WaterTempSentence.OutPort3)
+            //        if (SerialPort3.IsOpen)
+            //            WriteSerial(3,message);
+            //    if (Properties.Settings.Default.WaterTempSentence.OutPort4)
+            //        if (SerialPort4.IsOpen)
+            //            WriteSerial(4,message); 
+            //}
+            
             // Build RMB Sentence ****************************************************************************************
 
             if (WPT.IsValid())   // Implies BRG and DST are also valid
@@ -725,34 +861,6 @@ namespace LionRiver
                     if (SerialPort3.IsOpen)
                         WriteSerial(3,message);
                 if (Properties.Settings.Default.RouteSentence.OutPort4)
-                    if (SerialPort4.IsOpen)
-                        WriteSerial(4,message); 
-            }
-
-            // Build MTW Sentence ****************************************************************************************
-
-            if (TEMP.IsValid())
-            {
-
-                message = "IIMTW," + TEMP.Val.ToString("0.#") + ",C";
-
-                int checksum = 0;
-
-                foreach (char c in message)
-                    checksum ^= Convert.ToByte(c);
-
-                message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
-
-                if (Properties.Settings.Default.WaterTempSentence.OutPort1)
-                    if (SerialPort1.IsOpen)
-                        WriteSerial(1,message);
-                if (Properties.Settings.Default.WaterTempSentence.OutPort2)
-                    if (SerialPort2.IsOpen)
-                        WriteSerial(2,message);
-                if (Properties.Settings.Default.WaterTempSentence.OutPort3)
-                    if (SerialPort3.IsOpen)
-                        WriteSerial(3,message);
-                if (Properties.Settings.Default.WaterTempSentence.OutPort4)
                     if (SerialPort4.IsOpen)
                         WriteSerial(4,message); 
             }
