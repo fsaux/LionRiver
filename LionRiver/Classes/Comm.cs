@@ -24,6 +24,14 @@ namespace LionRiver
         static bool terminateThread1, terminateThread2, terminateThread3, terminateThread4;
         Thread readThread1, readThread2, readThread3, readThread4;
 
+        static bool rmc_sentence_available = false;
+        static bool rmb_sentenc_availabled = false;
+        static bool mwv_sentence_available = false;
+        static bool vhw_sentence_available = false;
+        static bool dpt_sentence_available = false;
+        static bool hdg_sentence_available = false;
+        static bool mtw_sentence_available = false;
+
         public void InitializeSerialPort1()
         {
             try
@@ -276,21 +284,8 @@ namespace LionRiver
 
                                 rmc_received = true;
                                 MarkDataReceivedOnNMEA(port);
+                                rmc_sentence_available = true;
 
-                                //Relay Out Sentence    
-
-                                if (Properties.Settings.Default.NavSentence.OutPort1)
-                                    if (SerialPort1.IsOpen)
-                                        WriteSerial(1, message);
-                                if (Properties.Settings.Default.NavSentence.OutPort2)
-                                    if (SerialPort2.IsOpen)
-                                        WriteSerial(2, message);
-                                if (Properties.Settings.Default.NavSentence.OutPort3)
-                                    if (SerialPort3.IsOpen)
-                                        WriteSerial(3, message);
-                                if (Properties.Settings.Default.NavSentence.OutPort4)
-                                    if (SerialPort4.IsOpen)
-                                        WriteSerial(4, message);
                             }
                             catch (Exception)
                             {
@@ -341,29 +336,16 @@ namespace LionRiver
                             try
                             {
                                 spd = double.Parse(msg[5]);
+
                                 vhw_received = true;
+                                MarkDataReceivedOnNMEA(port);
+                                vhw_sentence_available = true;
+
                             }
                             catch (Exception)
                             {
                                 MarkErrorOnNMEA(port, "Bad VHW sentence");
                             }
-
-                            MarkDataReceivedOnNMEA(port);
-
-                            //Relay Out Sentence 
-
-                            if (Properties.Settings.Default.HullSpeedSentence.OutPort1)
-                                if (SerialPort1.IsOpen)
-                                    WriteSerial(1, message);
-                            if (Properties.Settings.Default.HullSpeedSentence.OutPort2)
-                                if (SerialPort2.IsOpen)
-                                    WriteSerial(2, message);
-                            if (Properties.Settings.Default.HullSpeedSentence.OutPort3)
-                                if (SerialPort3.IsOpen)
-                                    WriteSerial(3, message);
-                            if (Properties.Settings.Default.HullSpeedSentence.OutPort4)
-                                if (SerialPort4.IsOpen)
-                                    WriteSerial(4, message);
                         }
                         break;
 
@@ -376,21 +358,8 @@ namespace LionRiver
 
                                 dpt_received = true;
                                 MarkDataReceivedOnNMEA(port);
+                                dpt_sentence_available = true;
 
-                                //Relay Out Sentence 
-
-                                if (Properties.Settings.Default.DepthSentence.OutPort1)
-                                    if (SerialPort1.IsOpen)
-                                        WriteSerial(1, message);
-                                if (Properties.Settings.Default.DepthSentence.OutPort2)
-                                    if (SerialPort2.IsOpen)
-                                        WriteSerial(2, message);
-                                if (Properties.Settings.Default.DepthSentence.OutPort3)
-                                    if (SerialPort3.IsOpen)
-                                        WriteSerial(3, message);
-                                if (Properties.Settings.Default.DepthSentence.OutPort4)
-                                    if (SerialPort4.IsOpen)
-                                        WriteSerial(4, message);
                             }
                             catch (Exception)
                             {
@@ -408,21 +377,8 @@ namespace LionRiver
 
                                 dpt_received = true;
                                 MarkDataReceivedOnNMEA(port);
+                                dpt_sentence_available = true;
 
-                                //Relay Out Sentence 
-
-                                if (Properties.Settings.Default.DepthSentence.OutPort1)
-                                    if (SerialPort1.IsOpen)
-                                        WriteSerial(1, message);
-                                if (Properties.Settings.Default.DepthSentence.OutPort2)
-                                    if (SerialPort2.IsOpen)
-                                        WriteSerial(2, message);
-                                if (Properties.Settings.Default.DepthSentence.OutPort3)
-                                    if (SerialPort3.IsOpen)
-                                        WriteSerial(3, message);
-                                if (Properties.Settings.Default.DepthSentence.OutPort4)
-                                    if (SerialPort4.IsOpen)
-                                        WriteSerial(4, message);
                             }
                             catch (Exception)
                             {
@@ -451,21 +407,8 @@ namespace LionRiver
 
                                     mwv_received = true;
                                     MarkDataReceivedOnNMEA(port);
+                                    mwv_sentence_available = true;
 
-                                    //Relay Out Sentence 
-
-                                    if (Properties.Settings.Default.AppWindSentence.OutPort1)
-                                        if (SerialPort1.IsOpen)
-                                            WriteSerial(1, message);
-                                    if (Properties.Settings.Default.AppWindSentence.OutPort2)
-                                        if (SerialPort2.IsOpen)
-                                            WriteSerial(2, message);
-                                    if (Properties.Settings.Default.AppWindSentence.OutPort3)
-                                        if (SerialPort3.IsOpen)
-                                            WriteSerial(3, message);
-                                    if (Properties.Settings.Default.AppWindSentence.OutPort4)
-                                        if (SerialPort4.IsOpen)
-                                            WriteSerial(4, message);
                                 }
                             }
                             catch (Exception)
@@ -498,21 +441,7 @@ namespace LionRiver
 
                                 hdg_received = true;
                                 MarkDataReceivedOnNMEA(port);
-
-                                //Relay Out Sentence 
-
-                                if (Properties.Settings.Default.HeadingSentence.OutPort1)
-                                    if (SerialPort1.IsOpen)
-                                        WriteSerial(1, message);
-                                if (Properties.Settings.Default.HeadingSentence.OutPort2)
-                                    if (SerialPort2.IsOpen)
-                                        WriteSerial(2, message);
-                                if (Properties.Settings.Default.HeadingSentence.OutPort3)
-                                    if (SerialPort3.IsOpen)
-                                        WriteSerial(3, message);
-                                if (Properties.Settings.Default.HeadingSentence.OutPort4)
-                                    if (SerialPort4.IsOpen)
-                                        WriteSerial(4, message);
+                                hdg_sentence_available = true;
                             }
                             catch (Exception)
                             {
@@ -530,21 +459,7 @@ namespace LionRiver
 
                                 mtw_received = true;
                                 MarkDataReceivedOnNMEA(port);
-
-                                //Relay Out Sentence 
-
-                                if (Properties.Settings.Default.WaterTempSentence.OutPort1)
-                                    if (SerialPort1.IsOpen)
-                                        WriteSerial(1, message);
-                                if (Properties.Settings.Default.WaterTempSentence.OutPort2)
-                                    if (SerialPort2.IsOpen)
-                                        WriteSerial(2, message);
-                                if (Properties.Settings.Default.WaterTempSentence.OutPort3)
-                                    if (SerialPort3.IsOpen)
-                                        WriteSerial(3, message);
-                                if (Properties.Settings.Default.WaterTempSentence.OutPort4)
-                                    if (SerialPort4.IsOpen)
-                                        WriteSerial(4, message);
+                                mtw_sentence_available = true;
                             }
                             catch (Exception)
                             {

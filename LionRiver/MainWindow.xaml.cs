@@ -1138,6 +1138,7 @@ namespace LionRiver
             else
             {
                 CalcNav(DateTime.Now);
+                rmb_sentenc_availabled = true;
                 SendNMEA();
             }
 
