@@ -159,6 +159,7 @@ namespace LionRiver
         #endregion
 
         #region Timers
+        DispatcherTimer TXTimer = new DispatcherTimer();
         DispatcherTimer NMEATimer = new DispatcherTimer();
         DispatcherTimer RMC_received_Timer = new DispatcherTimer();
         DispatcherTimer ShortNavTimer = new DispatcherTimer();
@@ -906,6 +907,9 @@ namespace LionRiver
             #endregion
 
             #region Timers
+            TXTimer.Tick += new EventHandler(TXTimer_Tick);
+            TXTimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
+
             NMEATimer.Tick += new EventHandler(NMEATimer_Tick);
             NMEATimer.Interval = new TimeSpan(0, 0, 5);
 
@@ -941,6 +945,7 @@ namespace LionRiver
             DummyTimer.Interval = new TimeSpan(0, 0, 0,0,100);
             //DummyTimer.Start();
 
+            TXTimer.Start();
             NMEATimer.Start();
             ShortNavTimer.Start();
             MediumNavTimer.Start();
@@ -991,7 +996,7 @@ namespace LionRiver
                 Properties.Settings.Default.Save();
             }
 
-            SendPTAKheaders();
+            BuildPTAKheaders();
 
             #endregion
 
@@ -1129,6 +1134,125 @@ namespace LionRiver
             rmc_received = false;
         }
 
+        private void TXTimer_Tick(object sender, EventArgs e)
+        {
+            bool o1 = false;
+            bool o2 = false;
+            bool o3 = false;
+            bool o4 = false;
+
+            if (rmc_sentence_available)
+            {
+                o1 = Properties.Settings.Default.NavSentence.OutPort1;
+                o2 = Properties.Settings.Default.NavSentence.OutPort2;
+                o3 = Properties.Settings.Default.NavSentence.OutPort3;
+                o4 = Properties.Settings.Default.NavSentence.OutPort4;
+                TXSentence(rmc_sentence, o1, o2, o3, o4);
+                rmc_sentence_available = false;
+            }
+
+            if (rmb_sentence_available)
+            {
+                o1 = Properties.Settings.Default.RouteSentence.OutPort1;
+                o2 = Properties.Settings.Default.RouteSentence.OutPort2;
+                o3 = Properties.Settings.Default.RouteSentence.OutPort3;
+                o4 = Properties.Settings.Default.RouteSentence.OutPort4;
+                TXSentence(rmb_sentence, o1, o2, o3, o4);
+                rmb_sentence_available = false;
+            }
+
+            if (hdg_sentence_available)
+            {
+                o1 = Properties.Settings.Default.HeadingSentence.OutPort1;
+                o2 = Properties.Settings.Default.HeadingSentence.OutPort2;
+                o3 = Properties.Settings.Default.HeadingSentence.OutPort3;
+                o4 = Properties.Settings.Default.HeadingSentence.OutPort4;
+                TXSentence(hdg_sentence, o1, o2, o3, o4);
+                hdg_sentence_available = false;
+            }
+
+            if (vhw_sentence_available)
+            {
+                o1 = Properties.Settings.Default.HullSpeedSentence.OutPort1;
+                o2 = Properties.Settings.Default.HullSpeedSentence.OutPort2;
+                o3 = Properties.Settings.Default.HullSpeedSentence.OutPort3;
+                o4 = Properties.Settings.Default.HullSpeedSentence.OutPort4;
+                TXSentence(vhw_sentence, o1, o2, o3, o4);
+                vhw_sentence_available = false;
+            }
+
+            if (mwv_sentence_available)
+            {
+                o1 = Properties.Settings.Default.AppWindSentence.OutPort1;
+                o2 = Properties.Settings.Default.AppWindSentence.OutPort2;
+                o3 = Properties.Settings.Default.AppWindSentence.OutPort3;
+                o4 = Properties.Settings.Default.AppWindSentence.OutPort4;
+                TXSentence(mwv_sentence, o1, o2, o3, o4);
+                mwv_sentence_available = false;
+            }
+
+            if (mtw_sentence_available)
+            {
+                o1 = Properties.Settings.Default.WaterTempSentence.OutPort1;
+                o2 = Properties.Settings.Default.WaterTempSentence.OutPort2;
+                o3 = Properties.Settings.Default.WaterTempSentence.OutPort3;
+                o4 = Properties.Settings.Default.WaterTempSentence.OutPort4;
+                TXSentence(mtw_sentence, o1, o2, o3, o4);
+                mtw_sentence_available = false;
+            }
+
+            if (dpt_sentence_available)
+            {
+                o1 = Properties.Settings.Default.DepthSentence.OutPort1;
+                o2 = Properties.Settings.Default.DepthSentence.OutPort2;
+                o3 = Properties.Settings.Default.DepthSentence.OutPort3;
+                o4 = Properties.Settings.Default.DepthSentence.OutPort4;
+                TXSentence(dpt_sentence, o1, o2, o3, o4);
+                dpt_sentence_available = false;
+            }
+
+            if (ptak_sentence_available)
+            {
+                o1 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort1;
+                o2 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort2;
+                o3 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort3;
+                o4 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort4;
+                TXSentence(ptak_sentence, o1, o2, o3, o4);
+                ptak_sentence_available = false;
+            }
+
+            if (phdr_sentence_available)
+            {
+                o1 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort1;
+                o2 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort2;
+                o3 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort3;
+                o4 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort4;
+                TXSentence(phdr1_sentence, o1, o2, o3, o4);
+                TXSentence(phdr2_sentence, o1, o2, o3, o4);
+                TXSentence(phdr3_sentence, o1, o2, o3, o4);
+                TXSentence(phdr4_sentence, o1, o2, o3, o4);
+                TXSentence(phdr5_sentence, o1, o2, o3, o4);
+                TXSentence(phdr6_sentence, o1, o2, o3, o4);
+                phdr_sentence_available = false;
+            }
+        }
+
+        private void TXSentence(string message, bool o1, bool o2, bool o3, bool o4)
+        {
+            if (o1)
+                if (SerialPort1.IsOpen)
+                    WriteSerial(1, message);
+            if (o2)
+                if (SerialPort2.IsOpen)
+                    WriteSerial(2, message);
+            if (o3)
+                if (SerialPort3.IsOpen)
+                    WriteSerial(3, message);
+            if (o4)
+                if (SerialPort4.IsOpen)
+                    WriteSerial(4, message);
+        }
+
         private void ShortNavTimer_Tick(object sender, EventArgs e)
         {
             if (replayLog)
@@ -1138,8 +1262,8 @@ namespace LionRiver
             else
             {
                 CalcNav(DateTime.Now);
-                rmb_sentenc_availabled = true;
-                SendNMEA();
+                BuildNMEASentences();
+                BuildPTAKSentences();
             }
 
             UpdateNav();
@@ -1147,7 +1271,6 @@ namespace LionRiver
 
         private void MediumNavTimer_Tick(object sender, EventArgs e)
         {
-            SendPerformanceNMEA();
         }
 
         private void LongNavTimer_Tick(object sender, EventArgs e)
@@ -1160,7 +1283,7 @@ namespace LionRiver
         private void XLNavTimer_Tick(object sender, EventArgs e)
         {
             SetGribTimeNow();
-            SendPTAKheaders();
+            BuildPTAKheaders();
         }
 
         static async Task<string> DownloadPage(string url)
@@ -1950,7 +2073,7 @@ namespace LionRiver
                 StreamReader sr = new StreamReader(filename);
                 NavPolar.Load(sr);
                 sr.Close();
-                SendPTAKheaders();
+                BuildPTAKheaders();
             }
 
         }
@@ -3593,7 +3716,7 @@ namespace LionRiver
                     { NavPolar.IsLoaded = false; }
                 }
 
-                SendPTAKheaders();
+                BuildPTAKheaders();
             }
 
             SettingsButton.IsChecked = false;

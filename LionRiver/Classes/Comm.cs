@@ -25,12 +25,20 @@ namespace LionRiver
         Thread readThread1, readThread2, readThread3, readThread4;
 
         static bool rmc_sentence_available = false;
-        static bool rmb_sentenc_availabled = false;
+        static bool rmb_sentence_available = false;
         static bool mwv_sentence_available = false;
         static bool vhw_sentence_available = false;
         static bool dpt_sentence_available = false;
         static bool hdg_sentence_available = false;
         static bool mtw_sentence_available = false;
+        static bool ptak_sentence_available = false;
+        static bool phdr_sentence_available = false;
+
+
+        static string rmc_sentence, rmb_sentence, mwv_sentence, vhw_sentence, dpt_sentence, hdg_sentence, mtw_sentence;
+        static string ptak_sentence;
+        static int ptak_cntr = 0; //cycle through PTAK sentence, one per second.
+        static string phdr1_sentence, phdr2_sentence, phdr3_sentence, phdr4_sentence, phdr5_sentence, phdr6_sentence;
 
         public void InitializeSerialPort1()
         {
@@ -52,7 +60,7 @@ namespace LionRiver
             {
                 SerialPort1.Open();
             }
-            catch (Exception) {}
+            catch (Exception) { }
         }
 
         public void InitializeSerialPort2()
@@ -161,13 +169,13 @@ namespace LionRiver
                 {
                     try
                     {
-                        message = SerialPort1.ReadLine();                       
+                        message = SerialPort1.ReadLine();
                     }
                     catch (Exception)
                     {
-                        message="";
+                        message = "";
                     }
-                    ProcessNMEA(message,0);
+                    ProcessNMEA(message, 0);
                 }
                 else
                     Thread.Sleep(1000);
@@ -189,7 +197,7 @@ namespace LionRiver
                     {
                         message = "";
                     }
-                    ProcessNMEA(message,1);
+                    ProcessNMEA(message, 1);
                 }
                 else
                     Thread.Sleep(1000);
@@ -246,7 +254,7 @@ namespace LionRiver
             {
                 message += "\n";
 
-                string[] msg=null;
+                string[] msg = null;
                 string NMEASentence;
 
                 try
@@ -284,7 +292,9 @@ namespace LionRiver
 
                                 rmc_received = true;
                                 MarkDataReceivedOnNMEA(port);
+                                rmc_sentence = message;
                                 rmc_sentence_available = true;
+
 
                             }
                             catch (Exception)
@@ -339,6 +349,7 @@ namespace LionRiver
 
                                 vhw_received = true;
                                 MarkDataReceivedOnNMEA(port);
+                                vhw_sentence = message;
                                 vhw_sentence_available = true;
 
                             }
@@ -358,6 +369,7 @@ namespace LionRiver
 
                                 dpt_received = true;
                                 MarkDataReceivedOnNMEA(port);
+                                dpt_sentence = message;
                                 dpt_sentence_available = true;
 
                             }
@@ -377,6 +389,7 @@ namespace LionRiver
 
                                 dpt_received = true;
                                 MarkDataReceivedOnNMEA(port);
+                                dpt_sentence = message;
                                 dpt_sentence_available = true;
 
                             }
@@ -407,6 +420,7 @@ namespace LionRiver
 
                                     mwv_received = true;
                                     MarkDataReceivedOnNMEA(port);
+                                    mwv_sentence = message;
                                     mwv_sentence_available = true;
 
                                 }
@@ -415,7 +429,7 @@ namespace LionRiver
                             {
                                 MarkErrorOnNMEA(port, "Bad MWV sentence");
                             }
-                            
+
                         }
                         break;
 
@@ -441,6 +455,7 @@ namespace LionRiver
 
                                 hdg_received = true;
                                 MarkDataReceivedOnNMEA(port);
+                                hdg_sentence = message;
                                 hdg_sentence_available = true;
                             }
                             catch (Exception)
@@ -459,6 +474,7 @@ namespace LionRiver
 
                                 mtw_received = true;
                                 MarkDataReceivedOnNMEA(port);
+                                mtw_sentence = message;
                                 mtw_sentence_available = true;
                             }
                             catch (Exception)
@@ -511,7 +527,7 @@ namespace LionRiver
             }
         }
 
-        public void SendNMEA()
+        public void BuildNMEASentences()
         {
             string message;
 
@@ -555,7 +571,7 @@ namespace LionRiver
             //}
 
             //// Build MWV Sentence ****************************************************************************************
-            
+
             //if (AWA.IsValid())
             //{
 
@@ -643,7 +659,7 @@ namespace LionRiver
             //        if (SerialPort4.IsOpen)
             //            WriteSerial(4,message); 
             //}
- 
+
             //// Build RMC Sentence ****************************************************************************************
 
             //if (COG.IsValid())   // Implies SOG, LAT and LON are also valid
@@ -656,7 +672,7 @@ namespace LionRiver
 
             //    double deg, min;
             //    string cd;
- 
+
             //    deg = Math.Abs(Math.Truncate(LAT.Val));
             //    min = (Math.Abs(LAT.Val) - deg) * 60;
 
@@ -737,13 +753,13 @@ namespace LionRiver
             //        if (SerialPort4.IsOpen)
             //            WriteSerial(4,message); 
             //}
-            
+
             // Build RMB Sentence ****************************************************************************************
 
             if (WPT.IsValid())   // Implies BRG and DST are also valid
             {
-                string xte=",,";
-                string owpt=",";
+                string xte = ",,";
+                string owpt = ",";
 
                 if (XTE.IsValid())
                 {
@@ -766,22 +782,12 @@ namespace LionRiver
 
                 message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
 
-                if (Properties.Settings.Default.RouteSentence.OutPort1)
-                    if (SerialPort1.IsOpen)
-                        WriteSerial(1,message);
-                if (Properties.Settings.Default.RouteSentence.OutPort2)
-                    if (SerialPort2.IsOpen)
-                        WriteSerial(2,message);
-                if (Properties.Settings.Default.RouteSentence.OutPort3)
-                    if (SerialPort3.IsOpen)
-                        WriteSerial(3,message);
-                if (Properties.Settings.Default.RouteSentence.OutPort4)
-                    if (SerialPort4.IsOpen)
-                        WriteSerial(4,message); 
+                rmb_sentence = message;
+                rmb_sentence_available = true;
             }
 
             // Build PTAK4 Sentence ****************************************************************************************
-            
+
             if (LINEDST.IsValid())
             {
 
@@ -806,11 +812,11 @@ namespace LionRiver
                         SerialPort3.WriteLine(message4);
                 if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort4)
                     if (SerialPort4.IsOpen)
-                        SerialPort4.WriteLine(message4); 
+                        SerialPort4.WriteLine(message4);
             }
         }
 
-        public void SendPerformanceNMEA()
+        public void BuildPTAKSentences()
         {
 
             // Build PTAK Sentence ****************************************************************************************
@@ -818,92 +824,61 @@ namespace LionRiver
             if (PERF.IsValid())
             {
 
-                string message1, message2, message3, message5, message6;
+                string message = "";
 
-                message1 = "PTAK,FFD1," + TGTSPD.Val.ToString("0.0");
-                message2 = "PTAK,FFD2," + TGTTWA.Val.ToString("0") + "@";
-                double pf = PERF.Val * 100;
-                message3 = "PTAK,FFD3," + pf.ToString("0");
-                //message5 = "PTAK,FFD5," + TGTVMC.Average(Inst.BufFiveSec).ToString("0.0");
-                message5 = "PTAK,FFD5," + NTWA.FormattedValue + "@";
-                message6 = "PTAK,FFD6," + TGTCTS.Val.ToString("0") + "@";
+                switch (ptak_cntr)
+                {
+                    case 0:
+                        message = "PTAK,FFD1," + TGTSPD.Val.ToString("0.0");
+                        break;
+
+                    case 1:
+                        message = "PTAK,FFD2," + TGTTWA.Val.ToString("0") + "@";
+                        break;
+
+                    case 2:
+                        double pf = PERF.Val * 100;
+                        message = "PTAK,FFD3," + pf.ToString("0");
+                        break;
+
+                    case 3:
+                        message = "PTAK,FFD4," + TGTVMC.Val.ToString("0.0");
+                        break;
+
+                    case 4:
+                        message = "PTAK,FFD5," + NTWA.FormattedValue + "@";
+                        break;
+
+                    case 5:
+                        message = "PTAK,FFD6," + TGTCTS.Val.ToString("0") + "@";
+                        break;
+                }
+
+                ptak_cntr++;
+                if (ptak_cntr > 5)
+                    ptak_cntr = 0;
 
                 int checksum = 0;
 
-                checksum = 0;
-                foreach (char c in message1)
+                foreach (char c in message)
                     checksum ^= Convert.ToByte(c);
-                message1 = "$" + message1 + "*" + checksum.ToString("X2") + "\r\n";
+                message = "$" + message + "*" + checksum.ToString("X2") + "\r\n";
 
-                checksum = 0;
-                foreach (char c in message2)
-                    checksum ^= Convert.ToByte(c);
-                message2 = "$" + message2 + "*" + checksum.ToString("X2") + "\r\n";
+                ptak_sentence = message;
+                ptak_sentence_available = true;
 
-                checksum = 0;
-                foreach (char c in message3)
-                    checksum ^= Convert.ToByte(c);
-                message3 = "$" + message3 + "*" + checksum.ToString("X2") + "\r\n";
-
-                checksum = 0;
-                foreach (char c in message5)
-                    checksum ^= Convert.ToByte(c);
-                message5 = "$" + message5 + "*" + checksum.ToString("X2") + "\r\n";
-
-                checksum = 0;
-                foreach (char c in message6)
-                    checksum ^= Convert.ToByte(c);
-                message6 = "$" + message6 + "*" + checksum.ToString("X2") + "\r\n";
-
-
-                if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort1)
-                    if (SerialPort1.IsOpen)
-                    {
-                        SerialPort1.WriteLine(message1);
-                        SerialPort1.WriteLine(message2);
-                        SerialPort1.WriteLine(message3);
-                        SerialPort1.WriteLine(message5);
-                        SerialPort1.WriteLine(message6);
-                    }
-                if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort2)
-                    if (SerialPort2.IsOpen)
-                    {
-                        SerialPort2.WriteLine(message1);
-                        SerialPort2.WriteLine(message2);
-                        SerialPort2.WriteLine(message3);
-                        SerialPort2.WriteLine(message5);
-                        SerialPort2.WriteLine(message6);
-                    }
-                if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort3)
-                    if (SerialPort3.IsOpen)
-                    {
-                        SerialPort3.WriteLine(message1);
-                        SerialPort3.WriteLine(message2);
-                        SerialPort3.WriteLine(message3);
-                        SerialPort3.WriteLine(message5);
-                        SerialPort3.WriteLine(message6);
-                    }
-                if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort4)
-                    if (SerialPort4.IsOpen)
-                    {
-                        SerialPort4.WriteLine(message1);
-                        SerialPort4.WriteLine(message2);
-                        SerialPort4.WriteLine(message3);
-                        SerialPort4.WriteLine(message5);
-                        SerialPort4.WriteLine(message6);
-                    }
             }
         }
 
-        public void SendPTAKheaders()
+        public void BuildPTAKheaders()
         {
             string message1, message2, message3, message4, message5, message6;
 
             message1 = "PTAK,FFP1,TgtSPD, KNOTS";
             message2 = "PTAK,FFP2,TgtTWA, TRUE";
             message3 = "PTAK,FFP3,Perf, %";
-            message4 = "PTAK,FFP4,Toline,METRES";
-            //message5 = "PTAK,FFP5,TgtVMC, KNOTS";
+            //message4 = "PTAK,FFP4,Toline,METRES";
+            message4 = "PTAK,FFP4,TgtVMC, KNOTS";
             message5 = "PTAK,FFP5,NxtTWA, ";
             message6 = "PTAK,FFP6,TgtCTS, TRUE";
 
@@ -938,46 +913,15 @@ namespace LionRiver
                 checksum ^= Convert.ToByte(c);
             message6 = "$" + message6 + "*" + checksum.ToString("X2") + "\r\n";
 
-            if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort1)
-                if (SerialPort1.IsOpen)
-                {
-                    SerialPort1.WriteLine(message1);
-                    SerialPort1.WriteLine(message2);
-                    SerialPort1.WriteLine(message3);
-                    SerialPort1.WriteLine(message4);
-                    SerialPort1.WriteLine(message5);
-                    SerialPort1.WriteLine(message6);
-                }
-            if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort2)
-                if (SerialPort2.IsOpen)
-                {
-                    SerialPort2.WriteLine(message1);
-                    SerialPort2.WriteLine(message2);
-                    SerialPort2.WriteLine(message3);
-                    SerialPort2.WriteLine(message4);
-                    SerialPort2.WriteLine(message5);
-                    SerialPort2.WriteLine(message6);
-                }
-            if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort3)
-                if (SerialPort3.IsOpen)
-                {
-                    SerialPort3.WriteLine(message1);
-                    SerialPort3.WriteLine(message2);
-                    SerialPort3.WriteLine(message3);
-                    SerialPort3.WriteLine(message4);
-                    SerialPort3.WriteLine(message5);
-                    SerialPort3.WriteLine(message6);
-                }
-            if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort4)
-                if (SerialPort4.IsOpen)
-                {
-                    SerialPort4.WriteLine(message1);
-                    SerialPort4.WriteLine(message2);
-                    SerialPort4.WriteLine(message3);
-                    SerialPort4.WriteLine(message4);
-                    SerialPort4.WriteLine(message5);
-                    SerialPort4.WriteLine(message6);
-                }
+            phdr1_sentence = message1;
+            phdr2_sentence = message2;
+            phdr3_sentence = message3;
+            phdr4_sentence = message4;
+            phdr5_sentence = message5;
+            phdr6_sentence = message6;
+
+            phdr_sentence_available = true;
+
         }
 
         public void CheckTXoverrun()
