@@ -96,7 +96,7 @@ namespace LionRiver
         public static List<Instrument> LoggedInstrumentList = new List<Instrument>();
 
         static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000", 10);
-        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn", "0.0");
+        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn", "0.0",5);
         static LatitudeInstrument LAT = new LatitudeInstrument("Lat", "");
         static LongitudeInstrument LON = new LongitudeInstrument("Lon", "");
         static PositionInstrument POS = new PositionInstrument("Position", "");
