@@ -95,8 +95,8 @@ namespace LionRiver
 
         public static List<Instrument> LoggedInstrumentList = new List<Instrument>();
 
-        static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000", 10);
-        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn", "0.0",5);
+        static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000");
+        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn", "0.0");
         static LatitudeInstrument LAT = new LatitudeInstrument("Lat", "");
         static LongitudeInstrument LON = new LongitudeInstrument("Lon", "");
         static PositionInstrument POS = new PositionInstrument("Position", "");
@@ -106,8 +106,8 @@ namespace LionRiver
         static LinearInstrument DPT = new LinearInstrument("Depth", "m", "0.0");
         static LinearInstrument AWS = new LinearInstrument("AWS", "Kn");
         static AngularInstrumentRel AWA = new AngularInstrumentRel("AWA", "°");
-        static LinearInstrument TWS = new LinearInstrument("TWS", "Kn", "#.#", 2);
-        static AngularInstrumentRel TWA = new AngularInstrumentRel("TWA", "°", "#", 2);
+        static LinearInstrument TWS = new LinearInstrument("TWS", "Kn", "#.#", 3);
+        static AngularInstrumentRel TWA = new AngularInstrumentRel("TWA", "°", "#", 3);
         static AngularInstrumentAbs TWD = new AngularInstrumentAbs("TWD", "°", "000", 15);
         static AngularInstrumentAbs HDT = new AngularInstrumentAbs("HDG", "°T");
         static AngularInstrumentAbs BRG = new AngularInstrumentAbs("BRG", "°T", "000", 1, false);
@@ -126,7 +126,7 @@ namespace LionRiver
         static LatitudeInstrument LWLAT = new LatitudeInstrument("Lat", "", "", 1, false);
         static LongitudeInstrument LWLON = new LongitudeInstrument("Lon", "", "", 1, false);
         static AngularInstrumentAbs LEGBRG = new AngularInstrumentAbs("BRG", "", "000", 1, false);
-        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn", "0.0", 1, false);
+        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn", "0.0", 5, false);
 
         // Next Leg
         static AngularInstrumentRel NTWA = new AngularInstrumentRel("Next TWA", "°", "#", 1, false);
@@ -136,22 +136,22 @@ namespace LionRiver
         static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn", "0.0", 30);
 
         // Performance
-        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn", "0.0", 4, false);
-        static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T", "#", 4, false);
+        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn", "0.0", 15, false);
+        static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T", "#", 15, false);
         static PercentInstrument PERF = new PercentInstrument("Perf", "%", "#", 15);
-        static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn", "#.##", 4, false);
-        static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T", "000", 4, false);
+        static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn", "#.##", 15, false);
+        static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T", "000", 15, false);
 
         // Starting Line
         static LinearInstrument LINEDST = new LinearInstrument("Dst to line", "m", "#", 1, false);
 
         // Laylines
-        static AngularInstrumentAbs TGTCOGp = new AngularInstrumentAbs("Tgt COG Stbd", "°T", "", 1, false);
-        static AngularInstrumentAbs TGTCOGs = new AngularInstrumentAbs("Tgt COG Port", "°T", "", 1, false);
-        static LinearInstrument TGTSOGp = new LinearInstrument("Tgt SOG Stbd", "Kn", "", 1, false);
-        static LinearInstrument TGTSOGs = new LinearInstrument("Tgt SOG Port", "Kn", "", 1, false);
-        static LinearInstrument DSTLYLp = new LinearInstrumentShort("Dst Lay Port", "m", "", 1, false);
-        static LinearInstrument DSTLYLs = new LinearInstrumentShort("Dst Lay Stbd", "m", "", 1, false);
+        static AngularInstrumentAbs TGTCOGp = new AngularInstrumentAbs("Tgt COG Stbd", "°T", "", 5, false);
+        static AngularInstrumentAbs TGTCOGs = new AngularInstrumentAbs("Tgt COG Port", "°T", "", 5, false);
+        static LinearInstrument TGTSOGp = new LinearInstrument("Tgt SOG Stbd", "Kn", "", 5, false);
+        static LinearInstrument TGTSOGs = new LinearInstrument("Tgt SOG Port", "Kn", "", 5, false);
+        static LinearInstrument DSTLYLp = new LinearInstrumentShort("Dst Lay Port", "m", "", 5, false);
+        static LinearInstrument DSTLYLs = new LinearInstrumentShort("Dst Lay Stbd", "m", "", 5, false);
 
         static TimeSpanInstrument TTGLYLp = new TimeSpanInstrument("TTG Lay Port", "", "", 1, false);
         static TimeSpanInstrument TTGLYLs = new TimeSpanInstrument("TTG Lay Stbd", "", "", 1, false);
@@ -370,6 +370,7 @@ namespace LionRiver
             new PlotSelector {Name="TWD",Group="A",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>((s+360)%360).ToString("0") },
             new PlotSelector {Name="TWS",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
             new PlotSelector {Name="Drift",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
+            new PlotSelector {Name="Set",Group="A",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>((s+360)%360).ToString("0") },
             new PlotSelector {Name="Perf",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
             new PlotSelector {Name="Depth",Group="A",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("0.0") },
             new PlotSelector {Name="DMG",Group="B",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
@@ -908,7 +909,7 @@ namespace LionRiver
 
             #region Timers
             TXTimer.Tick += new EventHandler(TXTimer_Tick);
-            TXTimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
+            TXTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
 
             NMEATimer.Tick += new EventHandler(NMEATimer_Tick);
             NMEATimer.Interval = new TimeSpan(0, 0, 5);
@@ -5353,6 +5354,24 @@ namespace LionRiver
                     result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = x.DRIFT }).ToList());
                     break;
 
+                case "Set":
+                    rrx = logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.SET + 360) % 360 }).ToList();
+                    for (int i = 1; i < rrx.Count(); i++)
+                    {
+                        if (rrx[i].Value != null && rrx[i - 1].Value != null)
+                        {
+                            var delta = rrx[i].Value - rrx[i - 1].Value;
+                            if (delta > 150)
+                                rrx[i].Value -= 360;
+                            else
+                                if (delta < -150)
+                                rrx[i].Value += 360;
+                        }
+                    }
+
+                    result.Add("_single", rrx);
+                    break;
+
                 case "Perf":
                     result.Add("_single",logEntries.Select(x => new DateModel { DateTime = x.timestamp, Value = (x.PERF * 100) }).ToList());
                     break;
@@ -5447,6 +5466,10 @@ namespace LionRiver
 
                 case "Drift":
                     mResult = DRIFT.GetLastVal(level).Val;
+                    break;
+
+                case "Set":
+                    mResult = (SET.GetLastVal(level).Val + 360) % 360;
                     break;
 
                 case "Perf":
