@@ -1325,6 +1325,7 @@ namespace LionRiver
 
         private async void FleetUpdateTimer_Tick(object sender, EventArgs e)
         {
+            FleetUpdateTimer.Stop();
             string json;
 
             try
@@ -1550,6 +1551,8 @@ namespace LionRiver
 
             if (PlayButton.IsChecked == true)
                 UpdateFleet(DateTime.Now);
+
+            FleetUpdateTimer.Start();
         }
 
         private void ReplayTimer_Tick(object sender, EventArgs e)
