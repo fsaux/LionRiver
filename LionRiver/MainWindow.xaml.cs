@@ -1885,10 +1885,11 @@ namespace LionRiver
         {
             if (mouseHandlingMode == MouseHandlingMode.CreatingRoute && (e.Timestamp - ClickTime) < 200)
             {
-                var lb = sender as MapItemsControl;
-                var boat = lb.SelectedItem as Boat;
-
-                RouteAddMarkAt(boat.Location);
+                var mi = sender as MapItem;
+                var boat = mi.DataContext as Boat;
+                if (boat != null)
+                    RouteAddMarkAt(boat.Location);
+            
                 e.Handled = true;
             }
         }
