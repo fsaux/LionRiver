@@ -279,7 +279,7 @@ namespace LionRiver
                 VMG.SetValid(now);
 
                 //Set estimated saling mode in case route and/or performance data is not available
-                if (Math.Abs(TWA.Val) < 50)
+                if (Math.Abs(TWA.Val) < 55)
                     sailingMode = SailingMode.Beating;
                 else
                 if (Math.Abs(TWA.Val) > 130)
@@ -360,7 +360,7 @@ namespace LionRiver
                 PolarPoint pb = NavPolar.GetBeatTarget(TWS.Val);
                 PolarPoint pr = NavPolar.GetRunTarget(TWS.Val);
 
-                if (Angle <= (pb.TWA + 15)) // Beating
+                if (Angle <= (pb.TWA + 20)) // Beating
                 {
                     TGTSPD.Val = pb.SPD;
                     TGTSPD.SetValid(now);
@@ -372,7 +372,7 @@ namespace LionRiver
                     sailingMode = SailingMode.Beating;
                 }
 
-                if (Angle < (pr.TWA - 15) && Angle > (pb.TWA + 15)) // Reaching
+                if (Angle < (pr.TWA - 20) && Angle > (pb.TWA + 20)) // Reaching
                 {
                     TGTSPD.Val = NavPolar.GetTarget(Math.Abs(TWA.Val), TWS.Val);
                     TGTSPD.SetValid(now);
@@ -384,7 +384,7 @@ namespace LionRiver
                     sailingMode = SailingMode.Reaching;
                 }
 
-                if (Angle >= (pr.TWA - 15)) // Running
+                if (Angle >= (pr.TWA - 20)) // Running
                 {
                     TGTSPD.Val = pr.SPD;
                     TGTSPD.SetValid(now);
