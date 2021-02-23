@@ -310,12 +310,11 @@ namespace LionRiver
             #endregion
 
             #region Leeway
-            if(AWA.IsValid() && SPD.IsValid() && LWay.IsAvailable())
+            if(AWA.IsValid() && SPD.IsValid() && LWay.IsAvailable() && Properties.Settings.Default.EstimateLeeway)
             {
                 LWY.Val = LWay.Get(AWA.Val, AWS.Val, SPD.Val);
                 LWY.SetValid(now);
             }
-
 
             #endregion
 
@@ -347,6 +346,26 @@ namespace LionRiver
             {
                 double Dx = SOG.Val * Math.Cos(COG.Val * Math.PI / 180) - SPD.Val * Math.Cos(HDT.Val * Math.PI / 180);
                 double Dy = SOG.Val * Math.Sin(COG.Val * Math.PI / 180) - SPD.Val * Math.Sin(HDT.Val * Math.PI / 180);
+
+                if(LWY.IsValid())
+                {
+                    double lwy;
+                    if (AWA.Val < 0)
+                        lwy = -LWY.Val;
+                    else
+                        lwy = LWY.Val;
+
+                    double lm = SPD.Val * Math.Tan(lwy * Math.PI / 180);
+                    double la = HDT.Val - 90;
+                    double lx = lm * Math.Cos(la * Math.PI / 180);
+                    double ly = lm * Math.Sin(la * Math.PI / 180);
+
+                    double ang = Math.Atan2(ly, lx) * 180 / Math.PI;
+
+                    Dx -= lx;
+                    Dy -= ly;
+                }
+
                 DRIFT.Val = Math.Sqrt(Dx * Dx + Dy * Dy);
                 DRIFT.SetValid(now);
                 SET.Val = Math.Atan2(Dy, Dx) * 180 / Math.PI;

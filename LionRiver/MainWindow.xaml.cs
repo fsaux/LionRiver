@@ -475,16 +475,15 @@ namespace LionRiver
 
             if (lfilename != "")
             {
-                //try
-                //{
+                try
+                {
                     StreamReader sr = new StreamReader(lfilename);
                     LWay.Load(sr);
                     sr.Close();
-                //}
-                //catch
-                //{
-                //    int i = 1;i++;
-                //}
+                }
+                catch
+                {
+                }
             }
             #endregion
 

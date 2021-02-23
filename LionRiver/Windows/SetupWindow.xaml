@@ -129,7 +129,7 @@
                     <Label Content="Polar file:" Height="26" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="10,99,0,0"  VerticalAlignment="Top" Width="230" Text="{Binding Source={x:Static p:Settings.Default}, Path=PolarFile, Mode=TwoWay}" AcceptsReturn="False" Grid.ColumnSpan="2" />
                     <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="14,127,0,0" Name="button4" VerticalAlignment="Top" Width="26" Grid.Column="1" Click="button4_Click" />
-                    <CheckBox Content="Estimate leeway" Margin="10,158,56.333,127"/>
+                    <CheckBox Content="Estimate leeway" IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=EstimateLeeway, Mode=TwoWay}" Margin="10,158,56.333,127"/>
                     <Label Content="Leeway file:" Height="26" HorizontalAlignment="Left" Margin="10,183,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.538,1.103" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="10,214,0,0"  VerticalAlignment="Top" Width="230" Text="{Binding Source={x:Static p:Settings.Default}, Path=LeewayFile, Mode=TwoWay}" AcceptsReturn="False" Grid.ColumnSpan="2" />
                     <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="14.667,242,0,0" Name="lwbutton" VerticalAlignment="Top" Width="26" Grid.Column="1" Click="lwbutton_Click" />

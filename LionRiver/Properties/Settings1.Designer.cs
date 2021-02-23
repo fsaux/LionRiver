@@ -913,5 +913,17 @@ namespace LionRiver.Properties {
                 this["LeewayFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EstimateLeeway {
+            get {
+                return ((bool)(this["EstimateLeeway"]));
+            }
+            set {
+                this["EstimateLeeway"] = value;
+            }
+        }
     }
 }
