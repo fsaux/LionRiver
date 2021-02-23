@@ -309,6 +309,16 @@ namespace LionRiver
             }
             #endregion
 
+            #region Leeway
+            if(AWA.IsValid() && SPD.IsValid() && LWay.IsAvailable())
+            {
+                LWY.Val = LWay.Get(AWA.Val, AWS.Val, SPD.Val);
+                LWY.SetValid(now);
+            }
+
+
+            #endregion
+
             #region Heel
             //if (AWA.IsValid() && SPD.IsValid())
             //{

@@ -246,5 +246,26 @@ namespace LionRiver
 
         }
 
+        private void lwbutton_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+            dlg.Filter = "Leeway files|*.lwy";
+            try
+            {
+                dlg.InitialDirectory = System.IO.Path.GetDirectoryName(Properties.Settings.Default.LeewayFile);
+            }
+            catch { }
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                // Read Leeway
+                Properties.Settings.Default.LeewayFile = dlg.FileName;
+            }
+
+
+        }
     }
 }

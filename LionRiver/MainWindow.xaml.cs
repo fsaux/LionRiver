@@ -86,7 +86,8 @@ namespace LionRiver
             { "TGTTWA", new InstrumentDisplay1() },
             { "PERF", new InstrumentDisplay1() },
             { "TGTVMC", new InstrumentDisplay1() },
-            { "TGTCTS", new InstrumentDisplay1() }
+            { "TGTCTS", new InstrumentDisplay1() },
+            { "LWY", new InstrumentDisplay1() }
         };
 
         public FrameworkElement MovingInstrument;
@@ -115,6 +116,8 @@ namespace LionRiver
         static LinearInstrument XTE = new LinearInstrument("XTE", "Nm", "#.##", 1, false);
         static LinearInstrument VMG = new LinearInstrument("WMG", "Kn", "0.0", 1, false);
         static AngularInstrumentAbs HEEL = new AngularInstrumentAbs("HEEL", "°", "#", 15, false);
+        static AngularInstrumentAbs LWY = new AngularInstrumentAbs("LWY", "°", "0.0", 15, false);
+
 
         // Destination Waypoint
         static WaypointInstrument WPT = new WaypointInstrument("To:", "", "", 1, false);
@@ -185,8 +188,10 @@ namespace LionRiver
         StartUpWindow StartupWdw;
         #endregion
 
-        #region Polar
+        #region Polar & Leeway
         static Polar NavPolar;
+        static Leeway LWay;
+
         #endregion
 
         #region Start Line
@@ -447,8 +452,9 @@ namespace LionRiver
 
         private void MainWindow_Initialize()
         {
-            #region Polars
+            #region Polars & Leeway
             NavPolar = new Polar();
+            LWay = new Leeway();
 
             string pfilename = Properties.Settings.Default.PolarFile;
 
@@ -465,6 +471,21 @@ namespace LionRiver
                 { NavPolar.IsLoaded = false; }
             }
 
+            string lfilename = Properties.Settings.Default.LeewayFile;
+
+            if (lfilename != "")
+            {
+                //try
+                //{
+                    StreamReader sr = new StreamReader(lfilename);
+                    LWay.Load(sr);
+                    sr.Close();
+                //}
+                //catch
+                //{
+                //    int i = 1;i++;
+                //}
+            }
             #endregion
 
             #region Mapping
@@ -1028,6 +1049,8 @@ namespace LionRiver
             InstrumentDisplays["PERF"].DataContext = PERF;
             InstrumentDisplays["TGTVMC"].DataContext = TGTVMC;
             InstrumentDisplays["TGTCTS"].DataContext = TGTCTS;
+            InstrumentDisplays["LWY"].DataContext = LWY;
+
 
             InstrumentStackContextMenu.ItemsSource = InstrumentDisplays;
 
@@ -3719,6 +3742,20 @@ namespace LionRiver
                     }
                     catch
                     { NavPolar.IsLoaded = false; }
+                }
+
+                string lfilename = Properties.Settings.Default.LeewayFile;
+
+                if (lfilename != "")
+                {
+                    try
+                    {
+                        StreamReader sr = new StreamReader(lfilename);
+                        LWay.Load(sr);
+                        sr.Close();
+                    }
+                    catch
+                    { }
                 }
 
                 BuildPTAKheaders();

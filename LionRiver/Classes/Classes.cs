@@ -738,8 +738,142 @@ namespace LionRiver
             else
                 return null;        // No match found
         }
-    } 
+    }
 
+    #endregion
+
+    #region Leeway
+    public class LeewayPoint
+    {
+
+        public double AWA { get; set; }
+        public double Cdrag { get; set; }
+        public double Clift { get; set; }
+        public double Aref { get; set; }
+
+    }
+
+    public class Leeway
+    {
+        public const double K = 0.00017; //Empiric from data analysis
+        public const double MaxLeeway = 10; // Keep it below this max value
+
+
+        private List<LeewayPoint> leewayPoints;
+
+        public void Load(StreamReader f)
+        {
+            leewayPoints = new List<LeewayPoint>();
+
+            while (f.Peek() >= 0)
+            {
+                string s = f.ReadLine();
+                string[] str = s.Split(',');
+
+                double awa = Convert.ToDouble(str[0]);
+                double cd = Convert.ToDouble(str[1]);
+                double Clift = Convert.ToDouble(str[2]);
+                double Aref = Convert.ToDouble(str[3]);
+
+                LeewayPoint lp = new LeewayPoint
+                {
+                    AWA = Convert.ToDouble(str[0]),
+                    Cdrag = Convert.ToDouble(str[1]),
+                    Clift = Convert.ToDouble(str[2]),
+                    Aref = Convert.ToDouble(str[3])
+                };
+
+                leewayPoints.Add(lp);
+            }
+
+            var tlp = new List<LeewayPoint>();
+
+            for (double awa = 0; awa <= 180; awa +=1) // Create new table every degree
+                tlp.Add(GetInterpolated(awa));
+
+            leewayPoints = tlp;
+        }
+
+        public bool IsAvailable()
+        {
+            return leewayPoints != null;
+        }
+
+        public LeewayPoint GetInterpolated(double awa)
+        {
+            double cd = 0, cl = 0, aref = 0;
+            LeewayPoint lp0, lp1;
+
+            awa = Math.Abs(awa);
+
+            if (leewayPoints != null)
+            {
+                lp1 = (from x in leewayPoints
+                       where x.AWA > awa
+                       select x).FirstOrDefault();
+
+                if (lp1 == null)
+                    return leewayPoints.Last();
+                else
+                {
+                    int i = leewayPoints.IndexOf(lp1);
+                    lp0 = leewayPoints[i - 1];
+
+                    double dx = (awa - lp0.AWA) / (lp1.AWA - lp0.AWA);
+
+                    if (dx != 0)
+                    {
+                        double dcd = lp1.Cdrag - lp0.Cdrag;
+                        double dcl = lp1.Clift - lp0.Clift;
+                        double daref = lp1.Aref - lp0.Aref;
+
+                        cd = lp0.Cdrag + dx * dcd;
+                        cl = lp0.Clift + dx * dcl;
+                        aref = lp0.Aref + dx * daref;
+                    }
+                    else
+                    {
+                        cd = lp0.Cdrag;
+                        cl = lp0.Clift;
+                        aref = lp0.Aref;
+                    }
+                    return new LeewayPoint() { AWA = awa, Cdrag = cd, Clift = cl, Aref = aref };
+                }
+            }
+            return null;
+        }
+
+        public double Get(double awa, double aws, double bspd)
+        {
+            double lwy = 0;
+
+            awa = Math.Abs(awa);
+
+            if (leewayPoints != null)
+            {
+                var idx = Convert.ToInt32(Math.Round(awa));
+
+                var cd = leewayPoints[idx].Cdrag;
+                var cl = leewayPoints[idx].Clift;
+                var aref = leewayPoints[idx].Aref;
+
+                double hf = aws * aws * (cd * Math.Sin(awa * Math.PI / 180) + cl * Math.Cos(awa * Math.PI / 180)) * aref;
+
+                if (bspd != 0)
+                    lwy = Math.Asin(Leeway.K * hf / bspd / bspd) * 180 / Math.PI;
+                else
+                    lwy = 0;
+
+                if (lwy>Leeway.MaxLeeway)
+                    lwy = Leeway.MaxLeeway;
+
+                if (double.IsNaN(lwy) || lwy < 0)
+                    lwy = 0;
+            }
+
+            return lwy;
+        }
+    }
     #endregion
 
     public class NMEASentence
