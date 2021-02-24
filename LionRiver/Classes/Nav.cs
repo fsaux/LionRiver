@@ -386,8 +386,8 @@ namespace LionRiver
                 double Angle = Math.Abs(TWD.Val - BRG.Val + 360) % 360;
                 if (Angle > 180) Angle = 360 - Angle;
 
-                PolarPoint pb = NavPolar.GetBeatTarget(TWS.Val);
-                PolarPoint pr = NavPolar.GetRunTarget(TWS.Val);
+                PolarPoint pb = NavPolar.GetBeatTargeInterpolated(TWS.Val);
+                PolarPoint pr = NavPolar.GetRunTargetInterpolated(TWS.Val);
 
                 if (Angle <= (pb.TWA + 20)) // Beating
                 {
@@ -403,7 +403,7 @@ namespace LionRiver
 
                 if (Angle < (pr.TWA - 20) && Angle > (pb.TWA + 20)) // Reaching
                 {
-                    TGTSPD.Val = NavPolar.GetTarget(Math.Abs(TWA.Val), TWS.Val);
+                    TGTSPD.Val = NavPolar.GetTargeInterpolated(Math.Abs(TWA.Val), TWS.Val);
                     TGTSPD.SetValid(now);
                     TGTTWA.Val = Math.Abs(TWA.Val);
                     TGTTWA.SetValid(now);
@@ -687,17 +687,17 @@ namespace LionRiver
                     if (Angle > 180) Angle = 360 - Angle;
                     if (Angle < 50)
                     {
-                        p = NavPolar.GetBeatTarget(TWS.Val);
+                        p = NavPolar.GetBeatTargeInterpolated(TWS.Val);
                         vmc = p.SPD * Math.Cos(p.TWA * Math.PI / 180);
                     }
                     else
                         if (Angle > 140)
                     {
-                        p = NavPolar.GetRunTarget(TWS.Val);
+                        p = NavPolar.GetRunTargetInterpolated(TWS.Val);
                         vmc = -p.SPD * Math.Cos(p.TWA * Math.PI / 180);
                     }
                     else
-                        vmc = NavPolar.GetTarget(Angle, TWS.Val);
+                        vmc = NavPolar.GetTargeInterpolated(Angle, TWS.Val);
                 }
 
                 if (vmc != 0)

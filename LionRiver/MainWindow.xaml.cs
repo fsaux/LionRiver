@@ -115,6 +115,7 @@ namespace LionRiver
         static LinearInstrument DST = new LinearInstrument("DST", "Nm", "#.#", 1, false);
         static LinearInstrument XTE = new LinearInstrument("XTE", "Nm", "#.##", 1, false);
         static LinearInstrument VMG = new LinearInstrument("WMG", "Kn", "0.0", 1, false);
+
         static AngularInstrumentAbs HEEL = new AngularInstrumentAbs("HEEL", "°", "#", 15, false);
         static AngularInstrumentAbs LWY = new AngularInstrumentAbs("LWY", "°", "0.0", 15, false);
 
@@ -4470,7 +4471,7 @@ namespace LionRiver
                         else
                         {
                             pr.TWA = twd - brg;
-                            pr.SPD = NavPolar.GetTarget(pr.TWA, tws) * perfAdj;
+                            pr.SPD = NavPolar.GetTargeInterpolated(pr.TWA, tws) * perfAdj;
                         }
 
                         if (pr != null && pr.SPD != 0)

@@ -498,9 +498,19 @@ namespace LionRiver
                 }
                 i += 2;
             }
+
+            List<PolarPoint> tempPoints = new List<PolarPoint>();
+
+            for(int a=0;a<180;a+=1)
+            {
+                var tempPoint = new PolarPoint() { TWA = a, SPD = this.GetTargetInterpolated(a) };
+                tempPoints.Add(tempPoint);
+            }
+
+            Points = tempPoints;
         }
 
-        public double GetTarget(double twa)
+        public double GetTargetInterpolated(double twa)
         {
             PolarPoint p1 = new PolarPoint();
             PolarPoint p2 = new PolarPoint();
@@ -522,6 +532,12 @@ namespace LionRiver
             return p3.SPD;
         }
 
+        public double GetTarget(double twa)
+        {
+            var idx = Convert.ToInt32(Math.Round(twa));
+            return Points[idx].SPD;
+        }
+
         public PolarPoint GetTargetVMC(double twd, double brg, double drift, double set)
         {
             PolarPoint pr = new PolarPoint();
@@ -531,7 +547,7 @@ namespace LionRiver
             for (double twa = 0; twa <= 180; twa += 1)
             {
 
-                double spd = this.GetTarget(twa);
+                double spd = this.GetTargetInterpolated(twa);
                 double sogx1 = spd * Math.Cos((twd + twa) * Math.PI / 180) + drift * Math.Cos(set * Math.PI / 180);
                 double sogy1 = spd * Math.Sin((twd + twa) * Math.PI / 180) + drift * Math.Sin(set * Math.PI / 180);
                 double sogx2 = spd * Math.Cos((twd - twa) * Math.PI / 180) + drift * Math.Cos(set * Math.PI / 180);
@@ -589,7 +605,7 @@ namespace LionRiver
             this.IsLoaded = true;
         }
 
-        public double GetTarget(double twa, double tws)
+        public double GetTargeInterpolated(double twa, double tws)
         {
             int i = 0, j = 0;
 
@@ -617,7 +633,7 @@ namespace LionRiver
             return bs;
         }
 
-        public PolarPoint GetBeatTarget(double tws)
+        public PolarPoint GetBeatTargeInterpolated(double tws)
         {
             int i = 0, j = 0;
             PolarPoint p = new PolarPoint();
@@ -646,7 +662,7 @@ namespace LionRiver
             return p;
         }
 
-        public PolarPoint GetRunTarget(double tws)
+        public PolarPoint GetRunTargetInterpolated(double tws)
         {
             int i = 0, j = 0;
             PolarPoint p = new PolarPoint();
@@ -718,7 +734,7 @@ namespace LionRiver
 
             for (double twa = 0; twa < 360; twa+=2)
             {
-                double spd = this.GetTarget(twa, tws) * spdadj;
+                double spd = this.GetTargeInterpolated(twa, tws) * spdadj;
                 double hdg = twd - twa;
                 double cogx = spd * Math.Cos(hdg * Math.PI / 180) + drift * Math.Cos(set * Math.PI / 180);
                 double cogy = spd * Math.Sin(hdg * Math.PI / 180) + drift * Math.Sin(set * Math.PI / 180);
@@ -770,16 +786,11 @@ namespace LionRiver
                 string s = f.ReadLine();
                 string[] str = s.Split(',');
 
-                double awa = Convert.ToDouble(str[0]);
-                double cd = Convert.ToDouble(str[1]);
-                double Clift = Convert.ToDouble(str[2]);
-                double Aref = Convert.ToDouble(str[3]);
-
                 LeewayPoint lp = new LeewayPoint
                 {
                     AWA = Convert.ToDouble(str[0]),
-                    Cdrag = Convert.ToDouble(str[1]),
-                    Clift = Convert.ToDouble(str[2]),
+                    Clift = Convert.ToDouble(str[1]),
+                    Cdrag = Convert.ToDouble(str[2]),
                     Aref = Convert.ToDouble(str[3])
                 };
 
