@@ -535,6 +535,7 @@ namespace LionRiver
         public double GetTarget(double twa)
         {
             var idx = Convert.ToInt32(Math.Round(twa));
+            if (idx == 180) idx = 0;
             return Points[idx].SPD;
         }
 
@@ -863,6 +864,7 @@ namespace LionRiver
             if (leewayPoints != null)
             {
                 var idx = Convert.ToInt32(Math.Round(awa));
+                if (idx == 180) idx = 0;
 
                 var cd = leewayPoints[idx].Cdrag;
                 var cl = leewayPoints[idx].Clift;

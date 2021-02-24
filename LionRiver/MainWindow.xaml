@@ -666,16 +666,16 @@
                                 <Image Source="Images/Maps-and-Geolocation-Polyline-icon.png" Stretch="None" Margin="2" ToolTip="Routes"/>
                             </ToggleButton.Content>
                         </ToggleButton>
-
-                        <ToggleButton  Name="RouteCalcButton"  Style="{StaticResource MainToggleButton}" Margin="1,2"  Checked="RouteCalcButton_Checked" Unchecked="RouteCalcButton_Unchecked" VerticalAlignment="Top" >
-                            <ToggleButton.Content>
-                                <Image Source="Images/Numbers-2-icon.png" Stretch="None" Margin="2" ToolTip="Weather routing"/>
-                            </ToggleButton.Content>
-                        </ToggleButton>
-
+                        
                         <ToggleButton  Name="GribButton"  Style="{StaticResource MainToggleButton}" Margin="1,2"  Checked="GribButton_Checked" Unchecked="GribButton_Unchecked" VerticalAlignment="Top" >
                             <ToggleButton.Content>
                                 <Image Source="Images/Weather-Partly-cloudy-day-icon.png" Stretch="None" Margin="2" ToolTip="Grib"/>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+                        
+                        <ToggleButton  Name="RouteCalcButton"  Style="{StaticResource MainToggleButton}" Margin="1,2"  Checked="RouteCalcButton_Checked" Unchecked="RouteCalcButton_Unchecked" VerticalAlignment="Top" >
+                            <ToggleButton.Content>
+                                <Image Source="Images/Numbers-2-icon.png" Stretch="None" Margin="2" ToolTip="Weather routing"/>
                             </ToggleButton.Content>
                         </ToggleButton>
 
