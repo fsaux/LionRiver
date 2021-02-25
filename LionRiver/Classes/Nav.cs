@@ -407,7 +407,7 @@ namespace LionRiver
                     TGTSPD.SetValid(now);
                     TGTTWA.Val = Math.Abs(TWA.Val);
                     TGTTWA.SetValid(now);
-                    PERF.Val = Math.Abs(SPD.Val / TGTSPD.Val);
+                    PERF.Val = Math.Abs(SPD.Val * Math.Cos((COG.Val - BRG.Val) * Math.PI / 180) / TGTSPD.Val);
                     PERF.SetValid(now);
 
                     sailingMode = SailingMode.Reaching;
@@ -507,17 +507,32 @@ namespace LionRiver
 
             if (DRIFT.IsValid() && PERF.IsValid() && TWD.IsValid())
             {
+                double ttwa = TGTTWA.Val;
+                double tgtlwy = 0;
+                
+                if(LWY.IsValid())
+                {
+                    double awx = TWS.Val * Math.Cos(ttwa * Math.PI / 180) + TGTSPD.Val;
+                    double awy = TWS.Val * Math.Sin(ttwa * Math.PI / 180);
+                    double tgtawa = Math.Atan2(awy, awx) * 180 / Math.PI;
+                    double tgtaws = Math.Sqrt(awx * awx + awy * awy);
+                    tgtlwy = LWay.Get(tgtawa, tgtaws, TGTSPD.Val);
+                }
+
+                ttwa += tgtlwy;
+                if (ttwa > 180) ttwa = 180;
+
                 double relset = SET.Val - TWD.Val;
-                double dxs = TGTSPD.Val * Math.Cos(TGTTWA.Val * Math.PI / 180) + DRIFT.Val * Math.Cos(relset * Math.PI / 180);
-                double dys = TGTSPD.Val * Math.Sin(TGTTWA.Val * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
+                double dxs = TGTSPD.Val * Math.Cos(ttwa * Math.PI / 180) + DRIFT.Val * Math.Cos(relset * Math.PI / 180);
+                double dys = TGTSPD.Val * Math.Sin(ttwa * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
 
                 TGTCOGp.Val = Math.Atan2(dys, dxs) * 180 / Math.PI + TWD.Val;
                 TGTCOGp.SetValid(now);
                 TGTSOGp.Val = Math.Sqrt(dxs * dxs + dys * dys);
                 TGTSOGp.SetValid(now);
 
-                double dxp = TGTSPD.Val * Math.Cos(-TGTTWA.Val * Math.PI / 180) + DRIFT.Val * Math.Cos(relset * Math.PI / 180);
-                double dyp = TGTSPD.Val * Math.Sin(-TGTTWA.Val * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
+                double dxp = TGTSPD.Val * Math.Cos(-ttwa * Math.PI / 180) + DRIFT.Val * Math.Cos(relset * Math.PI / 180);
+                double dyp = TGTSPD.Val * Math.Sin(-ttwa * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
 
                 TGTCOGs.Val = Math.Atan2(dyp, dxp) * 180 / Math.PI + TWD.Val;
                 TGTCOGs.SetValid(now);

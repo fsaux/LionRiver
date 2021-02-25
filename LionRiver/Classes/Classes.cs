@@ -773,7 +773,7 @@ namespace LionRiver
     public class Leeway
     {
         public const double K = 0.00017; //Empiric from data analysis
-        public const double MaxLeeway = 10; // Keep it below this max value
+        public const double MaxLeeway = 6; // Keep it below this max value
 
 
         private List<LeewayPoint> leewayPoints;

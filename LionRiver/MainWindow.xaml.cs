@@ -96,21 +96,21 @@ namespace LionRiver
 
         public static List<Instrument> LoggedInstrumentList = new List<Instrument>();
 
-        static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000");
-        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn", "0.0");
+        static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000",3);
+        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn", "0.0",3);
         static LatitudeInstrument LAT = new LatitudeInstrument("Lat", "");
         static LongitudeInstrument LON = new LongitudeInstrument("Lon", "");
         static PositionInstrument POS = new PositionInstrument("Position", "");
         static AngularInstrumentRel MVAR = new AngularInstrumentRel("MVar", "°", "#", 1, false);
-        static LinearInstrument SPD = new LinearInstrument("SPD", "Kn", "0.0");
+        static LinearInstrument SPD = new LinearInstrument("SPD", "Kn", "0.0",3);
         static LinearInstrument TEMP = new LinearInstrument("Temp", "°C", "#.#");
         static LinearInstrument DPT = new LinearInstrument("Depth", "m", "0.0");
-        static LinearInstrument AWS = new LinearInstrument("AWS", "Kn");
-        static AngularInstrumentRel AWA = new AngularInstrumentRel("AWA", "°");
+        static LinearInstrument AWS = new LinearInstrument("AWS", "Kn","#.#",3);
+        static AngularInstrumentRel AWA = new AngularInstrumentRel("AWA", "°", "#", 3);
         static LinearInstrument TWS = new LinearInstrument("TWS", "Kn", "#.#", 3);
         static AngularInstrumentRel TWA = new AngularInstrumentRel("TWA", "°", "#", 3);
         static AngularInstrumentAbs TWD = new AngularInstrumentAbs("TWD", "°", "000", 15);
-        static AngularInstrumentAbs HDT = new AngularInstrumentAbs("HDG", "°T");
+        static AngularInstrumentAbs HDT = new AngularInstrumentAbs("HDG", "°T","000",3);
         static AngularInstrumentAbs BRG = new AngularInstrumentAbs("BRG", "°T", "000", 1, false);
         static LinearInstrument DST = new LinearInstrument("DST", "Nm", "#.#", 1, false);
         static LinearInstrument XTE = new LinearInstrument("XTE", "Nm", "#.##", 1, false);
