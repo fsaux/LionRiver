@@ -5131,7 +5131,7 @@ namespace LionRiver
 
                         TimeSpan deltaT = dt - lastTrackEntry.timestamp;
 
-                        if (deltaT < TimeSpan.FromHours(2))
+                        if (deltaT < TimeSpan.FromMinutes(30))
                         {
                             if (deltaT > TimeSpan.FromMinutes(15))
                                 deltaT = TimeSpan.FromMinutes(15);
