@@ -30,6 +30,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Zeroconf;
 
 namespace LionRiver
 {
@@ -1066,6 +1067,17 @@ namespace LionRiver
             }
             #endregion
 
+            EnumerateAllServicesFromAllHosts();
+
+
+        }
+
+        public async Task EnumerateAllServicesFromAllHosts()
+        {
+            ILookup<string, string> domains = await ZeroconfResolver.BrowseDomainsAsync();
+            var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
+            foreach (var resp in responses)
+                Console.WriteLine(resp);
         }
 
         #endregion
