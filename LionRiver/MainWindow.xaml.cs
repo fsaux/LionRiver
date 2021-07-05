@@ -377,7 +377,7 @@ namespace LionRiver
             new PlotSelector {Name="TWS",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
             new PlotSelector {Name="Drift",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0.0") },
             new PlotSelector {Name="Set",Group="A",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>((s+360)%360).ToString("0") },
-            new PlotSelector {Name="Perf",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
+            new PlotSelector {Name="Perf",Group="A",MinValue=70,MaxValue=125,Formatter=s=>s.ToString("0") },
             new PlotSelector {Name="Depth",Group="A",MinValue=double.NaN,MaxValue=0,Formatter=s=>s.ToString("0.0") },
             new PlotSelector {Name="DMG",Group="B",MinValue=double.NaN,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
             new PlotSelector {Name="Active",Group="A",MinValue=0,MaxValue=double.NaN,Formatter=s=>s.ToString("0") },
