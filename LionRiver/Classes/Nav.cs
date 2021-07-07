@@ -395,8 +395,14 @@ namespace LionRiver
                     TGTSPD.SetValid(now);
                     TGTTWA.Val = pb.TWA;
                     TGTTWA.SetValid(now);
-                    PERF.Val = VMG.Val / (pb.SPD * Math.Cos(pb.TWA * Math.PI / 180));
-                    PERF.SetValid(now);
+                    var z = (pb.SPD * Math.Cos(pb.TWA * Math.PI / 180));
+                    if (z != 0)
+                    {
+                        PERF.Val = VMG.Val / z;
+                        PERF.SetValid(now);
+                    }
+                    else
+                        PERF.Invalidate();
 
                     sailingMode = SailingMode.Beating;
                 }
@@ -407,8 +413,14 @@ namespace LionRiver
                     TGTSPD.SetValid(now);
                     TGTTWA.Val = Math.Abs(TWA.Val);
                     TGTTWA.SetValid(now);
-                    PERF.Val = Math.Abs(SPD.Val * Math.Cos((COG.Val - BRG.Val) * Math.PI / 180) / TGTSPD.Val);
-                    PERF.SetValid(now);
+                    var z = TGTSPD.Val;
+                    if (z != 0)
+                    {
+                        PERF.Val = Math.Abs(SPD.Val * Math.Cos((COG.Val - BRG.Val) * Math.PI / 180) / z);
+                        PERF.SetValid(now);
+                    }
+                    else
+                        PERF.Invalidate();
 
                     sailingMode = SailingMode.Reaching;
                 }
@@ -419,8 +431,14 @@ namespace LionRiver
                     TGTSPD.SetValid(now);
                     TGTTWA.Val = pr.TWA;
                     TGTTWA.SetValid(now);
-                    PERF.Val = VMG.Val / (pr.SPD * Math.Cos(pr.TWA * Math.PI / 180));
-                    PERF.SetValid(now);
+                    var z = (pr.SPD * Math.Cos(pr.TWA * Math.PI / 180));
+                    if (z != 0)
+                    {
+                        PERF.Val = VMG.Val / z;
+                        PERF.SetValid(now);
+                    }
+                    else
+                        PERF.Invalidate();
 
                     sailingMode = SailingMode.Running;
                 }
