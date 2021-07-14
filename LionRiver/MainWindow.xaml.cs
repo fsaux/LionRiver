@@ -2639,7 +2639,7 @@ namespace LionRiver
         private int GetLastMarkNumber()
         {
             var mkList = (from m in marksItemCollection
-                          where (m as Mark).Name.Substring(0, 2) == "mk"
+                          where (m as Mark).Name.StartsWith("mk")
                           select (m as Mark).Name.Remove(0, 2).TrimEnd(' '));
 
             int lastM = 0;
@@ -2657,7 +2657,7 @@ namespace LionRiver
         private int GetLastRouteNumber()
         {
             var rtList = (from r in routeList
-                          where (r as Route).Name.Substring(0, 6) == "Route "
+                          where (r as Route).Name.StartsWith("Route ")
                           select (r as Route).Name.Remove(0, 6).TrimEnd(' '));
 
             int lastR = 0;
