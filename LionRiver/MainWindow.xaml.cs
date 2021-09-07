@@ -1363,6 +1363,9 @@ namespace LionRiver
             RootObj BoatsLastPosition = new RootObj();
             BoatsLastPosition = JsonConvert.DeserializeObject<RootObj>(json);
 
+            if (BoatsLastPosition.posicion == null)
+                return;
+
             List<FleetTrack> ftList = new List<FleetTrack>();
 
             using (var context = new LionRiverDBContext())
