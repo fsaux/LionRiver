@@ -925,5 +925,17 @@ namespace LionRiver.Properties {
                 this["EstimateLeeway"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SignalKServerURL {
+            get {
+                return ((string)(this["SignalKServerURL"]));
+            }
+            set {
+                this["SignalKServerURL"] = value;
+            }
+        }
     }
 }

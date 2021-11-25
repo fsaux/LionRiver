@@ -76,6 +76,10 @@ namespace LionRiver
             NMEASentences.Add(AppWindSentence);
             NMEASentences.Add(TacktickPerformanceSentence);
 
+            Combobox1.Items.Add("SK Server");
+            Combobox2.Items.Add("SK Server");
+            Combobox3.Items.Add("SK Server");
+            Combobox4.Items.Add("SK Server");
 
             foreach (string s in SerialPort.GetPortNames())
             {
@@ -144,6 +148,17 @@ namespace LionRiver
         private void button2_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Close();
+
+        }
+
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
         }
 
         private void button3_Click(object sender, RoutedEventArgs e)
