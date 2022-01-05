@@ -25,7 +25,7 @@
                 <TabItem Header="Comm" Name="tabItem1">
                     <Grid>
                         <Label Content="Signal K Server URL:" Height="26" HorizontalAlignment="Left" Margin="10,10,0,0" Name="label9x" VerticalAlignment="Top" />
-                        <TextBox Height="23" HorizontalAlignment="Left" Margin="131,10,0,0"  VerticalAlignment="Top" Width="295" Text="{Binding Source={x:Static p:Settings.Default}, Path=SignalKServerURL, Mode=TwoWay}" />
+                        <TextBox Height="23" Margin="131,10,10,0"  VerticalAlignment="Top" Width="295" Text="{Binding Source={x:Static p:Settings.Default}, Path=SignalKServerURL, Mode=TwoWay}" />
                         <DockPanel>
                             <ComboBox Name="Combobox1" Width="92" Height="23"  HorizontalAlignment="Left" SelectionChanged="Combobox1_SelectionChanged" Margin="14,50,0,0" VerticalAlignment="Top">
                                 <ComboBox.Background>

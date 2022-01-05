@@ -13,6 +13,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO.Ports;
 using System.Threading;
+using WebSocketSharp;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LionRiver
 {
@@ -21,9 +24,12 @@ namespace LionRiver
     {
 
         static SerialPort SerialPort1, SerialPort2, SerialPort3, SerialPort4;
-        static bool terminateThread1, terminateThread2, terminateThread3, terminateThread4;
-        Thread readThread1, readThread2, readThread3, readThread4;
+        static bool terminateThread1, terminateThread2, terminateThread3, terminateThread4, terminateSKThread;
+        Thread readThread1, readThread2, readThread3, readThread4, skThread;
 
+        int? signalKport;
+        string skWebSocketURL;
+        
         static bool rmc_sentence_available = false;
         static bool rmb_sentence_available = false;
         static bool mwv_sentence_available = false;
@@ -33,7 +39,6 @@ namespace LionRiver
         static bool mtw_sentence_available = false;
         static bool ptak_sentence_available = false;
         static bool phdr_sentence_available = false;
-
 
         static string rmc_sentence, rmb_sentence, mwv_sentence, vhw_sentence, dpt_sentence, hdg_sentence, mtw_sentence;
         static string ptak_sentence;
@@ -175,7 +180,7 @@ namespace LionRiver
                     {
                         message = "";
                     }
-                    ProcessNMEA(message, 0);
+                    ProcessNMEA183(message, 0);
                 }
                 else
                     Thread.Sleep(1000);
@@ -197,7 +202,7 @@ namespace LionRiver
                     {
                         message = "";
                     }
-                    ProcessNMEA(message, 1);
+                    ProcessNMEA183(message, 1);
                 }
                 else
                     Thread.Sleep(1000);
@@ -219,7 +224,7 @@ namespace LionRiver
                     {
                         message = "";
                     }
-                    ProcessNMEA(message, 2);
+                    ProcessNMEA183(message, 2);
                 }
                 else
                     Thread.Sleep(1000);
@@ -241,14 +246,14 @@ namespace LionRiver
                     {
                         message = "";
                     }
-                    ProcessNMEA(message, 3);
+                    ProcessNMEA183(message, 3);
                 }
                 else
                     Thread.Sleep(1000);
             }
         }
 
-        static public void ProcessNMEA(string message, int port)
+        static public void ProcessNMEA183(string message, int port)
         {
             if (message != "")
             {
@@ -265,7 +270,7 @@ namespace LionRiver
                 catch (Exception)
                 {
                     NMEASentence = "";
-                    MarkErrorOnNMEA(port, "Bad NMEA sentence");
+                    MarkErrorOnPort(port, "Bad NMEA sentence");
                 }
 
                 switch (NMEASentence)
@@ -290,8 +295,8 @@ namespace LionRiver
                                         mvar1 = -mvar1;
                                 }
 
-                                rmc_received = true;
-                                MarkDataReceivedOnNMEA(port);
+                                navSentence_received = true;
+                                MarkDataReceivedOnPort(port);
                                 rmc_sentence = message;
                                 rmc_sentence_available = true;
 
@@ -299,7 +304,7 @@ namespace LionRiver
                             }
                             catch (Exception)
                             {
-                                MarkErrorOnNMEA(port, "Bad RMC sentence");
+                                MarkErrorOnPort(port, "Bad RMC sentence");
                             }
 
                         }
@@ -347,15 +352,15 @@ namespace LionRiver
                             {
                                 spd = double.Parse(msg[5]);
 
-                                vhw_received = true;
-                                MarkDataReceivedOnNMEA(port);
+                                hullSpeedSentence_received = true;
+                                MarkDataReceivedOnPort(port);
                                 vhw_sentence = message;
                                 vhw_sentence_available = true;
 
                             }
                             catch (Exception)
                             {
-                                MarkErrorOnNMEA(port, "Bad VHW sentence");
+                                MarkErrorOnPort(port, "Bad VHW sentence");
                             }
                         }
                         break;
@@ -367,15 +372,15 @@ namespace LionRiver
                             {
                                 dpt = double.Parse(msg[3]);
 
-                                dpt_received = true;
-                                MarkDataReceivedOnNMEA(port);
+                                depthSentence_received = true;
+                                MarkDataReceivedOnPort(port);
                                 dpt_sentence = message;
                                 dpt_sentence_available = true;
 
                             }
                             catch (Exception)
                             {
-                                MarkErrorOnNMEA(port, "Bad DBT sentence");
+                                MarkErrorOnPort(port, "Bad DBT sentence");
                             }
                         }
                         break;
@@ -387,15 +392,15 @@ namespace LionRiver
                             {
                                 dpt = double.Parse(msg[1]);
 
-                                dpt_received = true;
-                                MarkDataReceivedOnNMEA(port);
+                                depthSentence_received = true;
+                                MarkDataReceivedOnPort(port);
                                 dpt_sentence = message;
                                 dpt_sentence_available = true;
 
                             }
                             catch (Exception)
                             {
-                                MarkErrorOnNMEA(port, "Bad DPT sentence");
+                                MarkErrorOnPort(port, "Bad DPT sentence");
                             }
                         }
                         break;
@@ -418,8 +423,8 @@ namespace LionRiver
                                             break;
                                     }
 
-                                    mwv_received = true;
-                                    MarkDataReceivedOnNMEA(port);
+                                    AppWindSentence_received = true;
+                                    MarkDataReceivedOnPort(port);
                                     mwv_sentence = message;
                                     mwv_sentence_available = true;
 
@@ -427,7 +432,7 @@ namespace LionRiver
                             }
                             catch (Exception)
                             {
-                                MarkErrorOnNMEA(port, "Bad MWV sentence");
+                                MarkErrorOnPort(port, "Bad MWV sentence");
                             }
 
                         }
@@ -453,14 +458,14 @@ namespace LionRiver
                                     mvar2 = 0;
                                 }
 
-                                hdg_received = true;
-                                MarkDataReceivedOnNMEA(port);
+                                headingSentence_received = true;
+                                MarkDataReceivedOnPort(port);
                                 hdg_sentence = message;
                                 hdg_sentence_available = true;
                             }
                             catch (Exception)
                             {
-                                MarkErrorOnNMEA(port, "Bad HDG sentence");
+                                MarkErrorOnPort(port, "Bad HDG sentence");
                             }
                         }
                         break;
@@ -473,13 +478,13 @@ namespace LionRiver
                                 temp = double.Parse(msg[1]);
 
                                 mtw_received = true;
-                                MarkDataReceivedOnNMEA(port);
+                                MarkDataReceivedOnPort(port);
                                 mtw_sentence = message;
                                 mtw_sentence_available = true;
                             }
                             catch (Exception)
                             {
-                                MarkErrorOnNMEA(port, "Bad MTW sentence");
+                                MarkErrorOnPort(port, "Bad MTW sentence");
                             }
                         }
                         break;
@@ -488,7 +493,7 @@ namespace LionRiver
             }
         }
 
-        private static void MarkDataReceivedOnNMEA(int port)
+        private static void MarkDataReceivedOnPort(int port)
         {
             if (port == 0) DataReceiverStatus1.Result = RxTxResult.Ok;
             if (port == 1) DataReceiverStatus2.Result = RxTxResult.Ok;
@@ -496,7 +501,7 @@ namespace LionRiver
             if (port == 3) DataReceiverStatus4.Result = RxTxResult.Ok;
         }
 
-        private static void MarkErrorOnNMEA(int port, string err)
+        private static void MarkErrorOnPort(int port, string err)
         {
             if (port == 0) { DataReceiverStatus1.Result = RxTxResult.WrongRxData; DataReceiverStatus1.Error = err; }
             if (port == 1) { DataReceiverStatus2.Result = RxTxResult.WrongRxData; DataReceiverStatus2.Error = err; }
@@ -504,13 +509,13 @@ namespace LionRiver
             if (port == 3) { DataReceiverStatus4.Result = RxTxResult.WrongRxData; DataReceiverStatus4.Error = err; }
         }
 
-        private static bool DataReceivedOnPort(int port)
-        {
-            return (port == 1 && Properties.Settings.Default.WaterTempSentence.InPort == 0 ||
-                    port == 2 && Properties.Settings.Default.WaterTempSentence.InPort == 1 ||
-                    port == 3 && Properties.Settings.Default.WaterTempSentence.InPort == 2 ||
-                    port == 4 && Properties.Settings.Default.WaterTempSentence.InPort == 3);
-        }
+        //private static bool DataReceivedOnPort(int port)
+        //{
+        //    return (port == 1 && Properties.Settings.Default.WaterTempSentence.InPort == 0 ||
+        //            port == 2 && Properties.Settings.Default.WaterTempSentence.InPort == 1 ||
+        //            port == 3 && Properties.Settings.Default.WaterTempSentence.InPort == 2 ||
+        //            port == 4 && Properties.Settings.Default.WaterTempSentence.InPort == 3);
+        //}
 
         private static void WriteSerial(int port, string msg)
         {
@@ -523,7 +528,7 @@ namespace LionRiver
             }
             catch
             {
-                MarkErrorOnNMEA(port, "Cannot TX sentence");
+                MarkErrorOnPort(port, "Cannot TX sentence");
             }
         }
 
@@ -951,6 +956,284 @@ namespace LionRiver
             }
 
         }
+
+        public void readSKDeltas()
+        {
+            using (var ws = new WebSocket(skWebSocketURL+"?subscribe=none"))
+            {
+                ws.OnMessage += Ws_OnMessage;
+                ws.Connect();
+
+                SubscribeSK(ws);
+
+                while (!terminateSKThread)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                ws.Close();
+            }
+        }
+
+        private void SubscribeSK(WebSocket ws)
+        {
+            var sksubs = new List<skSubscribe>();
+
+            if (Properties.Settings.Default.NavSentence.InPort == signalKport)
+            {
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "navigation.courseOverGroundTrue",
+                    period = 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "navigation.speedOverGround",
+                    period = 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "navigation.position",
+                    period = 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+            }
+
+            if (Properties.Settings.Default.AppWindSentence.InPort == signalKport)
+            {
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "environment.wind.angleApparent",
+                    period = 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "environment.wind.speedApparent",
+                    period = 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+            }
+
+            if (Properties.Settings.Default.HullSpeedSentence.InPort == signalKport)
+            {
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "navigation.speedThroughWater",
+                    period = 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+            }
+
+            if (Properties.Settings.Default.HeadingSentence.InPort == signalKport)
+            {
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "navigation.headingTrue",
+                    period = 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+            }
+
+            if (Properties.Settings.Default.DepthSentence.InPort == signalKport)
+            {
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "environment.depth.belowSurface",
+                    period = 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+            }
+
+            if (sksubs.Count() != 0)
+            {
+                var sub = new skSubscribeRootObj
+                {
+                    context = "vessels.self",
+                    subscribe = sksubs
+                };
+
+                string json = JsonConvert.SerializeObject(sub);
+
+                ws.Send(json);
+            }
+        }
+
+        public void CloseSKPort()
+        {
+            terminateSKThread = true;
+            if (skThread != null)
+                skThread.Join();
+        }
+
+
+        private void Ws_OnMessage(object sender, MessageEventArgs e)
+        {
+            string message = e.Data as string ;
+            ProcessSKupdate(message, (int)signalKport);
+        }
+
+        public void ProcessSKupdate(string message, int port)
+        {
+            skUpdateRootObj sk = new skUpdateRootObj();
+
+            if (message != "")
+            {
+                try
+                {
+                    sk = JsonConvert.DeserializeObject<skUpdateRootObj>(message);
+                }
+                catch { sk = null; }
+
+                if (sk != null)
+                {
+                    if (sk.updates != null)
+                    {
+                        foreach (skUpdate upd in sk.updates)
+                        {
+                            foreach (JObject v in upd.values)
+                            {
+                                switch((string)v["path"])
+                                {
+                                    case "navigation.position":
+                                        try
+                                        {
+                                            lon = double.Parse((string)v["value"]["longitude"]);
+                                            lat = double.Parse((string)v["value"]["latitude"]);
+
+                                            navSentence_received = true;
+                                            MarkDataReceivedOnPort(port);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK navigation.position sentence");
+                                        }
+                                        break;
+
+                                    case "navigation.speedOverGround":
+                                        try
+                                        {
+                                            sog = double.Parse((string)v["value"]) * 3600 / 1852;
+
+                                            navSentence_received = true;
+                                            MarkDataReceivedOnPort(port);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK navigation.speedOverGround sentence");
+                                        }
+                                        break;
+
+                                    case "navigation.courseOverGroundTrue":
+                                        try
+                                        {
+                                            cog = double.Parse((string)v["value"]) * 180 / Math.PI;
+
+                                            navSentence_received = true;
+                                            MarkDataReceivedOnPort(port);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK navigation.courseOverGround sentence");
+                                        }
+                                        break;
+
+                                    case "environment.wind.angleApparent":
+                                        try
+                                        {
+                                            awa = double.Parse((string)v["value"]) * 180 / Math.PI;
+
+                                            AppWindSentence_received = true;
+                                            MarkDataReceivedOnPort(port);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK environment.wind.angleApparent sentence");
+                                        }
+                                        break;
+
+                                    case "environment.wind.speedApparent":
+                                        try
+                                        {
+                                            aws = double.Parse((string)v["value"]) * 3600 / 1852;
+
+                                            AppWindSentence_received = true;
+                                            MarkDataReceivedOnPort(port);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK environment.wind.speedApparent sentence");
+                                        }
+                                        break;
+
+                                    case "navigation.speedThroughWater":
+                                        try
+                                        {
+                                            spd = double.Parse((string)v["value"]) * 3600 / 1852;
+
+                                            hullSpeedSentence_received = true;
+                                            MarkDataReceivedOnPort(port);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK navigation.speedThroughWater sentence");
+                                        }
+                                        break;
+
+                                    case "navigation.headingTrue":
+                                        try
+                                        {
+                                            hdg = double.Parse((string)v["value"]) * 180 / Math.PI;
+
+                                            headingSentence_received = true;
+                                            MarkDataReceivedOnPort(port);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK navigation.headingTrue sentence");
+                                        }
+                                        break;
+
+                                    case "environment.depth.belowSurface":
+                                        try
+                                        {
+                                            dpt = double.Parse((string)v["value"]);
+
+                                            depthSentence_received = true;
+                                            MarkDataReceivedOnPort(port);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK environment.depth sentence");
+                                        }
+                                        break;
+
+
+
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+
+
+
+            }
+
+        }
+
     }
 
 }

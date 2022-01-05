@@ -30,6 +30,8 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using WebSocketSharp;
+
 
 namespace LionRiver
 {
@@ -49,11 +51,11 @@ namespace LionRiver
 
         //Primitives
         static double lat, lon, sog, cog, mvar1, mvar2, spd, dpt, awa, aws, hdg, temp;
-        static bool rmc_received = false;
-        static bool mwv_received = false;
-        static bool vhw_received = false;
-        static bool dpt_received = false;
-        static bool hdg_received = false;
+        static bool navSentence_received = false;
+        static bool AppWindSentence_received = false;
+        static bool hullSpeedSentence_received = false;
+        static bool depthSentence_received = false;
+        static bool headingSentence_received = false;
         static bool mtw_received = false;
 
         #endregion
@@ -451,7 +453,7 @@ namespace LionRiver
             //StartupWdw.Close();
         }
 
-        private void MainWindow_Initialize()
+        private async void MainWindow_Initialize()
         {
             #region Polars & Leeway
             NavPolar = new Polar();
@@ -976,7 +978,7 @@ namespace LionRiver
             FleetUpdateTimer.Start();
             #endregion
 
-            #region Ports and Threads
+            #region Serial Ports and Threads
 
             SerialPort1 = new SerialPort();
             InitializeSerialPort1();
@@ -1009,7 +1011,6 @@ namespace LionRiver
             readThread4.CurrentCulture = new System.Globalization.CultureInfo("en-US", false);
             terminateThread4 = false;
             readThread4.Start();
-
 
             if (Properties.Settings.Default.TacktickPerformanceSentence == null)
             {
@@ -1063,6 +1064,48 @@ namespace LionRiver
             {
                 if (k != "")
                     InstrumentStackPanel.Children.Add(InstrumentDisplays[k]);
+            }
+            #endregion
+
+            #region Signalk
+
+            if (Properties.Settings.Default.Port1 == "SK Server") signalKport = 0;
+            if (Properties.Settings.Default.Port2 == "SK Server") signalKport = 1;
+            if (Properties.Settings.Default.Port3 == "SK Server") signalKport = 2;
+            if (Properties.Settings.Default.Port4 == "SK Server") signalKport = 3;
+
+            if (signalKport != null)
+            {
+                skConnectRootObj sk = new skConnectRootObj();
+                string json;
+
+                try
+                {
+                    json = await HttpGet(Properties.Settings.Default.SignalKServerURL + "/signalk");
+                }
+                catch
+                {
+                    json = "";
+                }
+
+                if (json != "")
+                {
+                    try
+                    {
+                        sk = JsonConvert.DeserializeObject<skConnectRootObj>(json);
+                    }
+                    catch { sk = null; }
+                }
+                else
+                    sk = null;
+
+                if (sk != null)
+                {
+                    skWebSocketURL = sk.endpoints["v1"].ws;
+                    skThread = new Thread(readSKDeltas);
+                    terminateSKThread = false;
+                    skThread.Start();
+                }
             }
             #endregion
 
@@ -1155,7 +1198,7 @@ namespace LionRiver
 
         private void RMC_received_Timer_Tick(object sender, EventArgs e)
         {
-            rmc_received = false;
+            navSentence_received = false;
         }
 
         private void TXTimer_Tick(object sender, EventArgs e)
@@ -1346,6 +1389,29 @@ namespace LionRiver
             }
         }
 
+        static async Task<string> HttpGet(string url)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+                Uri uri = new Uri(url);
+                HttpResponseMessage response = await client.GetAsync(uri);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                return jsonResponse;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
         private async void FleetUpdateTimer_Tick(object sender, EventArgs e)
         {
             FleetUpdateTimer.Stop();
@@ -1360,8 +1426,8 @@ namespace LionRiver
                 return;
             }
 
-            RootObj BoatsLastPosition = new RootObj();
-            BoatsLastPosition = JsonConvert.DeserializeObject<RootObj>(json);
+            PositionList BoatsLastPosition = new PositionList();
+            BoatsLastPosition = JsonConvert.DeserializeObject<PositionList>(json);
 
             if (BoatsLastPosition.posicion == null)
                 return;
@@ -1437,7 +1503,7 @@ namespace LionRiver
 
                     if (lastUpdateTime != newUpdateTime)  // New boat or data available, download complete track, save new entries only
                     {
-                        RootObj bTrack = new RootObj();
+                        PositionList bTrack = new PositionList();
 
                         try
                         {
@@ -1453,7 +1519,7 @@ namespace LionRiver
                         {
                             try
                             {
-                                bTrack = JsonConvert.DeserializeObject<RootObj>(json);
+                                bTrack = JsonConvert.DeserializeObject<PositionList>(json);
                             }
                             catch { bTrack = null; }
                         }
@@ -1700,7 +1766,6 @@ namespace LionRiver
 
             MainNavPlot.Chart.UpdaterTick -= Chart_UpdaterTick;
         }
-
 
         private void Dummy_Tick(object sender, EventArgs e)
         {
@@ -5627,6 +5692,7 @@ namespace LionRiver
             CloseSerialPort2();
             CloseSerialPort3();
             CloseSerialPort4();
+            CloseSKPort();
 
             Properties.Settings.Default.MapScale = map.ZoomLevel;
             Properties.Settings.Default.MapCenter = map.Center;

@@ -15,6 +15,8 @@ using LiveCharts;
 using OSGeo.GDAL;
 using OSGeo.OSR;
 using LiveCharts.Events;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LionRiver
 {
@@ -2776,10 +2778,71 @@ namespace LionRiver
         public string velocidad { get; set; }
     }
 
-    public class RootObj // Root for JSON object
+    public class PositionList // Root for JSON object
     {
         public List<JSONBoatPosition> posicion { get; set; }
     }
+
+    #endregion
+
+    #region Signalk
+
+    public class skEndPoint // from JSON object
+    {
+        public string version { get; set; }
+        [JsonProperty("signalk-http")]
+        public string http { get; set; }
+        [JsonProperty("signalk-ws")]
+        public string ws { get; set; }
+    }
+
+    public class skServer // from JSON object
+    {
+        public string id { get; set; }
+        public string version { get; set; }
+    }
+
+    public class skConnectRootObj // Root for JSON object
+    {
+        public Dictionary<string,skEndPoint> endpoints { get; set; }
+        public skServer server { get; set; }
+    }
+
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
+    public class skSubscribe
+    {
+        public string path { get; set; }
+        public int? period { get; set; }
+        public string format { get; set; }
+        public string policy { get; set; }
+        public int? minPeriod { get; set; }
+    }
+
+    public class skSubscribeRootObj
+    {
+        public string context { get; set; }
+        public List<skSubscribe> subscribe { get; set; }
+    }
+
+    //public class skValue
+    //{
+    //    public string path { get; set; }
+    //    public JObject value { get; set; }
+    //    public string value()
+    //}
+
+    public class skUpdate
+    {
+        public object source { get; set; }
+        public List<JObject> values { get; set; }
+    }
+
+    public class skUpdateRootObj
+    {
+        public string context { get; set; }
+        public List<skUpdate> updates { get; set; }
+    }
+
 
     #endregion
 

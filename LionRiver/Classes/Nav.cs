@@ -123,7 +123,7 @@ namespace LionRiver
             sailingMode = SailingMode.None;
 
             #region Primitives
-            if (rmc_received || bypassComm)
+            if (navSentence_received || bypassComm)
             {
                 LAT.Val = lat;
                 LON.Val = lon;
@@ -136,19 +136,19 @@ namespace LionRiver
                 RMC_received_Timer.Start();
             }
 
-            if (vhw_received || bypassComm)
+            if (hullSpeedSentence_received || bypassComm)
             {
                 SPD.Val = spd;
                 SPD.SetValid(now);
             }
 
-            if (dpt_received || bypassComm)
+            if (depthSentence_received || bypassComm)
             {
                 DPT.Val = dpt;
                 DPT.SetValid(now);
             }
 
-            if (mwv_received || bypassComm)
+            if (AppWindSentence_received || bypassComm)
             {
                 AWA.Val = awa;
                 AWS.Val = aws;
@@ -162,7 +162,7 @@ namespace LionRiver
                 TEMP.SetValid(now);
             }
 
-            if (hdg_received || bypassComm)
+            if (headingSentence_received || bypassComm)
             {
                 double mv = Properties.Settings.Default.MagVar; //default
                 if (mvar2 != 0) mv = mvar2;                     //From HDG
