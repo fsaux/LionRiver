@@ -475,9 +475,9 @@ namespace LionRiver
                         {
                             try
                             {
-                                temp = double.Parse(msg[1]);
+                                wtemp = double.Parse(msg[1]);
 
-                                mtw_received = true;
+                                waterTempSentence_received = true;
                                 MarkDataReceivedOnPort(port);
                                 mtw_sentence = message;
                                 mtw_sentence_available = true;
@@ -1037,11 +1037,20 @@ namespace LionRiver
             {
                 sksubs.Add(new skSubscribe()
                 {
-                    path = "navigation.headingTrue",
+                    path = "navigation.headingMagnetic",
                     period = 1000,
                     format = "delta",
                     policy = "fixed"
                 });
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "navigation.magneticVariation",
+                    period = 600 * 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+
+                //
             }
 
             if (Properties.Settings.Default.DepthSentence.InPort == signalKport)
@@ -1050,6 +1059,17 @@ namespace LionRiver
                 {
                     path = "environment.depth.belowSurface",
                     period = 1000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+            }
+
+            if (Properties.Settings.Default.WaterTempSentence.InPort == signalKport)
+            {
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "environment.water.temperature",
+                    period = 10000,
                     format = "delta",
                     policy = "fixed"
                 });
@@ -1190,7 +1210,7 @@ namespace LionRiver
                                         }
                                         break;
 
-                                    case "navigation.headingTrue":
+                                    case "navigation.headingMagnetic":
                                         try
                                         {
                                             hdg = double.Parse((string)v["value"]) * 180 / Math.PI;
@@ -1200,7 +1220,18 @@ namespace LionRiver
                                         }
                                         catch (Exception)
                                         {
-                                            MarkErrorOnPort(port, "Bad SK navigation.headingTrue sentence");
+                                            MarkErrorOnPort(port, "Bad SK navigation.headingMagnetic sentence");
+                                        }
+                                        break;
+
+                                    case "navigation.magneticVariation":
+                                        try
+                                        {
+                                            mvar3 = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK navigation.magneticVariation sentence");
                                         }
                                         break;
 
@@ -1218,7 +1249,19 @@ namespace LionRiver
                                         }
                                         break;
 
+                                    case "environment.water.temperature":
+                                        try
+                                        {
+                                            wtemp = double.Parse((string)v["value"]) - 273.15;
 
+                                            waterTempSentence_received = true;
+                                            MarkDataReceivedOnPort(port);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                        }
+                                        break;
 
                                 }
 

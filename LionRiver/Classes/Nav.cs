@@ -156,15 +156,16 @@ namespace LionRiver
                 AWS.SetValid(now);
             }
 
-            if (mtw_received || bypassComm)
+            if (waterTempSentence_received || bypassComm)
             {
-                TEMP.Val = temp;
+                TEMP.Val = wtemp;
                 TEMP.SetValid(now);
             }
 
             if (headingSentence_received || bypassComm)
             {
                 double mv = Properties.Settings.Default.MagVar; //default
+                if (mvar3 != 0) mv = mvar3;                     //From SignalK
                 if (mvar2 != 0) mv = mvar2;                     //From HDG
                 if (mvar1 != 0) mv = mvar1;                     //From RMC
 
@@ -681,7 +682,7 @@ namespace LionRiver
                     awa = double.Parse(str[7]);
                     aws = double.Parse(str[8]);
                     dpt = double.Parse(str[9]);
-                    temp = double.Parse(str[10]);
+                    wtemp = double.Parse(str[10]);
 
                     if (dt.ToLocalTime() > starttime)
                         CalcNav(dt.ToLocalTime(), true);

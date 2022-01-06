@@ -50,13 +50,13 @@ namespace LionRiver
         static DataReceiverStatus DataReceiverStatus4 = new DataReceiverStatus();
 
         //Primitives
-        static double lat, lon, sog, cog, mvar1, mvar2, spd, dpt, awa, aws, hdg, temp;
+        static double lat, lon, sog, cog, mvar1, mvar2, mvar3, spd, dpt, awa, aws, hdg, wtemp;
         static bool navSentence_received = false;
         static bool AppWindSentence_received = false;
         static bool hullSpeedSentence_received = false;
         static bool depthSentence_received = false;
         static bool headingSentence_received = false;
-        static bool mtw_received = false;
+        static bool waterTempSentence_received = false;
 
         #endregion
 
