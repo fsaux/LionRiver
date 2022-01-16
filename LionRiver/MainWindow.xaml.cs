@@ -5,6 +5,7 @@ using LiveCharts.Wpf;
 using LiveCharts.Wpf.Charts.Base;
 using MapControl;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
@@ -166,7 +167,7 @@ namespace LionRiver
 
         #region Timers
         DispatcherTimer TXTimer = new DispatcherTimer();
-        DispatcherTimer NMEATimer = new DispatcherTimer();
+        DispatcherTimer DataReceivedCheckTimer = new DispatcherTimer();
         DispatcherTimer RMC_received_Timer = new DispatcherTimer();
         DispatcherTimer ShortNavTimer = new DispatcherTimer();
         DispatcherTimer MediumNavTimer = new DispatcherTimer();
@@ -934,8 +935,8 @@ namespace LionRiver
             TXTimer.Tick += new EventHandler(TXTimer_Tick);
             TXTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
 
-            NMEATimer.Tick += new EventHandler(NMEATimer_Tick);
-            NMEATimer.Interval = new TimeSpan(0, 0, 5);
+            DataReceivedCheckTimer.Tick += new EventHandler(DataReceivedCheckTimer_Tick);
+            DataReceivedCheckTimer.Interval = new TimeSpan(0, 0, 5);
 
             RMC_received_Timer.Tick += new EventHandler(RMC_received_Timer_Tick);
             RMC_received_Timer.Interval = new TimeSpan(0, 0, 5);
@@ -953,7 +954,7 @@ namespace LionRiver
             XLNavTimer.Interval = new TimeSpan(0, 15, 0);
 
             FleetUpdateTimer.Tick += new EventHandler(FleetUpdateTimer_Tick);
-            FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
+            FleetUpdateTimer.Interval = new TimeSpan(0, 0, 15);
             //FleetUpdateTimer.Interval = new TimeSpan(0, 0, 60);  // For testing
 
             ReplayTimer.Tick += new EventHandler(ReplayTimer_Tick);
@@ -970,7 +971,7 @@ namespace LionRiver
             //DummyTimer.Start();
 
             TXTimer.Start();
-            NMEATimer.Start();
+            DataReceivedCheckTimer.Start();
             ShortNavTimer.Start();
             MediumNavTimer.Start();
             LongNavTimer.Start();
@@ -1069,44 +1070,8 @@ namespace LionRiver
 
             #region Signalk
 
-            if (Properties.Settings.Default.Port1 == "SK Server") signalKport = 0;
-            if (Properties.Settings.Default.Port2 == "SK Server") signalKport = 1;
-            if (Properties.Settings.Default.Port3 == "SK Server") signalKport = 2;
-            if (Properties.Settings.Default.Port4 == "SK Server") signalKport = 3;
+            OpenSkPort();
 
-            if (signalKport != null)
-            {
-                skConnectRootObj sk = new skConnectRootObj();
-                string json;
-
-                try
-                {
-                    json = await HttpGet(Properties.Settings.Default.SignalKServerURL + "/signalk");
-                }
-                catch
-                {
-                    json = "";
-                }
-
-                if (json != "")
-                {
-                    try
-                    {
-                        sk = JsonConvert.DeserializeObject<skConnectRootObj>(json);
-                    }
-                    catch { sk = null; }
-                }
-                else
-                    sk = null;
-
-                if (sk != null)
-                {
-                    skWebSocketURL = sk.endpoints["v1"].ws;
-                    skThread = new Thread(readSKDeltas);
-                    terminateSKThread = false;
-                    skThread.Start();
-                }
-            }
             #endregion
 
         }
@@ -1115,7 +1080,7 @@ namespace LionRiver
 
         #region Timer ticks
 
-        private void NMEATimer_Tick(object sender, EventArgs e)
+        private void DataReceivedCheckTimer_Tick(object sender, EventArgs e)
         {
 
             switch (DataReceiverStatus1.Result)
@@ -1214,7 +1179,7 @@ namespace LionRiver
                 o2 = Properties.Settings.Default.NavSentence.OutPort2;
                 o3 = Properties.Settings.Default.NavSentence.OutPort3;
                 o4 = Properties.Settings.Default.NavSentence.OutPort4;
-                TXSentence(rmc_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(rmc_sentence, o1, o2, o3, o4);
                 rmc_sentence_available = false;
             }
 
@@ -1224,7 +1189,7 @@ namespace LionRiver
                 o2 = Properties.Settings.Default.RouteSentence.OutPort2;
                 o3 = Properties.Settings.Default.RouteSentence.OutPort3;
                 o4 = Properties.Settings.Default.RouteSentence.OutPort4;
-                TXSentence(rmb_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(rmb_sentence, o1, o2, o3, o4);
                 rmb_sentence_available = false;
             }
 
@@ -1234,7 +1199,7 @@ namespace LionRiver
                 o2 = Properties.Settings.Default.HeadingSentence.OutPort2;
                 o3 = Properties.Settings.Default.HeadingSentence.OutPort3;
                 o4 = Properties.Settings.Default.HeadingSentence.OutPort4;
-                TXSentence(hdg_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(hdg_sentence, o1, o2, o3, o4);
                 hdg_sentence_available = false;
             }
 
@@ -1244,7 +1209,7 @@ namespace LionRiver
                 o2 = Properties.Settings.Default.HullSpeedSentence.OutPort2;
                 o3 = Properties.Settings.Default.HullSpeedSentence.OutPort3;
                 o4 = Properties.Settings.Default.HullSpeedSentence.OutPort4;
-                TXSentence(vhw_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(vhw_sentence, o1, o2, o3, o4);
                 vhw_sentence_available = false;
             }
 
@@ -1254,7 +1219,7 @@ namespace LionRiver
                 o2 = Properties.Settings.Default.AppWindSentence.OutPort2;
                 o3 = Properties.Settings.Default.AppWindSentence.OutPort3;
                 o4 = Properties.Settings.Default.AppWindSentence.OutPort4;
-                TXSentence(mwv_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(mwv_sentence, o1, o2, o3, o4);
                 mwv_sentence_available = false;
             }
 
@@ -1264,7 +1229,7 @@ namespace LionRiver
                 o2 = Properties.Settings.Default.WaterTempSentence.OutPort2;
                 o3 = Properties.Settings.Default.WaterTempSentence.OutPort3;
                 o4 = Properties.Settings.Default.WaterTempSentence.OutPort4;
-                TXSentence(mtw_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(mtw_sentence, o1, o2, o3, o4);
                 mtw_sentence_available = false;
             }
 
@@ -1274,7 +1239,7 @@ namespace LionRiver
                 o2 = Properties.Settings.Default.DepthSentence.OutPort2;
                 o3 = Properties.Settings.Default.DepthSentence.OutPort3;
                 o4 = Properties.Settings.Default.DepthSentence.OutPort4;
-                TXSentence(dpt_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(dpt_sentence, o1, o2, o3, o4);
                 dpt_sentence_available = false;
             }
 
@@ -1284,7 +1249,7 @@ namespace LionRiver
                 o2 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort2;
                 o3 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort3;
                 o4 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort4;
-                TXSentence(ptak_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(ptak_sentence, o1, o2, o3, o4);
                 ptak_sentence_available = false;
             }
 
@@ -1294,30 +1259,14 @@ namespace LionRiver
                 o2 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort2;
                 o3 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort3;
                 o4 = Properties.Settings.Default.TacktickPerformanceSentence.OutPort4;
-                TXSentence(phdr1_sentence, o1, o2, o3, o4);
-                TXSentence(phdr2_sentence, o1, o2, o3, o4);
-                TXSentence(phdr3_sentence, o1, o2, o3, o4);
-                TXSentence(phdr4_sentence, o1, o2, o3, o4);
-                TXSentence(phdr5_sentence, o1, o2, o3, o4);
-                TXSentence(phdr6_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(phdr1_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(phdr2_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(phdr3_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(phdr4_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(phdr5_sentence, o1, o2, o3, o4);
+                TX_NMEA183Sentence(phdr6_sentence, o1, o2, o3, o4);
                 phdr_sentence_available = false;
             }
-        }
-
-        private void TXSentence(string message, bool o1, bool o2, bool o3, bool o4)
-        {
-            if (o1)
-                if (SerialPort1.IsOpen)
-                    WriteSerial(1, message);
-            if (o2)
-                if (SerialPort2.IsOpen)
-                    WriteSerial(2, message);
-            if (o3)
-                if (SerialPort3.IsOpen)
-                    WriteSerial(3, message);
-            if (o4)
-                if (SerialPort4.IsOpen)
-                    WriteSerial(4, message);
         }
 
         private void ShortNavTimer_Tick(object sender, EventArgs e)
@@ -1329,11 +1278,12 @@ namespace LionRiver
             else
             {
                 CalcNav(DateTime.Now);
-                BuildNMEASentences();
+                BuildNMEA183Sentences();
                 BuildPTAKSentences();
+                WriteSKDeltas();
             }
 
-            UpdateNav();
+            UpdateScreen();
         }
 
         private void MediumNavTimer_Tick(object sender, EventArgs e)
@@ -1345,71 +1295,15 @@ namespace LionRiver
             CalcLongNav(DateTime.Now);
             CalcRouteData();
             routeControl.DataGrid1.Items.Refresh();
+
+            if (signalKport != null && SignalkWebSocket == null)
+                OpenSkPort();
         }
 
         private void XLNavTimer_Tick(object sender, EventArgs e)
         {
             SetGribTimeNow();
             BuildPTAKheaders();
-        }
-
-        static async Task<string> DownloadPage(string url)
-        {
-            using (var client = new HttpClient())
-            {
-                using (var r = await client.GetAsync(new Uri(url)))
-                {
-                    string result = await r.Content.ReadAsStringAsync();
-                    return result;
-                }
-            }
-        }
-
-        static async Task<string> HttpPost(string url, string str)
-        {
-            try
-            {
-                HttpClient client = new HttpClient();
-
-                Uri uri = new Uri(url);
-                StringContent content = new StringContent(str, System.Text.Encoding.UTF8, "application/x-www-form-urlencoded");
-                HttpResponseMessage response = await client.PostAsync(uri, content);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return string.Empty;
-                }
-
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                return jsonResponse;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
-        }
-
-        static async Task<string> HttpGet(string url)
-        {
-            try
-            {
-                HttpClient client = new HttpClient();
-
-                Uri uri = new Uri(url);
-                HttpResponseMessage response = await client.GetAsync(uri);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return string.Empty;
-                }
-
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                return jsonResponse;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
         }
 
         private async void FleetUpdateTimer_Tick(object sender, EventArgs e)
@@ -1419,7 +1313,7 @@ namespace LionRiver
 
             try
             {
-                json = await DownloadPage("http://posicionadores.yca.org.ar/sistema/regatas/RegataYCA/feedposiciones.json?_=1487086731874");
+                json = await DownloadPage("https://posicionadores.yca.org.ar/sistema/regatas/RegataYCA/feedposiciones.json?_=1642306356206");
             }
             catch
             {
@@ -1507,7 +1401,10 @@ namespace LionRiver
 
                         try
                         {
-                            json = await HttpPost("http://posicionadores.yca.org.ar/sistema/posicionador.php", "modo=trayectoria&barco=" + bp.embarcacion);
+                            json = await HttpPost("https://posicionadores.yca.org.ar/sistema/endpoint.php",
+                                "modo=trayectoria&barco=" + bp.embarcacion,
+                                "application/x-www-form-urlencoded",
+                                System.Text.Encoding.UTF8);
                         }
                         catch
                         {
@@ -2173,19 +2070,6 @@ namespace LionRiver
             }
 
         }
-
-        //private void MenuItem_InsertComment_Click(object sender, RoutedEventArgs e)
-        //{
-        //    LogCommentDlg dlg = new LogCommentDlg();
-
-        //    Nullable<bool> result = dlg.ShowDialog();
-
-        //    if (result == true)
-        //    {
-        //        CommentLogged = true;
-        //        Comment = dlg.textBox1.Text;
-        //    }
-        //}
 
         private void GPXLoadButton_Click(object sender, RoutedEventArgs e)
         {
@@ -3247,7 +3131,7 @@ namespace LionRiver
 
         private void SelectFleetBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var fboat = ((e.Source as MapItemsControl).SelectedItem as MapItem).DataContext as Boat;
+            var fboat = (e.Source as MapItem).DataContext as Boat;
 
             fboat.IsSelected = true;
 
@@ -3267,7 +3151,7 @@ namespace LionRiver
 
         private void SelectFleetBoatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            var fboat = ((e.Source as MapItemsControl).SelectedItem as MapItem).DataContext as Boat;
+            var fboat = (e.Source as MapItem).DataContext as Boat;   
 
             if (fboat.IsSelected)
                 e.CanExecute = false;
@@ -3280,7 +3164,7 @@ namespace LionRiver
 
         private void UnselectFleetBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var fboat = ((e.Source as MapItemsControl).SelectedItem as MapItem).DataContext as Boat;
+            var fboat = (e.Source as MapItem).DataContext as Boat;
 
             fboat.IsSelected = false;
 
@@ -3297,7 +3181,7 @@ namespace LionRiver
 
         private void UnselectFleetBoatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            var fboat = ((e.Source as MapItemsControl).SelectedItem as MapItem).DataContext as Boat;
+            var fboat = (e.Source as MapItem).DataContext as Boat;
 
             if (fboat.IsSelected == false)
                 e.CanExecute = false;
@@ -3827,6 +3711,8 @@ namespace LionRiver
                 }
 
                 BuildPTAKheaders();
+
+                OpenSkPort();
             }
 
             SettingsButton.IsChecked = false;
@@ -4761,7 +4647,7 @@ namespace LionRiver
 
         #region MainWindow Updates
 
-        private void UpdateNav()
+        private void UpdateScreen()
         {
             if (PlayButton.IsChecked == true)
             {

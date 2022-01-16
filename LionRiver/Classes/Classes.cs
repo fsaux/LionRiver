@@ -2831,17 +2831,63 @@ namespace LionRiver
     //    public string value()
     //}
 
-    public class skUpdate
+    public class skReceiveUpdate
     {
         public object source { get; set; }
         public List<JObject> values { get; set; }
     }
 
-    public class skUpdateRootObj
+    public class skReceiveUpdateRootObj
     {
         public string context { get; set; }
-        public List<skUpdate> updates { get; set; }
+        public List<skReceiveUpdate> updates { get; set; }
     }
+
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
+    public class skSendUpdateRootObj
+    {
+        public string requestId { get; set; }
+        public string context { get; set; }
+        public object put { get; set; }
+    }
+
+    public class skPut
+    {
+        public string path { get; set; }
+        public string source { get; set; }
+        public double value { get; set; }
+    }
+
+    public class skPutPos:skPut
+    {
+        public new skPosition value { get; set; }
+    }
+
+    public class skPosition
+    {
+        public double latitude { get; set; }
+        public double longitude { get; set; }
+    }
+
+    public class skLoginObj
+    {
+        public string username { get; set; }
+        public string password { get; set; }
+    }
+
+    public class skAuthRootObj
+    {
+        public string requestId { get; set; }
+        public skLoginObj login { get; set; }
+    }
+
+    public class skTokenObj
+    {
+        public string token { get; set; }
+        public int? timeToLive { get; set; }
+    }
+
+
 
 
     #endregion

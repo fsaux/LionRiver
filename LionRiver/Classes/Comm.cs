@@ -16,6 +16,11 @@ using System.Threading;
 using WebSocketSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using WebSocketSharp.Net;
+using MapControl;
 
 namespace LionRiver
 {
@@ -28,8 +33,12 @@ namespace LionRiver
         Thread readThread1, readThread2, readThread3, readThread4, skThread;
 
         int? signalKport;
-        string skWebSocketURL;
-        
+        string skWebSocketURL, skHttpURL, skToken;
+        WebSocket SignalkWebSocket;
+        bool skTacktickPerformanceSentenceOut, skRouteSentenceOut;
+        Location skActiveWpt, skLastWpt;
+
+
         static bool rmc_sentence_available = false;
         static bool rmb_sentence_available = false;
         static bool mwv_sentence_available = false;
@@ -517,6 +526,22 @@ namespace LionRiver
         //            port == 4 && Properties.Settings.Default.WaterTempSentence.InPort == 3);
         //}
 
+        private void TX_NMEA183Sentence(string message, bool o1, bool o2, bool o3, bool o4)
+        {
+            if (o1)
+                if (SerialPort1.IsOpen)
+                    WriteSerial(1, message);
+            if (o2)
+                if (SerialPort2.IsOpen)
+                    WriteSerial(2, message);
+            if (o3)
+                if (SerialPort3.IsOpen)
+                    WriteSerial(3, message);
+            if (o4)
+                if (SerialPort4.IsOpen)
+                    WriteSerial(4, message);
+        }
+
         private static void WriteSerial(int port, string msg)
         {
             try
@@ -532,7 +557,7 @@ namespace LionRiver
             }
         }
 
-        public void BuildNMEASentences()
+        public void BuildNMEA183Sentences()
         {
             string message;
 
@@ -957,21 +982,166 @@ namespace LionRiver
 
         }
 
-        public void readSKDeltas()
+        public void SkWebSocketThread()
         {
-            using (var ws = new WebSocket(skWebSocketURL+"?subscribe=none"))
+            using (var ws = new WebSocket(skWebSocketURL + "?subscribe=none"))
             {
                 ws.OnMessage += Ws_OnMessage;
+                ws.OnOpen += Ws_OnOpen;
+                ws.OnClose += Ws_OnClose;
+
+                ws.SetCookie(new Cookie("JAUTHENTICATION", skToken));
+
                 ws.Connect();
-
-                SubscribeSK(ws);
-
+                
                 while (!terminateSKThread)
                 {
                     Thread.Sleep(1000);
                 }
 
                 ws.Close();
+            }
+        }
+
+        private void Ws_OnClose(object sender, CloseEventArgs e)
+        {
+            SignalkWebSocket = null;
+        }
+
+        private void Ws_OnMessage(object sender, MessageEventArgs e)
+        {
+            var json = e.Data as string;
+
+                ProcessSKupdate(json, (int)signalKport);
+        }
+
+        private void Ws_OnOpen(object sender, EventArgs e)
+        {
+            var ws = sender as WebSocket;
+
+            SignalkWebSocket = ws;
+            
+            SubscribeSK((WebSocket)sender);
+        }
+
+        public void WriteSKDeltas()
+        {
+            if (SignalkWebSocket != null)
+            {
+
+                try
+                {
+                    skSendUpdateRootObj sk;
+                    string json;
+
+                    if (skRouteSentenceOut)
+                    {
+                        if (VMGWPT.IsValid())
+                        {
+                            sk = new skSendUpdateRootObj()
+                            {
+                                requestId = Guid.NewGuid().ToString(),
+                                put = new skPut()
+                                {
+                                    path = "navigation.courseGreatCircle.nextPoint.velocityMadeGood",
+                                    value = VMG.Val * 1852 / 3600,
+                                    source = "Lionriver"
+                                }
+                            };
+
+                            json = JsonConvert.SerializeObject(sk);
+                            SignalkWebSocket.Send(json);
+                        }
+
+                        if (WPT.IsValid()) // XTE
+                        {
+                            double val;
+
+                            if (XTE.IsValid())
+                                val = XTE.Val * 1852;
+                            else
+                                val = 0;
+
+                            sk = new skSendUpdateRootObj()
+                            {
+                                requestId = Guid.NewGuid().ToString(),
+                                put = new skPut()
+                                {
+                                    path = "navigation.courseGreatCircle.crossTrackError",
+                                    value = val,
+                                    source = "Lionriver"
+                                }
+                            };
+
+                            json = JsonConvert.SerializeObject(sk);
+                            SignalkWebSocket.Send(json);
+                        }
+
+                        if (DST.IsValid())
+                        {
+                            sk = new skSendUpdateRootObj()
+                            {
+                                requestId = Guid.NewGuid().ToString(),
+                                put = new skPut()
+                                {
+                                    path = "navigation.courseGreatCircle.nextPoint.distance",
+                                    value = DST.Val * 1852,
+                                    source = "Lionriver"
+                                }
+                            };
+
+                            json = JsonConvert.SerializeObject(sk);
+                            SignalkWebSocket.Send(json);
+                        }
+
+                        if (BRG.IsValid())
+                        {
+                            sk = new skSendUpdateRootObj()
+                            {
+                                requestId = Guid.NewGuid().ToString(),
+                                put = new skPut()
+                                {
+                                    path = "navigation.courseGreatCircle.nextPoint.bearingTrue",
+                                    value = BRG.Val * Math.PI / 180,
+                                    source = "Lionriver"
+                                }
+                            };
+
+                            json = JsonConvert.SerializeObject(sk);
+                            SignalkWebSocket.Send(json);
+                        }
+
+                        if (WPT.IsValid())
+                        {
+                            if (WLAT.Val != skActiveWpt.Latitude || WLON.Val != skActiveWpt.Longitude)
+                            {
+                                skActiveWpt.Latitude = WLAT.Val;
+                                skActiveWpt.Longitude = WLON.Val;
+
+                                sk = new skSendUpdateRootObj()
+                                {
+                                    requestId = Guid.NewGuid().ToString(),
+                                    put = new skPutPos()
+                                    {
+                                        path = "navigation.courseGreatCircle.nextPoint.position",
+                                        value = new skPosition
+                                        {
+                                            latitude = WLAT.Val,
+                                            longitude = WLON.Val
+                                        },
+                                        source = "Lionriver"
+                                    }
+                                };
+
+                                json = JsonConvert.SerializeObject(sk);
+                                SignalkWebSocket.Send(json);
+                            }
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
             }
         }
 
@@ -1096,22 +1266,115 @@ namespace LionRiver
                 skThread.Join();
         }
 
-
-        private void Ws_OnMessage(object sender, MessageEventArgs e)
+        public async void OpenSkPort()
         {
-            string message = e.Data as string ;
-            ProcessSKupdate(message, (int)signalKport);
+            if (Properties.Settings.Default.Port1 == "SK Server") signalKport = 0;
+            if (Properties.Settings.Default.Port2 == "SK Server") signalKport = 1;
+            if (Properties.Settings.Default.Port3 == "SK Server") signalKport = 2;
+            if (Properties.Settings.Default.Port4 == "SK Server") signalKport = 3;
+
+            if(Properties.Settings.Default.RouteSentence.OutPort1||
+                Properties.Settings.Default.RouteSentence.OutPort2||
+                Properties.Settings.Default.RouteSentence.OutPort3||
+                Properties.Settings.Default.RouteSentence.OutPort4)
+            {
+                skRouteSentenceOut = true;
+            }
+            else
+            {
+                skRouteSentenceOut = false;
+            }
+
+            if (Properties.Settings.Default.TacktickPerformanceSentence.OutPort1 ||
+                Properties.Settings.Default.TacktickPerformanceSentence.OutPort2 ||
+                Properties.Settings.Default.TacktickPerformanceSentence.OutPort3 ||
+                Properties.Settings.Default.TacktickPerformanceSentence.OutPort4)
+            {
+                skTacktickPerformanceSentenceOut = true;
+            }
+            else
+            {
+                skTacktickPerformanceSentenceOut = false;
+            }
+
+            if (signalKport != null && SignalkWebSocket == null)
+            {
+                skConnectRootObj sk = new skConnectRootObj();
+                string json;
+
+                try
+                {
+                    json = await HttpGet(Properties.Settings.Default.SignalKServerURL + "/signalk");
+                }
+                catch
+                {
+                    json = "";
+                }
+
+                if (json != "")
+                {
+                    try
+                    {
+                        sk = JsonConvert.DeserializeObject<skConnectRootObj>(json);
+                    }
+                    catch { sk = null; }
+                }
+                else
+                    sk = null;
+
+                if (sk != null)
+                {
+                    skWebSocketURL = sk.endpoints["v1"].ws;
+                    skHttpURL = sk.endpoints["v1"].http;
+
+                    var auth = new skLoginObj()
+                    {
+                        username = "lionriver",
+                        password = "lionriver"
+                    };
+
+                    var jAuth = JsonConvert.SerializeObject(auth);
+
+                    json = "";
+
+                    try
+                    {
+                        json = await HttpPost(Properties.Settings.Default.SignalKServerURL + "/signalk/v1/auth/login", jAuth, "application/json", null);
+                    }
+                    catch
+                    {
+                        json = "";
+                    }
+
+                    if (json != "")
+                    {
+                        var o = JObject.Parse(json);
+
+                        skToken = (string)o["token"];
+
+                        if (skToken != null)
+                        {
+                            skThread = new Thread(SkWebSocketThread);
+                            terminateSKThread = false;
+                            //skThread.Start();
+                        }
+                    }
+                }
+            }
+
+            skActiveWpt = new Location();
+            skLastWpt = new Location();
         }
 
         public void ProcessSKupdate(string message, int port)
         {
-            skUpdateRootObj sk = new skUpdateRootObj();
+            skReceiveUpdateRootObj sk;
 
             if (message != "")
             {
                 try
                 {
-                    sk = JsonConvert.DeserializeObject<skUpdateRootObj>(message);
+                    sk = JsonConvert.DeserializeObject<skReceiveUpdateRootObj>(message);
                 }
                 catch { sk = null; }
 
@@ -1119,7 +1382,7 @@ namespace LionRiver
                 {
                     if (sk.updates != null)
                     {
-                        foreach (skUpdate upd in sk.updates)
+                        foreach (skReceiveUpdate upd in sk.updates)
                         {
                             foreach (JObject v in upd.values)
                             {
@@ -1127,45 +1390,46 @@ namespace LionRiver
                                 {
                                     case "navigation.position":
                                         try
-                                        {
-                                            lon = double.Parse((string)v["value"]["longitude"]);
-                                            lat = double.Parse((string)v["value"]["latitude"]);
+                                            {
+                                                lon = double.Parse((string)v["value"]["longitude"]);
+                                                lat = double.Parse((string)v["value"]["latitude"]);
 
-                                            navSentence_received = true;
-                                            MarkDataReceivedOnPort(port);
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK navigation.position sentence");
-                                        }
+                                                navSentence_received = true;
+                                                MarkDataReceivedOnPort(port);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK navigation.position sentence");
+                                            }
                                         break;
 
                                     case "navigation.speedOverGround":
                                         try
                                         {
-                                            sog = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                sog = double.Parse((string)v["value"]) * 3600 / 1852;
 
-                                            navSentence_received = true;
-                                            MarkDataReceivedOnPort(port);
+                                                navSentence_received = true;
+                                                MarkDataReceivedOnPort(port);
+                                            
                                         }
                                         catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK navigation.speedOverGround sentence");
-                                        }
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK navigation.speedOverGround sentence");
+                                            }
                                         break;
 
                                     case "navigation.courseOverGroundTrue":
                                         try
-                                        {
-                                            cog = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                            {
+                                                cog = double.Parse((string)v["value"]) * 180 / Math.PI;
 
-                                            navSentence_received = true;
-                                            MarkDataReceivedOnPort(port);
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK navigation.courseOverGround sentence");
-                                        }
+                                                navSentence_received = true;
+                                                MarkDataReceivedOnPort(port);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK navigation.courseOverGround sentence");
+                                            }
                                         break;
 
                                     case "environment.wind.angleApparent":
@@ -1277,6 +1541,92 @@ namespace LionRiver
 
         }
 
+        static async Task<string> DownloadPage(string url)
+        {
+            using (var client = new HttpClient())
+            {
+                using (var r = await client.GetAsync(new Uri(url)))
+                {
+                    string result = await r.Content.ReadAsStringAsync();
+                    return result;
+                }
+            }
+        }
+
+        static async Task<string> HttpPost(string url, string strcont,string mediatype, Encoding enc)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+                Uri uri = new Uri(url);
+                StringContent content = new StringContent(strcont, enc , mediatype);
+                if(enc==null)
+                    content.Headers.ContentType.CharSet = string.Empty;
+                HttpResponseMessage response = await client.PostAsync(uri, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                return jsonResponse;
+            }
+            catch (Exception e)
+            {
+                return string.Empty;
+            }
+        }
+
+        static async Task<string> HttpPut(string url, string str, string token)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+                Uri uri = new Uri(url);
+                StringContent content = new StringContent(str, null, "application/json");
+                content.Headers.ContentType.CharSet = string.Empty;
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("JWT", token);
+                HttpResponseMessage response = await client.PutAsync(uri, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                return jsonResponse;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        static async Task<string> HttpGet(string url)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+                Uri uri = new Uri(url);
+                HttpResponseMessage response = await client.GetAsync(uri);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                return jsonResponse;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
     }
 
 }
