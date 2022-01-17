@@ -1147,6 +1147,45 @@ namespace LionRiver
             }
         }
 
+        public void WriteSKDeltaStopNav()
+        {
+            if (SignalkWebSocket != null)
+            {
+                try
+                {
+                    List<skSendUpdateRootObj> skList = new List<skSendUpdateRootObj>();
+
+
+                    if (skRouteSentenceOut)
+                    {
+                        #region WPT position
+
+                        skList.Add(new skSendUpdateRootObj()
+                        {
+                            requestId = Guid.NewGuid().ToString(),
+                            put = new skPutPos()
+                            {
+                                path = "navigation.courseGreatCircle.nextPoint.position",
+                                value = null,
+                                source = "Lionriver"
+                            }
+                        });
+                        
+                        #endregion
+
+                        foreach (skSendUpdateRootObj sko in skList)
+                        {
+                            string json = JsonConvert.SerializeObject(sko);
+                            SignalkWebSocket.Send(json);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
         private void SubscribeSK(WebSocket ws)
         {
             var sksubs = new List<skSubscribe>();

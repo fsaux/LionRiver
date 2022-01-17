@@ -454,7 +454,7 @@ namespace LionRiver
             //StartupWdw.Close();
         }
 
-        private async void MainWindow_Initialize()
+        private void MainWindow_Initialize()
         {
             #region Polars & Leeway
             NavPolar = new Polar();
@@ -2917,6 +2917,8 @@ namespace LionRiver
             ActiveRoute = null;
             ActiveLeg = null;
             ActiveMark = null;
+
+            WriteSKDeltaStopNav();
         }
 
         private void StopNavCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
