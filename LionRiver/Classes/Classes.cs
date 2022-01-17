@@ -2843,10 +2843,10 @@ namespace LionRiver
         public List<skReceiveUpdate> updates { get; set; }
     }
 
-    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class skSendUpdateRootObj
     {
         public string requestId { get; set; }
+        [JsonProperty(NullValueHandling=NullValueHandling.Ignore)]
         public string context { get; set; }
         public object put { get; set; }
     }
@@ -2855,7 +2855,7 @@ namespace LionRiver
     {
         public string path { get; set; }
         public string source { get; set; }
-        public double value { get; set; }
+        public double? value { get; set; }
     }
 
     public class skPutPos:skPut

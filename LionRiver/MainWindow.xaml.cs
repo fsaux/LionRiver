@@ -948,13 +948,13 @@ namespace LionRiver
             MediumNavTimer.Interval = new TimeSpan(0, 0, 4);
 
             LongNavTimer.Tick += new EventHandler(LongNavTimer_Tick);
-            LongNavTimer.Interval = new TimeSpan(0, 0, 15);
+            LongNavTimer.Interval = new TimeSpan(0, 0, 20);
 
             XLNavTimer.Tick += new EventHandler(XLNavTimer_Tick);
             XLNavTimer.Interval = new TimeSpan(0, 15, 0);
 
             FleetUpdateTimer.Tick += new EventHandler(FleetUpdateTimer_Tick);
-            FleetUpdateTimer.Interval = new TimeSpan(0, 0, 15);
+            FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
             //FleetUpdateTimer.Interval = new TimeSpan(0, 0, 60);  // For testing
 
             ReplayTimer.Tick += new EventHandler(ReplayTimer_Tick);
@@ -1293,8 +1293,8 @@ namespace LionRiver
         private void LongNavTimer_Tick(object sender, EventArgs e)
         {
             CalcLongNav(DateTime.Now);
-            CalcRouteData();
-            routeControl.DataGrid1.Items.Refresh();
+            //CalcRouteData();
+            //routeControl.DataGrid1.Items.Refresh();
 
             if (signalKport != null && SignalkWebSocket == null)
                 OpenSkPort();
@@ -1403,8 +1403,7 @@ namespace LionRiver
                         {
                             json = await HttpPost("https://posicionadores.yca.org.ar/sistema/endpoint.php",
                                 "modo=trayectoria&barco=" + bp.embarcacion,
-                                "application/x-www-form-urlencoded",
-                                System.Text.Encoding.UTF8);
+                                "application/x-www-form-urlencoded");
                         }
                         catch
                         {

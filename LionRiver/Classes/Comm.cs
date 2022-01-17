@@ -1031,111 +1031,113 @@ namespace LionRiver
 
                 try
                 {
-                    skSendUpdateRootObj sk;
-                    string json;
+                    List<skSendUpdateRootObj> skList=new List<skSendUpdateRootObj>();
+                    double? val;
+                    skPosition pval;
 
                     if (skRouteSentenceOut)
                     {
+
+                        #region VMG
                         if (VMGWPT.IsValid())
+                            val = VMG.Val * 1852 / 3600;
+                        else
+                            val = null;
+
+                        skList.Add(new skSendUpdateRootObj()
                         {
-                            sk = new skSendUpdateRootObj()
+                            requestId = Guid.NewGuid().ToString(),
+                            put = new skPut()
                             {
-                                requestId = Guid.NewGuid().ToString(),
-                                put = new skPut()
-                                {
-                                    path = "navigation.courseGreatCircle.nextPoint.velocityMadeGood",
-                                    value = VMG.Val * 1852 / 3600,
-                                    source = "Lionriver"
-                                }
-                            };
-
-                            json = JsonConvert.SerializeObject(sk);
-                            SignalkWebSocket.Send(json);
-                        }
-
-                        if (WPT.IsValid()) // XTE
-                        {
-                            double val;
-
-                            if (XTE.IsValid())
-                                val = XTE.Val * 1852;
-                            else
-                                val = 0;
-
-                            sk = new skSendUpdateRootObj()
-                            {
-                                requestId = Guid.NewGuid().ToString(),
-                                put = new skPut()
-                                {
-                                    path = "navigation.courseGreatCircle.crossTrackError",
-                                    value = val,
-                                    source = "Lionriver"
-                                }
-                            };
-
-                            json = JsonConvert.SerializeObject(sk);
-                            SignalkWebSocket.Send(json);
-                        }
-
-                        if (DST.IsValid())
-                        {
-                            sk = new skSendUpdateRootObj()
-                            {
-                                requestId = Guid.NewGuid().ToString(),
-                                put = new skPut()
-                                {
-                                    path = "navigation.courseGreatCircle.nextPoint.distance",
-                                    value = DST.Val * 1852,
-                                    source = "Lionriver"
-                                }
-                            };
-
-                            json = JsonConvert.SerializeObject(sk);
-                            SignalkWebSocket.Send(json);
-                        }
-
-                        if (BRG.IsValid())
-                        {
-                            sk = new skSendUpdateRootObj()
-                            {
-                                requestId = Guid.NewGuid().ToString(),
-                                put = new skPut()
-                                {
-                                    path = "navigation.courseGreatCircle.nextPoint.bearingTrue",
-                                    value = BRG.Val * Math.PI / 180,
-                                    source = "Lionriver"
-                                }
-                            };
-
-                            json = JsonConvert.SerializeObject(sk);
-                            SignalkWebSocket.Send(json);
-                        }
-
-                        if (WPT.IsValid())
-                        {
-                            if (WLAT.Val != skActiveWpt.Latitude || WLON.Val != skActiveWpt.Longitude)
-                            {
-                                skActiveWpt.Latitude = WLAT.Val;
-                                skActiveWpt.Longitude = WLON.Val;
-
-                                sk = new skSendUpdateRootObj()
-                                {
-                                    requestId = Guid.NewGuid().ToString(),
-                                    put = new skPutPos()
-                                    {
-                                        path = "navigation.courseGreatCircle.nextPoint.position",
-                                        value = new skPosition
-                                        {
-                                            latitude = WLAT.Val,
-                                            longitude = WLON.Val
-                                        },
-                                        source = "Lionriver"
-                                    }
-                                };
-
-                                json = JsonConvert.SerializeObject(sk);
-                                SignalkWebSocket.Send(json);
+                                path = "navigation.courseGreatCircle.nextPoint.velocityMadeGood",
+                                value = val,
+                                source = "Lionriver"
                             }
+                        });
+                        #endregion
+
+                        #region XTE
+                        if (XTE.IsValid())
+                            val = XTE.Val * 1852;
+                        else
+                            val = null;
+
+                        skList.Add(new skSendUpdateRootObj()
+                        {
+                            requestId = Guid.NewGuid().ToString(),
+                            put = new skPut()
+                            {
+                                path = "navigation.courseGreatCircle.crossTrackError",
+                                value = val,
+                                source = "Lionriver"
+                            }
+                        });
+                        #endregion
+
+                        #region DST
+                        if (DST.IsValid())
+                            val = DST.Val * 1852;
+                        else
+                            val = null;
+
+                        skList.Add(new skSendUpdateRootObj()
+                        {
+                            requestId = Guid.NewGuid().ToString(),
+                            put = new skPut()
+                            {
+                                path = "navigation.courseGreatCircle.nextPoint.distance",
+                                value = val,
+                                source = "Lionriver"
+                            }
+                        });
+                        #endregion
+
+                        #region BRG
+                        if (BRG.IsValid())
+                            val = BRG.Val * Math.PI / 180;
+                        else
+                            val = null;
+
+                        skList.Add(new skSendUpdateRootObj()
+                        {
+                            requestId = Guid.NewGuid().ToString(),
+                            put = new skPut()
+                            {
+                                path = "navigation.courseGreatCircle.nextPoint.bearingTrue",
+                                value = val,
+                                source = "Lionriver"
+                            }
+                        });
+                        #endregion
+
+                        #region WPT position
+                          
+                        if (WLAT.Val != skActiveWpt.Latitude || WLON.Val != skActiveWpt.Longitude)
+                        {
+                            skActiveWpt.Latitude = WLAT.Val;
+                            skActiveWpt.Longitude = WLON.Val;
+
+                            skList.Add(new skSendUpdateRootObj()
+                            {
+                                requestId = Guid.NewGuid().ToString(),
+                                put = new skPutPos()
+                                {
+                                    path = "navigation.courseGreatCircle.nextPoint.position",
+                                    value = pval = new skPosition
+                                    {
+                                        latitude = WLAT.Val,
+                                        longitude = WLON.Val
+                                    },
+                                    source = "Lionriver"
+                                }
+                            });
+                        }
+                        #endregion
+
+                        foreach(skSendUpdateRootObj sko in skList)
+                        {
+                            string json = JsonConvert.SerializeObject(sko);
+                            SignalkWebSocket.Send(json);
                         }
                     }
                 }
@@ -1339,7 +1341,7 @@ namespace LionRiver
 
                     try
                     {
-                        json = await HttpPost(Properties.Settings.Default.SignalKServerURL + "/signalk/v1/auth/login", jAuth, "application/json", null);
+                        json = await HttpPost(Properties.Settings.Default.SignalKServerURL + "/signalk/v1/auth/login", jAuth, "application/json");
                     }
                     catch
                     {
@@ -1356,7 +1358,7 @@ namespace LionRiver
                         {
                             skThread = new Thread(SkWebSocketThread);
                             terminateSKThread = false;
-                            //skThread.Start();
+                            skThread.Start();
                         }
                     }
                 }
@@ -1553,16 +1555,15 @@ namespace LionRiver
             }
         }
 
-        static async Task<string> HttpPost(string url, string strcont,string mediatype, Encoding enc)
+        static async Task<string> HttpPost(string url, string strcont,string mediatype)
         {
             try
             {
                 HttpClient client = new HttpClient();
 
                 Uri uri = new Uri(url);
-                StringContent content = new StringContent(strcont, enc , mediatype);
-                if(enc==null)
-                    content.Headers.ContentType.CharSet = string.Empty;
+                StringContent content = new StringContent(strcont, null , mediatype);
+                content.Headers.ContentType.CharSet = string.Empty;
                 HttpResponseMessage response = await client.PostAsync(uri, content);
 
                 if (!response.IsSuccessStatusCode)
