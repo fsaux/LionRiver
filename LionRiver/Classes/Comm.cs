@@ -1110,8 +1110,26 @@ namespace LionRiver
                         });
                         #endregion
 
+                        #region PERF
+                        if (PERF.IsValid())
+                            val = PERF.Val;
+                        else
+                            val = null;
+
+                        skList.Add(new skSendUpdateRootObj()
+                        {
+                            requestId = Guid.NewGuid().ToString(),
+                            put = new skPut()
+                            {
+                                path = "performance.polarSpeedRatio",
+                                value = val,
+                                source = "Lionriver"
+                            }
+                        });
+                        #endregion
+
                         #region WPT position
-                          
+
                         if (WLAT.Val != skActiveWpt.Latitude || WLON.Val != skActiveWpt.Longitude)
                         {
                             skActiveWpt.Latitude = WLAT.Val;
@@ -1178,6 +1196,52 @@ namespace LionRiver
                             string json = JsonConvert.SerializeObject(sko);
                             SignalkWebSocket.Send(json);
                         }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
+        public void WriteSKDeltaWptPos()
+        {
+            if (SignalkWebSocket != null)
+            {
+                try
+                {
+                    List<skSendUpdateRootObj> skList = new List<skSendUpdateRootObj>();
+
+                    if (skRouteSentenceOut)
+                    {
+                        #region WPT position
+
+                        if (WPT.IsValid())
+                        {
+                            skList.Add(new skSendUpdateRootObj()
+                            {
+                                requestId = Guid.NewGuid().ToString(),
+                                put = new skPutPos()
+                                {
+                                    path = "navigation.courseGreatCircle.nextPoint.position",
+                                    value = new skPosition
+                                    {
+                                        latitude = WLAT.Val,
+                                        longitude = WLON.Val
+                                    },
+                                    source = "Lionriver"
+                                }
+                            });
+
+                            foreach (skSendUpdateRootObj sko in skList)
+                            {
+                                string json = JsonConvert.SerializeObject(sko);
+                                SignalkWebSocket.Send(json);
+                            }
+                        }
+
+                        #endregion
+
                     }
                 }
                 catch (Exception)

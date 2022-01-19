@@ -145,7 +145,7 @@ namespace LionRiver
         // Performance
         static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn", "0.0", 15, false);
         static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T", "#", 15, false);
-        static PercentInstrument PERF = new PercentInstrument("Perf", "%", "#", 15);
+        static PercentInstrument PERF = new PercentInstrument("Perf", "%", "0", 15);
         static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn", "#.##", 15, false);
         static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T", "000", 15, false);
 
@@ -1295,6 +1295,8 @@ namespace LionRiver
             CalcLongNav(DateTime.Now);
             //CalcRouteData();
             //routeControl.DataGrid1.Items.Refresh();
+
+            WriteSKDeltaWptPos();
 
             if (signalKport != null && SignalkWebSocket == null)
                 OpenSkPort();
