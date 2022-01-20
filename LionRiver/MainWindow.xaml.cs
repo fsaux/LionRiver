@@ -954,8 +954,8 @@ namespace LionRiver
             XLNavTimer.Interval = new TimeSpan(0, 15, 0);
 
             FleetUpdateTimer.Tick += new EventHandler(FleetUpdateTimer_Tick);
-            //FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
-            FleetUpdateTimer.Interval = new TimeSpan(0, 0, 60);  // For testing
+            FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
+            //FleetUpdateTimer.Interval = new TimeSpan(0, 0, 60);  // For testing
 
             ReplayTimer.Tick += new EventHandler(ReplayTimer_Tick);
             ReplayTimer.Interval = new TimeSpan(0, 0, 0, 0, 80);
