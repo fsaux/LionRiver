@@ -2778,10 +2778,10 @@ namespace LionRiver
         public string velocidad { get; set; }
     }
 
-    public class PositionList // Root for JSON object
-    {
-        public List<JSONBoatPosition> posicion { get; set; }
-    }
+    //public class PositionList // Root for JSON object
+    //{
+    //    public List<JSONBoatPosition> posicion { get; set; }
+    //}
 
     #endregion
 

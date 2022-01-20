@@ -954,8 +954,8 @@ namespace LionRiver
             XLNavTimer.Interval = new TimeSpan(0, 15, 0);
 
             FleetUpdateTimer.Tick += new EventHandler(FleetUpdateTimer_Tick);
-            FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
-            //FleetUpdateTimer.Interval = new TimeSpan(0, 0, 60);  // For testing
+            //FleetUpdateTimer.Interval = new TimeSpan(0, 5, 0);
+            FleetUpdateTimer.Interval = new TimeSpan(0, 0, 60);  // For testing
 
             ReplayTimer.Tick += new EventHandler(ReplayTimer_Tick);
             ReplayTimer.Interval = new TimeSpan(0, 0, 0, 0, 80);
@@ -1322,10 +1322,10 @@ namespace LionRiver
                 return;
             }
 
-            PositionList BoatsLastPosition = new PositionList();
-            BoatsLastPosition = JsonConvert.DeserializeObject<PositionList>(json);
+            var BoatsLastPosition = new List<JSONBoatPosition>();
+            BoatsLastPosition = JsonConvert.DeserializeObject<List<JSONBoatPosition>>(json);
 
-            if (BoatsLastPosition.posicion == null)
+            if (BoatsLastPosition == null)
                 return;
 
             List<FleetTrack> ftList = new List<FleetTrack>();
@@ -1335,9 +1335,9 @@ namespace LionRiver
                 double cnt = 0;
                 ActivityProgressMsg.Text = "Fleet download in progress";
                 ActivityProgressGrid.Visibility = Visibility.Visible;
-                ActivityProgressBar.Maximum = BoatsLastPosition.posicion.Count();
+                ActivityProgressBar.Maximum = BoatsLastPosition.Count();
 
-                foreach (JSONBoatPosition bp in BoatsLastPosition.posicion)
+                foreach (JSONBoatPosition bp in BoatsLastPosition)
                 {
                     ActivityProgressBar.Value = ++cnt;
 
@@ -1399,7 +1399,7 @@ namespace LionRiver
 
                     if (lastUpdateTime != newUpdateTime)  // New boat or data available, download complete track, save new entries only
                     {
-                        PositionList bTrack = new PositionList();
+                        var bTrack = new List<JSONBoatPosition>();
 
                         try
                         {
@@ -1417,7 +1417,7 @@ namespace LionRiver
                         {
                             try
                             {
-                                bTrack = JsonConvert.DeserializeObject<PositionList>(json);
+                                bTrack = JsonConvert.DeserializeObject<List<JSONBoatPosition>>(json);
                             }
                             catch { bTrack = null; }
                         }
@@ -1427,9 +1427,9 @@ namespace LionRiver
                         if (bTrack != null)
                         {
                             // If there is only one track point available, add and continue
-                            if (bTrack.posicion.Count() == 1)
+                            if (bTrack.Count() == 1)
                             {
-                                var x0 = bTrack.posicion[0];
+                                var x0 = bTrack[0];
                                 DateTime t0 = DateTime.ParseExact(x0.fecha + " " + x0.hora, "dd/MM/yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture);
 
                                 if (t0 > lastUpdateTime)
@@ -1447,10 +1447,10 @@ namespace LionRiver
                             }
 
                             // If there are more that one track points, interpolate between entries
-                            for (int i = 1; i < bTrack.posicion.Count(); i++)
+                            for (int i = 1; i < bTrack.Count(); i++)
                             {
-                                var x0 = bTrack.posicion[i - 1];
-                                var x1 = bTrack.posicion[i];
+                                var x0 = bTrack[i - 1];
+                                var x1 = bTrack[i];
 
                                 DateTime t0 = DateTime.ParseExact(x0.fecha + " " + x0.hora, "dd/MM/yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture);
                                 DateTime t1 = DateTime.ParseExact(x1.fecha + " " + x1.hora, "dd/MM/yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture);
