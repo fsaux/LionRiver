@@ -17,6 +17,7 @@ using OSGeo.OSR;
 using LiveCharts.Events;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Specialized;
 
 namespace LionRiver
 {
@@ -1277,13 +1278,29 @@ namespace LionRiver
             }
         }
 
-        private void OnPropertyChanged(string propertyName)
+        protected void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+    }
+
+    public class AisBoat : Boat
+    {
+        private DateTime lastUpdate;
+
+        public DateTime LastUpdate
+        {
+            get { return lastUpdate; }
+            set
+            {
+                lastUpdate = value;
+                OnPropertyChanged("LastUpdate");
+            }
+        }
+
     }
 
     public class Mark : INotifyPropertyChanged
@@ -1321,7 +1338,7 @@ namespace LionRiver
             }
         }
     }
-
+    
     public class Leg : DependencyObject, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -2824,23 +2841,24 @@ namespace LionRiver
         public List<skSubscribe> subscribe { get; set; }
     }
 
-    //public class skValue
-    //{
-    //    public string path { get; set; }
-    //    public JObject value { get; set; }
-    //    public string value()
-    //}
-
     public class skReceiveUpdate
     {
         public object source { get; set; }
+        public DateTime timestamp { get; set; }
         public List<JObject> values { get; set; }
     }
 
-    public class skReceiveUpdateRootObj
+    public class skReceiveRootObj
     {
+        //Update
         public string context { get; set; }
         public List<skReceiveUpdate> updates { get; set; }
+
+        //Connection hello
+        public string name { get; set; }
+        public string version { get; set; }
+        public string self { get; set; }
+        public List<string> roles { get; set; }
     }
 
     public class skSendUpdateRootObj
@@ -2887,8 +2905,13 @@ namespace LionRiver
         public int? timeToLive { get; set; }
     }
 
-
-
+    public class skConnectionHello
+    {
+        public string name { get; set; }
+        public string version { get; set; }
+        public string self { get; set; }
+        public List<string> roles { get; set; }
+    }
 
     #endregion
 

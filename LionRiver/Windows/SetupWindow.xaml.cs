@@ -30,6 +30,7 @@ namespace LionRiver
         NMEASentence DepthSentence = new NMEASentence();
         NMEASentence WaterTempSentence = new NMEASentence();
         NMEASentence TacktickPerformanceSentence = new NMEASentence();
+        NMEASentence AisSentence = new NMEASentence();
 
         List<NMEASentence> NMEASentences = new List<NMEASentence>();
 
@@ -57,6 +58,7 @@ namespace LionRiver
             if (Properties.Settings.Default.HullSpeedSentence != null) HullSpeedSentence = Properties.Settings.Default.HullSpeedSentence;
             if (Properties.Settings.Default.AppWindSentence != null) AppWindSentence = Properties.Settings.Default.AppWindSentence;
             if (Properties.Settings.Default.TacktickPerformanceSentence != null) TacktickPerformanceSentence = Properties.Settings.Default.TacktickPerformanceSentence;
+            if (Properties.Settings.Default.AisSentence != null) AisSentence = Properties.Settings.Default.AisSentence;
 
             RouteSentence.Name = "Route"; RouteSentence.Comments = "RMB";
             NavSentence.Name = "Navigation"; NavSentence.Comments = "RMC";
@@ -66,6 +68,7 @@ namespace LionRiver
             HullSpeedSentence.Name = "Hull Speed"; HullSpeedSentence.Comments = "VHW";
             AppWindSentence.Name = "Apparent Wind"; AppWindSentence.Comments = "MWV";
             TacktickPerformanceSentence.Name = "Tacktick performance"; TacktickPerformanceSentence.Comments = "PTAK";
+            AisSentence.Name = "AIS";AisSentence.Comments = "AIS";
 
             NMEASentences.Add(RouteSentence);
             NMEASentences.Add(NavSentence); 
@@ -75,6 +78,7 @@ namespace LionRiver
             NMEASentences.Add(HullSpeedSentence);
             NMEASentences.Add(AppWindSentence);
             NMEASentences.Add(TacktickPerformanceSentence);
+            NMEASentences.Add(AisSentence);
 
             Combobox1.Items.Add("SK Server");
             Combobox2.Items.Add("SK Server");
@@ -131,6 +135,7 @@ namespace LionRiver
             Properties.Settings.Default.HullSpeedSentence = HullSpeedSentence;
             Properties.Settings.Default.AppWindSentence = AppWindSentence;
             Properties.Settings.Default.TacktickPerformanceSentence = TacktickPerformanceSentence;
+            Properties.Settings.Default.AisSentence = AisSentence;
 
             Properties.Settings.Default.MagVar = Convert.ToDouble(textBox1.Text);
 

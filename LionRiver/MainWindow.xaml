@@ -27,6 +27,7 @@
         <local:Inst x:Key="InstrumentData"></local:Inst>
         <!--<local:SampleItemCollection x:Key="BoatsItemCollection"/>-->
         <local:SampleItemCollection x:Key="FleetBoatItemCollection"/>
+        <local:SampleItemCollection x:Key="AisBoatItemCollection"/>
         <local:SampleItemCollection x:Key="LegsItemCollection"/>
         <local:LabelConverterTop x:Key="LabelConverterTop" />
         <local:LabelConverterLeft x:Key="LabelConverterLeft" />
@@ -562,6 +563,11 @@
 
                     <map:MapItemsControl x:Name="FleetBoatItemsControl" ItemsSource="{StaticResource FleetBoatItemCollection}"
                                              ItemContainerStyle="{StaticResource FleetBoatItemStyle }"
+                                             SelectionMode="Single"
+                                             Panel.ZIndex="20"/>
+
+                    <map:MapItemsControl x:Name="AisBoatItemsControl" ItemsSource="{StaticResource AisBoatItemCollection}"
+                                             ItemContainerStyle="{StaticResource AisBoatItemStyle }"
                                              SelectionMode="Single"
                                              Panel.ZIndex="20"/>
 

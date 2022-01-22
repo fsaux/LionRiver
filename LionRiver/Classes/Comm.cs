@@ -29,15 +29,15 @@ namespace LionRiver
     {
 
         static SerialPort SerialPort1, SerialPort2, SerialPort3, SerialPort4;
-        static bool terminateThread1, terminateThread2, terminateThread3, terminateThread4, terminateSKThread;
-        Thread readThread1, readThread2, readThread3, readThread4, skThread;
+        static bool terminateThread1, terminateThread2, terminateThread3, terminateThread4;
+        Thread readThread1, readThread2, readThread3, readThread4;
 
         int? signalKport;
         string skWebSocketURL, skHttpURL, skToken;
         WebSocket SignalkWebSocket;
         bool skTacktickPerformanceSentenceOut, skRouteSentenceOut;
         Location skActiveWpt, skLastWpt;
-
+        string skSelfUrn;
 
         static bool rmc_sentence_available = false;
         static bool rmb_sentence_available = false;
@@ -982,27 +982,6 @@ namespace LionRiver
 
         }
 
-        public void SkWebSocketThread()
-        {
-            using (var ws = new WebSocket(skWebSocketURL + "?subscribe=none"))
-            {
-                ws.OnMessage += Ws_OnMessage;
-                ws.OnOpen += Ws_OnOpen;
-                ws.OnClose += Ws_OnClose;
-
-                ws.SetCookie(new Cookie("JAUTHENTICATION", skToken));
-
-                ws.Connect();
-                
-                while (!terminateSKThread)
-                {
-                    Thread.Sleep(1000);
-                }
-
-                ws.Close();
-            }
-        }
-
         private void Ws_OnClose(object sender, CloseEventArgs e)
         {
             SignalkWebSocket = null;
@@ -1018,9 +997,10 @@ namespace LionRiver
         private void Ws_OnOpen(object sender, EventArgs e)
         {
             var ws = sender as WebSocket;
+            var json = e.ToString();
 
             SignalkWebSocket = ws;
-            
+
             SubscribeSK((WebSocket)sender);
         }
 
@@ -1031,7 +1011,7 @@ namespace LionRiver
 
                 try
                 {
-                    List<skSendUpdateRootObj> skList=new List<skSendUpdateRootObj>();
+                    List<skSendUpdateRootObj> skList = new List<skSendUpdateRootObj>();
                     double? val;
                     skPosition pval;
 
@@ -1110,24 +1090,6 @@ namespace LionRiver
                         });
                         #endregion
 
-                        #region PERF
-                        if (PERF.IsValid())
-                            val = PERF.Val;
-                        else
-                            val = null;
-
-                        skList.Add(new skSendUpdateRootObj()
-                        {
-                            requestId = Guid.NewGuid().ToString(),
-                            put = new skPut()
-                            {
-                                path = "performance.polarSpeedRatio",
-                                value = val,
-                                source = "Lionriver"
-                            }
-                        });
-                        #endregion
-
                         #region WPT position
 
                         if (WLAT.Val != skActiveWpt.Latitude || WLON.Val != skActiveWpt.Longitude)
@@ -1151,13 +1113,36 @@ namespace LionRiver
                             });
                         }
                         #endregion
-
-                        foreach(skSendUpdateRootObj sko in skList)
-                        {
-                            string json = JsonConvert.SerializeObject(sko);
-                            SignalkWebSocket.Send(json);
-                        }
                     }
+
+                    if(skTacktickPerformanceSentenceOut)
+                    {
+                        #region PERF
+                        if (PERF.IsValid())
+                            val = PERF.Val;
+                        else
+                            val = null;
+
+                        skList.Add(new skSendUpdateRootObj()
+                        {
+                            requestId = Guid.NewGuid().ToString(),
+                            put = new skPut()
+                            {
+                                path = "performance.polarSpeedRatio",
+                                value = val,
+                                source = "Lionriver"
+                            }
+                        });
+                        #endregion
+                    }
+
+                    foreach (skSendUpdateRootObj sko in skList)
+                    {
+                        string json = JsonConvert.SerializeObject(sko);
+                        SignalkWebSocket.Send(json);
+                    }
+
+
                 }
                 catch (Exception)
                 {
@@ -1253,6 +1238,8 @@ namespace LionRiver
         private void SubscribeSK(WebSocket ws)
         {
             var sksubs = new List<skSubscribe>();
+
+            // Subscriptions to vessels.self
 
             if (Properties.Settings.Default.NavSentence.InPort == signalKport)
             {
@@ -1362,13 +1349,40 @@ namespace LionRiver
 
                 ws.Send(json);
             }
+
+            sksubs.Clear();
+
+            // Subscriptions to vessels.*
+
+            if (Properties.Settings.Default.AisSentence.InPort == signalKport)
+            {
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "navigation.*",
+                    period = 30000,
+                    format = "delta",
+                    policy = "fixed"
+                });
+            }
+
+            if (sksubs.Count() != 0)
+            {
+                var sub = new skSubscribeRootObj
+                {
+                    context = "vessels.*",
+                    subscribe = sksubs
+                };
+
+                string json = JsonConvert.SerializeObject(sub);
+
+                ws.Send(json);
+            }
+
         }
 
         public void CloseSKPort()
         {
-            terminateSKThread = true;
-            if (skThread != null)
-                skThread.Join();
+            SignalkWebSocket.Close();
         }
 
         public async void OpenSkPort()
@@ -1400,6 +1414,11 @@ namespace LionRiver
             else
             {
                 skTacktickPerformanceSentenceOut = false;
+            }
+
+            if(SignalkWebSocket!=null)
+            {
+                SignalkWebSocket.Close();
             }
 
             if (signalKport != null && SignalkWebSocket == null)
@@ -1459,9 +1478,14 @@ namespace LionRiver
 
                         if (skToken != null)
                         {
-                            skThread = new Thread(SkWebSocketThread);
-                            terminateSKThread = false;
-                            skThread.Start();
+                            SignalkWebSocket = new WebSocket(skWebSocketURL + "?subscribe=none");
+                            SignalkWebSocket.OnMessage += Ws_OnMessage;
+                            SignalkWebSocket.OnOpen += Ws_OnOpen;
+                            SignalkWebSocket.OnClose += Ws_OnClose;
+
+                            SignalkWebSocket.SetCookie(new Cookie("JAUTHENTICATION", skToken));
+
+                            SignalkWebSocket.Connect();
                         }
                     }
                 }
@@ -1473,28 +1497,33 @@ namespace LionRiver
 
         public void ProcessSKupdate(string message, int port)
         {
-            skReceiveUpdateRootObj sk;
+            skReceiveRootObj sk;
 
             if (message != "")
             {
                 try
                 {
-                    sk = JsonConvert.DeserializeObject<skReceiveUpdateRootObj>(message);
+                    sk = JsonConvert.DeserializeObject<skReceiveRootObj>(message);
                 }
                 catch { sk = null; }
 
                 if (sk != null)
                 {
+                    if (sk.self != null)
+                        skSelfUrn = sk.self;
+
                     if (sk.updates != null)
                     {
-                        foreach (skReceiveUpdate upd in sk.updates)
+                        if (sk.context==skSelfUrn)
                         {
-                            foreach (JObject v in upd.values)
+                            foreach (skReceiveUpdate upd in sk.updates)
                             {
-                                switch((string)v["path"])
+                                foreach (JObject v in upd.values)
                                 {
-                                    case "navigation.position":
-                                        try
+                                    switch ((string)v["path"])
+                                    {
+                                        case "navigation.position":
+                                            try
                                             {
                                                 lon = double.Parse((string)v["value"]["longitude"]);
                                                 lat = double.Parse((string)v["value"]["latitude"]);
@@ -1506,25 +1535,25 @@ namespace LionRiver
                                             {
                                                 MarkErrorOnPort(port, "Bad SK navigation.position sentence");
                                             }
-                                        break;
+                                            break;
 
-                                    case "navigation.speedOverGround":
-                                        try
-                                        {
+                                        case "navigation.speedOverGround":
+                                            try
+                                            {
                                                 sog = double.Parse((string)v["value"]) * 3600 / 1852;
 
                                                 navSentence_received = true;
                                                 MarkDataReceivedOnPort(port);
-                                            
-                                        }
-                                        catch (Exception)
+
+                                            }
+                                            catch (Exception)
                                             {
                                                 MarkErrorOnPort(port, "Bad SK navigation.speedOverGround sentence");
                                             }
-                                        break;
+                                            break;
 
-                                    case "navigation.courseOverGroundTrue":
-                                        try
+                                        case "navigation.courseOverGroundTrue":
+                                            try
                                             {
                                                 cog = double.Parse((string)v["value"]) * 180 / Math.PI;
 
@@ -1535,113 +1564,177 @@ namespace LionRiver
                                             {
                                                 MarkErrorOnPort(port, "Bad SK navigation.courseOverGround sentence");
                                             }
-                                        break;
+                                            break;
 
-                                    case "environment.wind.angleApparent":
-                                        try
-                                        {
-                                            awa = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                        case "environment.wind.angleApparent":
+                                            try
+                                            {
+                                                awa = double.Parse((string)v["value"]) * 180 / Math.PI;
 
-                                            AppWindSentence_received = true;
-                                            MarkDataReceivedOnPort(port);
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK environment.wind.angleApparent sentence");
-                                        }
-                                        break;
+                                                AppWindSentence_received = true;
+                                                MarkDataReceivedOnPort(port);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.wind.angleApparent sentence");
+                                            }
+                                            break;
 
-                                    case "environment.wind.speedApparent":
-                                        try
-                                        {
-                                            aws = double.Parse((string)v["value"]) * 3600 / 1852;
+                                        case "environment.wind.speedApparent":
+                                            try
+                                            {
+                                                aws = double.Parse((string)v["value"]) * 3600 / 1852;
 
-                                            AppWindSentence_received = true;
-                                            MarkDataReceivedOnPort(port);
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK environment.wind.speedApparent sentence");
-                                        }
-                                        break;
+                                                AppWindSentence_received = true;
+                                                MarkDataReceivedOnPort(port);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.wind.speedApparent sentence");
+                                            }
+                                            break;
 
-                                    case "navigation.speedThroughWater":
-                                        try
-                                        {
-                                            spd = double.Parse((string)v["value"]) * 3600 / 1852;
+                                        case "navigation.speedThroughWater":
+                                            try
+                                            {
+                                                spd = double.Parse((string)v["value"]) * 3600 / 1852;
 
-                                            hullSpeedSentence_received = true;
-                                            MarkDataReceivedOnPort(port);
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK navigation.speedThroughWater sentence");
-                                        }
-                                        break;
+                                                hullSpeedSentence_received = true;
+                                                MarkDataReceivedOnPort(port);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK navigation.speedThroughWater sentence");
+                                            }
+                                            break;
 
-                                    case "navigation.headingMagnetic":
-                                        try
-                                        {
-                                            hdg = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                        case "navigation.headingMagnetic":
+                                            try
+                                            {
+                                                hdg = double.Parse((string)v["value"]) * 180 / Math.PI;
 
-                                            headingSentence_received = true;
-                                            MarkDataReceivedOnPort(port);
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK navigation.headingMagnetic sentence");
-                                        }
-                                        break;
+                                                headingSentence_received = true;
+                                                MarkDataReceivedOnPort(port);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK navigation.headingMagnetic sentence");
+                                            }
+                                            break;
 
-                                    case "navigation.magneticVariation":
-                                        try
-                                        {
-                                            mvar3 = double.Parse((string)v["value"]) * 180 / Math.PI;
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK navigation.magneticVariation sentence");
-                                        }
-                                        break;
+                                        case "navigation.magneticVariation":
+                                            try
+                                            {
+                                                mvar3 = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK navigation.magneticVariation sentence");
+                                            }
+                                            break;
 
-                                    case "environment.depth.belowSurface":
-                                        try
-                                        {
-                                            dpt = double.Parse((string)v["value"]);
+                                        case "environment.depth.belowSurface":
+                                            try
+                                            {
+                                                dpt = double.Parse((string)v["value"]);
 
-                                            depthSentence_received = true;
-                                            MarkDataReceivedOnPort(port);
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK environment.depth sentence");
-                                        }
-                                        break;
+                                                depthSentence_received = true;
+                                                MarkDataReceivedOnPort(port);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.depth sentence");
+                                            }
+                                            break;
 
-                                    case "environment.water.temperature":
-                                        try
-                                        {
-                                            wtemp = double.Parse((string)v["value"]) - 273.15;
+                                        case "environment.water.temperature":
+                                            try
+                                            {
+                                                wtemp = double.Parse((string)v["value"]) - 273.15;
 
-                                            waterTempSentence_received = true;
-                                            MarkDataReceivedOnPort(port);
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
-                                        }
-                                        break;
+                                                waterTempSentence_received = true;
+                                                MarkDataReceivedOnPort(port);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                    }
+
+                                }
+                            } 
+                        }
+                        else
+                        {
+                            foreach (skReceiveUpdate upd in sk.updates)
+                            {
+                                var urn = sk.context;
+                                AisBoat b;
+
+                                if (!AisBoats.ContainsKey(urn))
+                                {
+                                    b = new AisBoat()
+                                    {
+                                        BoatColor = Brushes.DarkRed.Color,
+                                        BoatVisible = Visibility.Visible,
+                                        IsAvailable = false,
+                                        Location = new Location()
+                                    };
+                                    AisBoats.Add(urn, b);
+                                }
+                                else
+                                {
+                                    b = AisBoats[urn];
+                                    b.LastUpdate = upd.timestamp;
+                                }
+
+                                foreach (JObject v in upd.values)
+                                {
+                                    switch ((string)v["path"])
+                                    {
+                                        case "navigation.position":
+                                            try
+                                            {
+                                                b.Location.Longitude = double.Parse((string)v["value"]["longitude"]);
+                                                b.Location.Latitude = double.Parse((string)v["value"]["latitude"]);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK navigation.position sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.speedOverGround":
+                                            try
+                                            {
+                                                b.BoatSpeed = double.Parse((string)v["value"]) * 3600 / 1852;
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK navigation.speedOverGround sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.courseOverGroundTrue":
+                                            try
+                                            {
+                                                b.Heading = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK navigation.courseOverGround sentence");
+                                            }
+                                            break;
+                                    }
 
                                 }
 
                             }
-
                         }
                     }
                 }
-
-
-
             }
 
         }
@@ -1677,7 +1770,7 @@ namespace LionRiver
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 return jsonResponse;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return string.Empty;
             }

@@ -270,6 +270,63 @@
                 </Setter>
             </Style>
 
+            <Style x:Key="AisBoatItemStyle" TargetType="{x:Type map:MapItem}">
+                <Setter Property="map:MapPanel.Location" Value="{Binding Location}"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                <Setter Property="ContextMenu" Value="{StaticResource FleetBoatContextMenu}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type map:MapItem}">
+                            <Canvas x:Name="boatCanvas">
+                                <Canvas.Resources>
+                                    <local:BooleanToVisibilityMultiConverter x:Key="BooleanToVisibilityMultiConverter" />
+                                </Canvas.Resources>
+                                <Canvas.Visibility>
+                                    <MultiBinding Converter="{StaticResource BooleanToVisibilityMultiConverter}">
+                                        <Binding Path="BoatVisible" />
+                                        <Binding Path="IsAvailable" />
+                                    </MultiBinding>
+                                </Canvas.Visibility>
+
+                                <Polyline 
+                                      Points="-4,0 -3,-6 0,-11 3,-6 4,0 4,6 3,9 -3,9 -4,6 -4,0">
+                                    <Polyline.Fill>
+                                        <SolidColorBrush x:Name="btColor"   Color="{Binding BoatColor}"/>
+                                    </Polyline.Fill>
+                                    <Polyline.RenderTransform>
+                                        <RotateTransform Angle="{Binding Heading}" />
+                                    </Polyline.RenderTransform>
+                                </Polyline>
+
+                                <Grid Canvas.Top="6">
+                                    <TextBlock x:Name="boatName" Text="{Binding Name}" FontSize="9" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="DimGray"/>
+                                </Grid>
+                            </Canvas>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+
+                                    <Setter Property="Foreground" TargetName="boatName" Value="Black"/>
+                                    <Setter Property="Background" TargetName="boatName" Value="Gray"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="Foreground" TargetName="boatName" Value="White"/>
+                                    <Setter Property="Canvas.RenderTransform" TargetName="boatCanvas">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <Style x:Key="ComboBoxStyle1" TargetType="{x:Type ComboBox}">
                 <Style.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="Black" />

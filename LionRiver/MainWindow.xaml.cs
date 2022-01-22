@@ -12,6 +12,7 @@ using OSGeo.OSR;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.IO;
@@ -290,28 +291,30 @@ namespace LionRiver
         #region MapItems
 
         ICollection<object> fleetBoatItemCollection;
+        ICollection<object> aisBoatItemCollection;
         ICollection<object> legsItemCollection;
 
         SampleItemCollection marksItemCollection;
 
-        Boat boat = new Boat
+        public Boat boat = new Boat
         {
             Name = "AltoRiesgo",
             Location = new Location(-34.5, -58.5),
             BoatVisible = Visibility.Hidden,
             BoatColor = Brushes.Yellow.Color
         };
-
-        Boat replayBoat = new Boat
+        public Boat replayBoat = new Boat
         {
             Name = "Replay",
             Location = new Location(-34.5, -58.5),
             BoatVisible = Visibility.Hidden,
             BoatColor = Brushes.Yellow.Color
         };
-
         static public List<Boat> fleetBoats = new List<Boat>();
+        public Dictionary<string, AisBoat> AisBoats = new Dictionary<string, AisBoat>();
 
+        public List<string> AisBoatDataAvailable = new List<string>();
+            
         static public LinearGradientBrush perfGradientBrush = (LinearGradientBrush)App.Current.FindResource("PerformanceMap");
 
         Track track;
@@ -523,6 +526,7 @@ namespace LionRiver
             #region MapItems
 
             fleetBoatItemCollection = (ICollection<object>)Resources["FleetBoatItemCollection"];
+            aisBoatItemCollection = (ICollection<object>)Resources["AisBoatItemCollection"];
             legsItemCollection = (ICollection<object>)Resources["LegsItemCollection"];
 
             //boatsItemCollection.Add(boat);
@@ -533,7 +537,6 @@ namespace LionRiver
 
             Panel.SetZIndex(repBoat, 45);
             Panel.SetZIndex(mainBoat, 100);
-
 
             marksItemCollection = new SampleItemCollection();
             markItemsControl.DataContext = marksItemCollection;
@@ -912,7 +915,8 @@ namespace LionRiver
                     {
                         Name = name,
                         IsSelected = false,
-                        BoatColor= ColorFromString(name)
+                        BoatColor = ColorFromString(name),
+                        IsAvailable = true
                     };
 
                     fleetBoats.Add(b);
@@ -920,7 +924,6 @@ namespace LionRiver
                     MapItem boatMapItem = new MapItem();
                     boatMapItem.DataContext = b;
                     fleetBoatItemCollection.Add(boatMapItem);
-
                 }
             }
 
@@ -945,7 +948,7 @@ namespace LionRiver
             ShortNavTimer.Interval = new TimeSpan(0, 0, 1);
 
             MediumNavTimer.Tick += new EventHandler(MediumNavTimer_Tick);
-            MediumNavTimer.Interval = new TimeSpan(0, 0, 4);
+            MediumNavTimer.Interval = new TimeSpan(0, 0, 3);
 
             LongNavTimer.Tick += new EventHandler(LongNavTimer_Tick);
             LongNavTimer.Interval = new TimeSpan(0, 0, 20);
@@ -1280,7 +1283,6 @@ namespace LionRiver
                 CalcNav(DateTime.Now);
                 BuildNMEA183Sentences();
                 BuildPTAKSentences();
-                WriteSKDeltas();
             }
 
             UpdateScreen();
@@ -1288,6 +1290,7 @@ namespace LionRiver
 
         private void MediumNavTimer_Tick(object sender, EventArgs e)
         {
+            WriteSKDeltas();
         }
 
         private void LongNavTimer_Tick(object sender, EventArgs e)
@@ -1297,6 +1300,8 @@ namespace LionRiver
             //routeControl.DataGrid1.Items.Refresh();
 
             WriteSKDeltaWptPos();
+
+            UpdateScreenAIS();
 
             if (signalKport != null && SignalkWebSocket == null)
                 OpenSkPort();
@@ -1373,12 +1378,9 @@ namespace LionRiver
 
                         b.BoatColor = ColorFromString(b.Name); ;
 
-                        //Random rnd = new Random();
-                        //b.BoatColor = Color.FromRgb((byte)rnd.Next(256), (byte)rnd.Next(256), (byte)rnd.Next(256));
-
                         fleetBoats.Add(b);
                         boatMapItem.DataContext = b;
-                        map.Children.Add(boatMapItem);
+                        fleetBoatItemCollection.Add(boatMapItem);
                     }
                     else //Update Time for existing fleet boat
                     {
@@ -3134,7 +3136,7 @@ namespace LionRiver
 
         private void SelectFleetBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var fboat = (e.Source as MapItem).DataContext as Boat;
+            var fboat = (e.OriginalSource as MapItem).DataContext as Boat;
 
             fboat.IsSelected = true;
 
@@ -3154,7 +3156,7 @@ namespace LionRiver
 
         private void SelectFleetBoatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            var fboat = (e.Source as MapItem).DataContext as Boat;   
+            var fboat = (e.OriginalSource as MapItem).DataContext as Boat;
 
             if (fboat.IsSelected)
                 e.CanExecute = false;
@@ -3167,7 +3169,7 @@ namespace LionRiver
 
         private void UnselectFleetBoatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var fboat = (e.Source as MapItem).DataContext as Boat;
+            var fboat = (e.OriginalSource as MapItem).DataContext as Boat;
 
             fboat.IsSelected = false;
 
@@ -3184,7 +3186,7 @@ namespace LionRiver
 
         private void UnselectFleetBoatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            var fboat = (e.Source as MapItem).DataContext as Boat;
+            var fboat = (e.OriginalSource as MapItem).DataContext as Boat;
 
             if (fboat.IsSelected == false)
                 e.CanExecute = false;
@@ -5002,6 +5004,33 @@ namespace LionRiver
             }
         }
 
+        private void UpdateScreenAIS()
+        {
+            foreach (KeyValuePair<string, AisBoat>kvp in AisBoats)
+            {
+                AisBoat b = kvp.Value;
+
+                if(!b.IsAvailable)
+                {
+                    MapItem mi = new MapItem();
+                    mi.DataContext = b;
+                    aisBoatItemCollection.Add(mi);
+                    b.IsAvailable = true;
+                }
+
+                if (b.LastUpdate != null)
+                {
+                    TimeSpan ts = new TimeSpan((DateTime.Now - b.LastUpdate).Ticks);
+                    //if (ts > TimeSpan.FromMinutes(5))
+                    //    b.BoatVisible = Visibility.Hidden;
+                    //else
+                    //    b.BoatVisible = Visibility.Visible;
+                }
+                else
+                    b.BoatVisible = Visibility.Hidden;
+            }
+        }
+
         private void UpdateFleet(DateTime dt)
         {
             DateTime minDt = dt.AddSeconds(-60); // Short lookup range for position = t - 60 seg
@@ -5481,7 +5510,6 @@ namespace LionRiver
 
             return mResult;
         }
-
 
         #endregion
 

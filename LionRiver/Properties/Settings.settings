@@ -233,5 +233,8 @@
     <Setting Name="SignalKServerURL" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="AisSentence" Type="LionRiver.NMEASentence" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
