@@ -3788,6 +3788,13 @@ namespace LionRiver
                 map.TargetCenter = map.ViewportPointToLocation(new Point(p.X, p.Y));
             }
 
+            UpdateScreenAIS();
+
+        }
+
+        private void PlayButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UpdateScreenAIS();
         }
 
         private void FwdBackSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -4593,8 +4600,6 @@ namespace LionRiver
             }
         }
 
-
-
         private void RouteClearResultsButton_Click(object sender, RoutedEventArgs e)
         {
             routeCalculationControl.RouteReplaySlider.IsEnabled = false;
@@ -5006,11 +5011,11 @@ namespace LionRiver
 
         private void UpdateScreenAIS()
         {
-            foreach (KeyValuePair<string, AisBoat>kvp in AisBoats)
+            foreach (KeyValuePair<string, AisBoat> kvp in AisBoats)
             {
                 AisBoat b = kvp.Value;
 
-                if(!b.IsAvailable)
+                if (!b.IsAvailable)
                 {
                     MapItem mi = new MapItem();
                     mi.DataContext = b;
@@ -5021,10 +5026,10 @@ namespace LionRiver
                 if (b.LastUpdate != null)
                 {
                     TimeSpan ts = new TimeSpan((DateTime.Now - b.LastUpdate).Ticks);
-                    //if (ts > TimeSpan.FromMinutes(5))
-                    //    b.BoatVisible = Visibility.Hidden;
-                    //else
-                    //    b.BoatVisible = Visibility.Visible;
+                    if (ts > TimeSpan.FromDays(105) || PlayButton.IsChecked == false)
+                        b.BoatVisible = Visibility.Hidden;
+                    else
+                        b.BoatVisible = Visibility.Visible;
                 }
                 else
                     b.BoatVisible = Visibility.Hidden;

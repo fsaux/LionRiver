@@ -725,7 +725,7 @@
 
                 <DockPanel Height="Auto" HorizontalAlignment="Right" Margin="5,5,5,5" VerticalAlignment="Bottom" Width="Auto" Panel.ZIndex="1" LastChildFill="False" Background="{x:Null}">
 
-                    <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="PlayButton_Checked" VerticalAlignment="Top">
+                    <ToggleButton   Name="PlayButton"  Style="{StaticResource MainToggleButton}" Margin="2" DockPanel.Dock="Right" Checked="PlayButton_Checked" VerticalAlignment="Top" Unchecked="PlayButton_Unchecked">
                         <ToggleButton.Content>
                             <Image  Source="Images/iconfinder_icon-play_211876.png" Stretch="Fill" Margin="2" ToolTip="Play" Width="28" Height="28"/>
                         </ToggleButton.Content>
