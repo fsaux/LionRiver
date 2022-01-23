@@ -1382,7 +1382,8 @@ namespace LionRiver
 
         public void CloseSKPort()
         {
-            SignalkWebSocket.Close();
+            if(SignalkWebSocket!=null)
+                SignalkWebSocket.Close();
         }
 
         public async void OpenSkPort()
@@ -1416,11 +1417,8 @@ namespace LionRiver
                 skTacktickPerformanceSentenceOut = false;
             }
 
-            if(SignalkWebSocket!=null)
-            {
-                SignalkWebSocket.Close();
-            }
-
+            CloseSKPort();
+            
             if (signalKport != null && SignalkWebSocket == null)
             {
                 skConnectRootObj sk = new skConnectRootObj();
