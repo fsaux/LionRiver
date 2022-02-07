@@ -1358,10 +1358,11 @@ namespace LionRiver
             {
                 sksubs.Add(new skSubscribe()
                 {
-                    path = "navigation.*",
-                    period = 30000,
+                    //path = "navigation.*",
+                    path = "*",
+                    minPeriod = 30000,
                     format = "delta",
-                    policy = "fixed"
+                    policy = "instant"
                 });
             }
 
@@ -1685,7 +1686,6 @@ namespace LionRiver
                                 else
                                 {
                                     b = AisBoats[urn];
-                                    b.LastUpdate = upd.timestamp;
                                 }
 
                                 foreach (JObject v in upd.values)
@@ -1697,6 +1697,7 @@ namespace LionRiver
                                             {
                                                 b.Location.Longitude = double.Parse((string)v["value"]["longitude"]);
                                                 b.Location.Latitude = double.Parse((string)v["value"]["latitude"]);
+                                                b.LastUpdate = upd.timestamp;
                                             }
                                             catch (Exception)
                                             {
@@ -1725,16 +1726,48 @@ namespace LionRiver
                                                 MarkErrorOnPort(port, "Bad SK navigation.courseOverGround sentence");
                                             }
                                             break;
+
+                                        case "":
+                                            try
+                                            {
+                                                var jo = (JObject)v["value"];
+                                                var jp = (JProperty)jo.First;
+                                                var s = jp.Name;
+                                                switch(s)
+                                                {
+                                                    case "name":
+                                                        b.Name = (string)jp.Value;
+                                                        break;
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK sentence");
+                                            }
+                                            break;
                                     }
-
                                 }
-
                             }
                         }
                     }
                 }
             }
 
+        }
+
+        public void ProcessAisSKupdate(string message)
+        {
+            JObject sk;
+
+            if (message != "")
+            {
+                try
+                {
+                    sk = JsonConvert.DeserializeObject<JObject>(message);
+                }
+                catch { sk = null; }
+
+            }
         }
 
         static async Task<string> DownloadPage(string url)

@@ -173,6 +173,7 @@ namespace LionRiver
         DispatcherTimer ShortNavTimer = new DispatcherTimer();
         DispatcherTimer MediumNavTimer = new DispatcherTimer();
         DispatcherTimer LongNavTimer = new DispatcherTimer();
+        //DispatcherTimer AisUpdateTimer = new DispatcherTimer();
         DispatcherTimer XLNavTimer = new DispatcherTimer();
         DispatcherTimer FleetUpdateTimer = new DispatcherTimer();
         DispatcherTimer ReplayTimer = new DispatcherTimer();
@@ -953,6 +954,9 @@ namespace LionRiver
             LongNavTimer.Tick += new EventHandler(LongNavTimer_Tick);
             LongNavTimer.Interval = new TimeSpan(0, 0, 20);
 
+            //AisUpdateTimer.Tick += new EventHandler(AisUpdateTimer_Tick);
+            //AisUpdateTimer.Interval = new TimeSpan(0, 0, 15);
+
             XLNavTimer.Tick += new EventHandler(XLNavTimer_Tick);
             XLNavTimer.Interval = new TimeSpan(0, 15, 0);
 
@@ -978,6 +982,7 @@ namespace LionRiver
             ShortNavTimer.Start();
             MediumNavTimer.Start();
             LongNavTimer.Start();
+            //AisUpdateTimer.Start();
             XLNavTimer.Start();
             FleetUpdateTimer.Start();
             #endregion
@@ -1306,6 +1311,29 @@ namespace LionRiver
             if (signalKport != null && SignalkWebSocket == null)
                 OpenSkPort();
         }
+
+        //private async void AisUpdateTimer_Tick(object sender, EventArgs e)
+        //{
+        //    if (skHttpURL != null && SignalkWebSocket !=null)
+        //    {
+        //        string json;
+
+        //        try
+        //        {
+        //            json = await HttpGet(skHttpURL + "vessels");
+        //        }
+        //        catch
+        //        {
+        //            json = "";
+        //        }
+
+        //        if (json != "")
+        //            ProcessAisSKupdate(json);
+
+        //        UpdateScreenAIS();
+        //    }
+
+        //}
 
         private void XLNavTimer_Tick(object sender, EventArgs e)
         {
@@ -5026,7 +5054,7 @@ namespace LionRiver
                 if (b.LastUpdate != null)
                 {
                     TimeSpan ts = new TimeSpan((DateTime.Now - b.LastUpdate).Ticks);
-                    if (ts > TimeSpan.FromMinutes(5) || PlayButton.IsChecked == false)
+                    if (ts > TimeSpan.FromMinutes(5) || PlayButton.IsChecked == false || Properties.Settings.Default.AisTargetsCheck == false)
                         b.BoatVisible = Visibility.Hidden;
                     else
                         b.BoatVisible = Visibility.Visible;

@@ -131,6 +131,18 @@
                         <CheckBox Name="PredictedWCheck" Grid.Column="0" VerticalAlignment="Center" IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=PredictedWindDirectionCheck, Mode=TwoWay}" />
                         <TextBlock Grid.Column="1" Text="Predicted W/C" Margin="5,2" HorizontalAlignment="Left" Foreground="LightGray"/>
                     </Grid>
+
+                    <Grid  Margin="30,0,0,0" Width="120">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Name="AisTargets" Grid.Column="0" VerticalAlignment="Center" IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=AisTargetsCheck, Mode=TwoWay}" />
+                        <TextBlock Grid.Column="1" Text="AIS Targets" Margin="5,2" HorizontalAlignment="Left" Foreground="LightGray"/>
+                    </Grid>
+
+
+
                 </WrapPanel>
 
 

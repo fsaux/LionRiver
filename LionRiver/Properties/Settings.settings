@@ -236,5 +236,8 @@
     <Setting Name="AisSentence" Type="LionRiver.NMEASentence" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="AisTargetsCheck" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

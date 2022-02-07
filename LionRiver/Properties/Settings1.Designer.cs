@@ -948,5 +948,17 @@ namespace LionRiver.Properties {
                 this["AisSentence"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AisTargetsCheck {
+            get {
+                return ((bool)(this["AisTargetsCheck"]));
+            }
+            set {
+                this["AisTargetsCheck"] = value;
+            }
+        }
     }
 }
