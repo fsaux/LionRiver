@@ -1358,11 +1358,10 @@ namespace LionRiver
             {
                 sksubs.Add(new skSubscribe()
                 {
-                    //path = "navigation.*",
                     path = "*",
-                    minPeriod = 30000,
+                    period = 20000,
                     format = "delta",
-                    policy = "instant"
+                    policy = "fixed"
                 });
             }
 
@@ -1695,8 +1694,12 @@ namespace LionRiver
                                         case "navigation.position":
                                             try
                                             {
-                                                b.Location.Longitude = double.Parse((string)v["value"]["longitude"]);
-                                                b.Location.Latitude = double.Parse((string)v["value"]["latitude"]);
+                                                b.Location = new Location()
+                                                {
+                                                    Latitude = double.Parse((string)v["value"]["latitude"]),
+                                                    Longitude = double.Parse((string)v["value"]["longitude"])
+                                                };
+
                                                 b.LastUpdate = upd.timestamp;
                                             }
                                             catch (Exception)

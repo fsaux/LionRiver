@@ -5054,7 +5054,7 @@ namespace LionRiver
                 if (b.LastUpdate != null)
                 {
                     TimeSpan ts = new TimeSpan((DateTime.Now - b.LastUpdate).Ticks);
-                    if (ts > TimeSpan.FromMinutes(5) || PlayButton.IsChecked == false || Properties.Settings.Default.AisTargetsCheck == false)
+                    if (ts > TimeSpan.FromDays(355) || PlayButton.IsChecked == false || Properties.Settings.Default.AisTargetsCheck == false)
                         b.BoatVisible = Visibility.Hidden;
                     else
                         b.BoatVisible = Visibility.Visible;
