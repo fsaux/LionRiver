@@ -5039,29 +5039,39 @@ namespace LionRiver
 
         private void UpdateScreenAIS()
         {
-            foreach (KeyValuePair<string, AisBoat> kvp in AisBoats)
+            try
             {
-                AisBoat b = kvp.Value;
-
-                if (!b.IsAvailable)
+                foreach (KeyValuePair<string, AisBoat> kvp in AisBoats)
                 {
-                    MapItem mi = new MapItem();
-                    mi.DataContext = b;
-                    aisBoatItemCollection.Add(mi);
-                    b.IsAvailable = true;
-                }
+                    AisBoat b = kvp.Value;
 
-                if (b.LastUpdate != null)
-                {
-                    TimeSpan ts = new TimeSpan((DateTime.Now - b.LastUpdate).Ticks);
-                    if (ts > TimeSpan.FromMinutes(3) || PlayButton.IsChecked == false || Properties.Settings.Default.AisTargetsCheck == false)
-                        b.BoatVisible = Visibility.Hidden;
+                    if (!b.IsAvailable)
+                    {
+                        MapItem mi = new MapItem();
+                        mi.DataContext = b;
+                        aisBoatItemCollection.Add(mi);
+                        b.IsAvailable = true;
+                    }
+
+                    if (b.LastUpdate != null)
+                    {
+                        TimeSpan ts = new TimeSpan((DateTime.Now - b.LastUpdate).Ticks);
+                        if (ts > TimeSpan.FromMinutes(3) || PlayButton.IsChecked == false || Properties.Settings.Default.AisTargetsCheck == false)
+                            b.BoatVisible = Visibility.Hidden;
+                        else
+                            b.BoatVisible = Visibility.Visible;
+                    }
                     else
-                        b.BoatVisible = Visibility.Visible;
+                        b.BoatVisible = Visibility.Hidden;
                 }
-                else
-                    b.BoatVisible = Visibility.Hidden;
+
             }
+            catch (Exception )
+            {
+                // TENGO QUE CORREGIR , USAR For()
+
+
+            }        
         }
 
         private void UpdateFleet(DateTime dt)
