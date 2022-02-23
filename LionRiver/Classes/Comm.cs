@@ -1359,8 +1359,8 @@ namespace LionRiver
                 sksubs.Add(new skSubscribe()
                 {
                     path = "*",
-                    period = 20000,
-                    format = "delta",
+                    minPeriod = 20000,
+                    format = "instant",
                     policy = "fixed"
                 });
             }
