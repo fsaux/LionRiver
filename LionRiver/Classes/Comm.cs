@@ -1712,6 +1712,7 @@ namespace LionRiver
                                             try
                                             {
                                                 b.BoatSpeed = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                b.LastUpdate = upd.timestamp;
                                             }
                                             catch (Exception)
                                             {
@@ -1723,6 +1724,7 @@ namespace LionRiver
                                             try
                                             {
                                                 b.Heading = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                b.LastUpdate = upd.timestamp;
                                             }
                                             catch (Exception)
                                             {
@@ -1740,6 +1742,7 @@ namespace LionRiver
                                                 {
                                                     case "name":
                                                         b.Name = (string)jp.Value;
+                                                        b.LastUpdate = upd.timestamp;
                                                         break;
                                                 }
                                             }

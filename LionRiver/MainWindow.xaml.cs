@@ -5055,16 +5055,21 @@ namespace LionRiver
 
                     if (b.LastUpdate != null)
                     {
-                        TimeSpan ts = new TimeSpan((DateTime.Now - b.LastUpdate).Ticks);
-                        if (ts > TimeSpan.FromMinutes(3) || PlayButton.IsChecked == false || Properties.Settings.Default.AisTargetsCheck == false)
+                        TimeSpan ts = new TimeSpan((DateTime.Now.ToUniversalTime() - b.LastUpdate).Ticks);
+                        if (ts > TimeSpan.FromMinutes(10) || PlayButton.IsChecked == false || Properties.Settings.Default.AisTargetsCheck == false)
                             b.BoatVisible = Visibility.Hidden;
                         else
+                        {
                             b.BoatVisible = Visibility.Visible;
+                            if (ts > TimeSpan.FromMinutes(3))
+                                b.BoatColor = Brushes.DimGray.Color;
+                            else
+                                b.BoatColor = Brushes.Red.Color;
+                        }
                     }
                     else
                         b.BoatVisible = Visibility.Hidden;
                 }
-
             }
             catch (Exception )
             {
