@@ -1107,8 +1107,7 @@ namespace LionRiver
                                     {
                                         latitude = WLAT.Val,
                                         longitude = WLON.Val
-                                    },
-                                    source = "Lionriver"
+                                    }
                                 }
                             });
                         }
@@ -1213,8 +1212,7 @@ namespace LionRiver
                                     {
                                         latitude = WLAT.Val,
                                         longitude = WLON.Val
-                                    },
-                                    source = "Lionriver"
+                                    }
                                 }
                             });
 
