@@ -100,69 +100,69 @@ namespace LionRiver
 
         public static List<Instrument> LoggedInstrumentList = new List<Instrument>();
 
-        static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000",3);
-        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn", "0.0",3);
+        static AngularInstrumentAbs COG = new AngularInstrumentAbs("COG", "°T", "000");
+        static LinearInstrument SOG = new LinearInstrument("SOG", "Kn", "0.0");
         static LatitudeInstrument LAT = new LatitudeInstrument("Lat", "");
         static LongitudeInstrument LON = new LongitudeInstrument("Lon", "");
         static PositionInstrument POS = new PositionInstrument("Position", "");
-        static AngularInstrumentRel MVAR = new AngularInstrumentRel("MVar", "°", "#", 1, false);
-        static LinearInstrument SPD = new LinearInstrument("SPD", "Kn", "0.0",3);
+        static AngularInstrumentRel MVAR = new AngularInstrumentRel("MVar", "°", "#");
+        static LinearInstrument SPD = new LinearInstrument("SPD", "Kn", "0.0");
         static LinearInstrument TEMP = new LinearInstrument("Temp", "°C", "#.#");
         static LinearInstrument DPT = new LinearInstrument("Depth", "m", "0.0");
-        static LinearInstrument AWS = new LinearInstrument("AWS", "Kn","#.#",3);
-        static AngularInstrumentRel AWA = new AngularInstrumentRel("AWA", "°", "#", 3);
-        static LinearInstrument TWS = new LinearInstrument("TWS", "Kn", "#.#", 3);
-        static AngularInstrumentRel TWA = new AngularInstrumentRel("TWA", "°", "#", 3);
-        static AngularInstrumentAbs TWD = new AngularInstrumentAbs("TWD", "°", "000", 15);
-        static AngularInstrumentAbs HDT = new AngularInstrumentAbs("HDG", "°T","000",3);
-        static AngularInstrumentAbs BRG = new AngularInstrumentAbs("BRG", "°T", "000", 1, false);
-        static LinearInstrument DST = new LinearInstrument("DST", "Nm", "#.#", 1, false);
-        static LinearInstrument XTE = new LinearInstrument("XTE", "Nm", "#.##", 1, false);
-        static LinearInstrument VMG = new LinearInstrument("WMG", "Kn", "0.0", 1, false);
+        static LinearInstrument AWS = new LinearInstrument("AWS", "Kn","#.#");
+        static AngularInstrumentRel AWA = new AngularInstrumentRel("AWA", "°", "#");
+        static LinearInstrument TWS = new LinearInstrument("TWS", "Kn", "#.#");
+        static AngularInstrumentRel TWA = new AngularInstrumentRel("TWA", "°", "#");
+        static AngularInstrumentAbs TWD = new AngularInstrumentAbs("TWD", "°", "000");
+        static AngularInstrumentAbs HDT = new AngularInstrumentAbs("HDG", "°T","000");
+        static AngularInstrumentAbs BRG = new AngularInstrumentAbs("BRG", "°T", "000");
+        static LinearInstrument DST = new LinearInstrument("DST", "Nm", "#.#");
+        static LinearInstrument XTE = new LinearInstrument("XTE", "Nm", "#.##");
+        static LinearInstrument VMG = new LinearInstrument("WMG", "Kn", "0.0");
 
-        static AngularInstrumentAbs HEEL = new AngularInstrumentAbs("HEEL", "°", "#", 15, false);
-        static AngularInstrumentAbs LWY = new AngularInstrumentAbs("LWY", "°", "0.0", 15, false);
+        static AngularInstrumentAbs HEEL = new AngularInstrumentAbs("HEEL", "°", "#");
+        static AngularInstrumentAbs LWY = new AngularInstrumentAbs("LWY", "°", "0.0");
 
 
         // Destination Waypoint
-        static WaypointInstrument WPT = new WaypointInstrument("To:", "", "", 1, false);
-        static LatitudeInstrument WLAT = new LatitudeInstrument("Lat", "", "", 1, false);
-        static LongitudeInstrument WLON = new LongitudeInstrument("Lon", "", "", 1, false);
+        static WaypointInstrument WPT = new WaypointInstrument("To:", "", "");
+        static LatitudeInstrument WLAT = new LatitudeInstrument("Lat", "", "");
+        static LongitudeInstrument WLON = new LongitudeInstrument("Lon", "", "");
 
         // Last Waypoint
-        static WaypointInstrument LWPT = new WaypointInstrument("", "", "", 1, false);
-        static LatitudeInstrument LWLAT = new LatitudeInstrument("Lat", "", "", 1, false);
-        static LongitudeInstrument LWLON = new LongitudeInstrument("Lon", "", "", 1, false);
-        static AngularInstrumentAbs LEGBRG = new AngularInstrumentAbs("BRG", "", "000", 1, false);
-        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn", "0.0", 5, false);
+        static WaypointInstrument LWPT = new WaypointInstrument("", "", "");
+        static LatitudeInstrument LWLAT = new LatitudeInstrument("Lat", "", "");
+        static LongitudeInstrument LWLON = new LongitudeInstrument("Lon", "", "");
+        static AngularInstrumentAbs LEGBRG = new AngularInstrumentAbs("BRG", "", "000");
+        static LinearInstrument VMGWPT = new LinearInstrument("WMGwpt", "Kn", "0.0");
 
         // Next Leg
-        static AngularInstrumentRel NTWA = new AngularInstrumentRel("Next TWA", "°", "#", 1, false);
+        static AngularInstrumentRel NTWA = new AngularInstrumentRel("Next TWA", "°", "#");
 
         // Drift
-        static AngularInstrumentAbs SET = new AngularInstrumentAbs("Set", "°T", "000", 30);
-        static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn", "0.0", 30);
+        static AngularInstrumentAbs SET = new AngularInstrumentAbs("Set", "°T", "000");
+        static LinearInstrument DRIFT = new LinearInstrument("Drift", "Kn", "0.0");
 
         // Performance
-        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn", "0.0", 15, false);
-        static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T", "#", 15, false);
-        static PercentInstrument PERF = new PercentInstrument("Perf", "%", "0", 15);
-        static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn", "#.##", 15, false);
-        static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T", "000", 15, false);
+        static LinearInstrument TGTSPD = new LinearInstrument("Tgt SPD", "Kn", "0.0");
+        static AngularInstrumentRel TGTTWA = new AngularInstrumentRel("Tgt TWA", "°T", "#");
+        static PercentInstrument PERF = new PercentInstrument("Perf", "%", "0");
+        static LinearInstrument TGTVMC = new LinearInstrument("Tgt VMC", "Kn", "#.##");
+        static AngularInstrumentAbs TGTCTS = new AngularInstrumentAbs("Tgt CTS", "°T", "000");
 
         // Starting Line
         static LinearInstrument LINEDST = new LinearInstrument("Dst to line", "m", "#", 1, false);
 
         // Laylines
-        static AngularInstrumentAbs TGTCOGp = new AngularInstrumentAbs("Tgt COG Stbd", "°T", "", 5, false);
-        static AngularInstrumentAbs TGTCOGs = new AngularInstrumentAbs("Tgt COG Port", "°T", "", 5, false);
-        static LinearInstrument TGTSOGp = new LinearInstrument("Tgt SOG Stbd", "Kn", "", 5, false);
-        static LinearInstrument TGTSOGs = new LinearInstrument("Tgt SOG Port", "Kn", "", 5, false);
-        static LinearInstrument DSTLYLp = new LinearInstrumentShort("Dst Lay Port", "m", "", 5, false);
-        static LinearInstrument DSTLYLs = new LinearInstrumentShort("Dst Lay Stbd", "m", "", 5, false);
+        static AngularInstrumentAbs TGTCOGp = new AngularInstrumentAbs("Tgt COG Stbd", "°T", "");
+        static AngularInstrumentAbs TGTCOGs = new AngularInstrumentAbs("Tgt COG Port", "°T", "");
+        static LinearInstrument TGTSOGp = new LinearInstrument("Tgt SOG Stbd", "Kn", "");
+        static LinearInstrument TGTSOGs = new LinearInstrument("Tgt SOG Port", "Kn", "");
+        static LinearInstrument DSTLYLp = new LinearInstrumentShort("Dst Lay Port", "m", "");
+        static LinearInstrument DSTLYLs = new LinearInstrumentShort("Dst Lay Stbd", "m", "");
 
-        static TimeSpanInstrument TTGLYLp = new TimeSpanInstrument("TTG Lay Port", "", "", 1, false);
-        static TimeSpanInstrument TTGLYLs = new TimeSpanInstrument("TTG Lay Stbd", "", "", 1, false);
+        static TimeSpanInstrument TTGLYLp = new TimeSpanInstrument("TTG Lay Port", "", "");
+        static TimeSpanInstrument TTGLYLs = new TimeSpanInstrument("TTG Lay Stbd", "", "");
 
         #endregion
 
@@ -2949,6 +2949,10 @@ namespace LionRiver
             ActiveRoute = null;
             ActiveLeg = null;
             ActiveMark = null;
+            WLAT.Invalidate();
+            WLON.Invalidate();
+            LWLAT.Invalidate();
+            LWLON.Invalidate();
 
             WriteSKDeltaStopNav();
         }
@@ -5593,8 +5597,12 @@ namespace LionRiver
             ActiveRoute = null;
             ActiveLeg = null;
             ActiveMark = null;
+            WLAT.Invalidate();
+            WLON.Invalidate();
+            LWLAT.Invalidate();
+            LWLON.Invalidate();
 
-            foreach(Mark mk in marksItemCollection.ToList())
+            foreach (Mark mk in marksItemCollection.ToList())
             {
                 if(mk.Name.Substring(0,3)=="MOB")
                 {

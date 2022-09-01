@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Media;
 using System.IO;
+using MapControl;
 
 namespace LionRiver
 {
@@ -125,58 +126,58 @@ namespace LionRiver
             #region Primitives
             if (navSentence_received || bypassComm)
             {
-                LAT.Val = lat;
-                LON.Val = lon;
-                SOG.Val = sog;
-                COG.Val = cog;
-                LAT.SetValid(now);
-                LON.SetValid(now);
-                SOG.SetValid(now);
-                COG.SetValid(now);
-                RMC_received_Timer.Start();
+                //LAT.Val = lat;
+                //LON.Val = lon;
+                //SOG.Val = sog;
+                //COG.Val = cog;
+                //LAT.SetValid();
+                //LON.SetValid();
+                //SOG.SetValid();
+                //COG.SetValid();
+                //RMC_received_Timer.Start();
             }
 
             if (hullSpeedSentence_received || bypassComm)
             {
-                SPD.Val = spd;
-                SPD.SetValid(now);
+                //SPD.Val = spd;
+                //SPD.SetValid();
             }
 
             if (depthSentence_received || bypassComm)
             {
-                DPT.Val = dpt;
-                DPT.SetValid(now);
+                //DPT.Val = dpt;
+                //DPT.SetValid();
             }
 
             if (AppWindSentence_received || bypassComm)
             {
-                AWA.Val = awa;
-                AWS.Val = aws;
-                AWA.SetValid(now);
-                AWS.SetValid(now);
+                //AWA.Val = awa;
+                //AWS.Val = aws;
+                //AWA.SetValid();
+                //AWS.SetValid();
             }
 
             if (waterTempSentence_received || bypassComm)
             {
-                TEMP.Val = wtemp;
-                TEMP.SetValid(now);
+                //TEMP.Val = wtemp;
+                //TEMP.SetValid();
             }
 
             if (headingSentence_received || bypassComm)
             {
-                double mv = Properties.Settings.Default.MagVar; //default
-                if (mvar3 != 0) mv = mvar3;                     //From SignalK
-                if (mvar2 != 0) mv = mvar2;                     //From HDG
-                if (mvar1 != 0) mv = mvar1;                     //From RMC
+                //double mv = Properties.Settings.Default.MagVar; //default
+                //if (mvar3 != 0) mv = mvar3;                     //From SignalK
+                //if (mvar2 != 0) mv = mvar2;                     //From HDG
+                //if (mvar1 != 0) mv = mvar1;                     //From RMC
 
-                MVAR.Val = mv;
-                MVAR.SetValid(now);
+                //MVAR.Val = mv;
+                //MVAR.SetValid();
 
-                if (bypassComm)
-                    mv = 0;         // heading from log file is "true heading" no need for correction
+                //if (bypassComm)
+                //    mv = 0;         // heading from log file is "true heading" no need for correction
 
-                HDT.Val = hdg + mv;
-                HDT.SetValid(now);
+                //HDT.Val = hdg + mv;
+                //HDT.SetValid();
             }
 
             #endregion
@@ -185,23 +186,24 @@ namespace LionRiver
 
             if (LAT.IsValid() && LON.IsValid())
             {
-                POS.Val.Latitude = LAT.Val;
-                POS.Val.Longitude = LON.Val;
-                POS.SetValid(now);
+                //POS.Val.Latitude = LAT.Val;
+                //POS.Val.Longitude = LON.Val;
+                //POS.SetValid();
             }
             else
             {
                 POS.Invalidate();
             }
 
+
             if (ActiveLeg != null)
             {
                 LWLAT.Val = ActiveLeg.FromLocation.Latitude;
-                LWLAT.SetValid(now);
+                LWLAT.SetValid();
                 LWLON.Val = ActiveLeg.FromLocation.Longitude;
-                LWLON.SetValid(now);
+                LWLON.SetValid();
                 LWPT.Val.str = ActiveLeg.FromMark.Name;
-                LWPT.SetValid(now);
+                LWPT.SetValid();
             }
             else
             {
@@ -215,30 +217,30 @@ namespace LionRiver
                 if (ActiveMark != null && POS.IsValid())
                 {
                     WLAT.Val = ActiveMark.Location.Latitude;
-                    WLAT.SetValid(now);
+                    WLAT.SetValid();
                     WLON.Val = ActiveMark.Location.Longitude;
-                    WLON.SetValid(now);
+                    WLON.SetValid();
                     WPT.Val.str = ActiveMark.Name;
-                    WPT.SetValid(now);
-                    BRG.Val = CalcBearing(LAT.Val, LON.Val, WLAT.Val, WLON.Val);
-                    BRG.SetValid(now);
-                    DST.Val = CalcDistance(LAT.Val, LON.Val, WLAT.Val, WLON.Val) / 1852;
-                    DST.SetValid(now);
+                    WPT.SetValid();
+                    //BRG.Val = CalcBearing(LAT.Val, LON.Val, WLAT.Val, WLON.Val);
+                    //BRG.SetValid();
+                    //DST.Val = CalcDistance(LAT.Val, LON.Val, WLAT.Val, WLON.Val) / 1852;
+                    //DST.SetValid();
                 }
                 else
                 {
-                    WLAT.Invalidate();
-                    WLON.Invalidate();
-                    WPT.Invalidate();
-                    BRG.Invalidate();
-                    DST.Invalidate();
+                    //WLAT.Invalidate();
+                    //WLON.Invalidate();
+                    //WPT.Invalidate();
+                    //BRG.Invalidate();
+                    //DST.Invalidate();
                 }
             }
 
             if (WPT.IsValid() && LWPT.IsValid())
             {
                 LEGBRG.Val = CalcBearing(LWLAT.Val, LWLON.Val, WLAT.Val, WLON.Val);
-                LEGBRG.SetValid(now);
+                LEGBRG.SetValid();
             }
             else
             {
@@ -248,8 +250,8 @@ namespace LionRiver
 
             if (LWPT.IsValid())
             {
-                XTE.Val = Math.Asin(Math.Sin(DST.Val * 1.852 / 6371) * Math.Sin((BRG.Val - LEGBRG.Val) * Math.PI / 180)) * 6371 / 1.852;
-                XTE.SetValid(now);
+                //XTE.Val = Math.Asin(Math.Sin(DST.Val * 1.852 / 6371) * Math.Sin((BRG.Val - LEGBRG.Val) * Math.PI / 180)) * 6371 / 1.852;
+                //XTE.SetValid();
             }
             else
                 if (XTE.IsValid())
@@ -257,8 +259,8 @@ namespace LionRiver
 
             if (SOG.IsValid() && BRG.IsValid() && WPT.IsValid())
             {
-                VMGWPT.Val = SOG.Val * Math.Cos((COG.Val - BRG.Val) * Math.PI / 180);
-                VMGWPT.SetValid(now);
+                //VMGWPT.Val = SOG.Val * Math.Cos((COG.Val - BRG.Val) * Math.PI / 180);
+                //VMGWPT.SetValid();
             }
             else
             {
@@ -270,14 +272,14 @@ namespace LionRiver
             #region True Wind
             if (AWA.IsValid() && SPD.IsValid())
             {
-                double Dx = AWS.Val * Math.Cos(AWA.Val * Math.PI / 180) - SPD.Val;
-                double Dy = AWS.Val * Math.Sin(AWA.Val * Math.PI / 180);
-                TWS.Val = Math.Sqrt(Dx * Dx + Dy * Dy);
-                TWS.SetValid(now);
-                TWA.Val = Math.Atan2(Dy, Dx) * 180 / Math.PI;
-                TWA.SetValid(now);
-                VMG.Val = SPD.Val * Math.Cos(TWA.Val * Math.PI / 180);
-                VMG.SetValid(now);
+                //double Dx = AWS.Val * Math.Cos(AWA.Val * Math.PI / 180) - SPD.Val;
+                //double Dy = AWS.Val * Math.Sin(AWA.Val * Math.PI / 180);
+                //TWS.Val = Math.Sqrt(Dx * Dx + Dy * Dy);
+                //TWS.SetValid();
+                //TWA.Val = Math.Atan2(Dy, Dx) * 180 / Math.PI;
+                //TWA.SetValid();
+                //VMG.Val = SPD.Val * Math.Cos(TWA.Val * Math.PI / 180);
+                //VMG.SetValid();
 
                 //Set estimated saling mode in case route and/or performance data is not available
                 if (Math.Abs(TWA.Val) < 55)
@@ -300,8 +302,8 @@ namespace LionRiver
 
             if (TWS.IsValid() && HDT.IsValid())
             {
-                TWD.Val = HDT.Val + TWA.Val;
-                TWD.SetValid(now);
+                //TWD.Val = HDT.Val + TWA.Val;
+                //TWD.SetValid();
             }
             else
             {
@@ -313,8 +315,8 @@ namespace LionRiver
             #region Leeway
             if(AWA.IsValid() && SPD.IsValid() && LWay.IsAvailable() && Properties.Settings.Default.EstimateLeeway)
             {
-                LWY.Val = LWay.Get(AWA.Val, AWS.Val, SPD.Val);
-                LWY.SetValid(now);
+                //LWY.Val = LWay.Get(AWA.Val, AWS.Val, SPD.Val);
+                //LWY.SetValid();
             }
 
             #endregion
@@ -332,7 +334,7 @@ namespace LionRiver
 
             //    HEEL.Val = k * awa * Math.Pow(aws, c) / (Math.Pow(awa, a) + b);
             //    if (HEEL.Val > 45) HEEL.Val = 45;
-            //    HEEL.SetValid(now);
+            //    HEEL.SetValid();
             //}
             //else
             //{
@@ -345,32 +347,32 @@ namespace LionRiver
             #region Drift
             if (SOG.IsValid() && COG.IsValid() && HDT.IsValid() && SPD.IsValid())
             {
-                double Dx = SOG.Val * Math.Cos(COG.Val * Math.PI / 180) - SPD.Val * Math.Cos(HDT.Val * Math.PI / 180);
-                double Dy = SOG.Val * Math.Sin(COG.Val * Math.PI / 180) - SPD.Val * Math.Sin(HDT.Val * Math.PI / 180);
+                //double Dx = SOG.Val * Math.Cos(COG.Val * Math.PI / 180) - SPD.Val * Math.Cos(HDT.Val * Math.PI / 180);
+                //double Dy = SOG.Val * Math.Sin(COG.Val * Math.PI / 180) - SPD.Val * Math.Sin(HDT.Val * Math.PI / 180);
 
-                if(LWY.IsValid())
-                {
-                    double lwy;
-                    if (AWA.Val < 0)
-                        lwy = -LWY.Val;
-                    else
-                        lwy = LWY.Val;
+                //if(LWY.IsValid())
+                //{
+                //    double lwy;
+                //    if (AWA.Val < 0)
+                //        lwy = -LWY.Val;
+                //    else
+                //        lwy = LWY.Val;
 
-                    double lm = SPD.Val * Math.Tan(lwy * Math.PI / 180);
-                    double la = HDT.Val - 90;
-                    double lx = lm * Math.Cos(la * Math.PI / 180);
-                    double ly = lm * Math.Sin(la * Math.PI / 180);
+                //    double lm = SPD.Val * Math.Tan(lwy * Math.PI / 180);
+                //    double la = HDT.Val - 90;
+                //    double lx = lm * Math.Cos(la * Math.PI / 180);
+                //    double ly = lm * Math.Sin(la * Math.PI / 180);
 
-                    double ang = Math.Atan2(ly, lx) * 180 / Math.PI;
+                //    double ang = Math.Atan2(ly, lx) * 180 / Math.PI;
 
-                    Dx -= lx;
-                    Dy -= ly;
-                }
+                //    Dx -= lx;
+                //    Dy -= ly;
+                //}
 
-                DRIFT.Val = Math.Sqrt(Dx * Dx + Dy * Dy);
-                DRIFT.SetValid(now);
-                SET.Val = Math.Atan2(Dy, Dx) * 180 / Math.PI;
-                SET.SetValid(now);
+                //DRIFT.Val = Math.Sqrt(Dx * Dx + Dy * Dy);
+                //DRIFT.SetValid();
+                //SET.Val = Math.Atan2(Dy, Dx) * 180 / Math.PI;
+                //SET.SetValid();
             }
             else
             {
@@ -387,65 +389,65 @@ namespace LionRiver
                 double Angle = Math.Abs(TWD.Val - BRG.Val + 360) % 360;
                 if (Angle > 180) Angle = 360 - Angle;
 
-                PolarPoint pb = NavPolar.GetBeatTargeInterpolated(TWS.Val);
-                PolarPoint pr = NavPolar.GetRunTargetInterpolated(TWS.Val);
+                //PolarPoint pb = NavPolar.GetBeatTargeInterpolated(TWS.Val);
+                //PolarPoint pr = NavPolar.GetRunTargetInterpolated(TWS.Val);
 
-                if (Angle <= (pb.TWA + 20)) // Beating
+                if (Angle <= (65)) // Beating
                 {
-                    TGTSPD.Val = pb.SPD;
-                    TGTSPD.SetValid(now);
-                    TGTTWA.Val = pb.TWA;
-                    TGTTWA.SetValid(now);
-                    var z = (pb.SPD * Math.Cos(pb.TWA * Math.PI / 180));
-                    if (z != 0)
-                    {
-                        PERF.Val = VMG.Val / z;
-                        PERF.SetValid(now);
-                    }
-                    else
-                        PERF.Invalidate();
+                    //    TGTSPD.Val = pb.SPD;
+                    //    TGTSPD.SetValid();
+                    //    TGTTWA.Val = pb.TWA;
+                    //    TGTTWA.SetValid();
+                    //    var z = (pb.SPD * Math.Cos(pb.TWA * Math.PI / 180));
+                    //    if (z != 0)
+                    //    {
+                    //        PERF.Val = VMG.Val / z;
+                    //        PERF.SetValid();
+                    //    }
+                    //    else
+                    //        PERF.Invalidate();
 
                     sailingMode = SailingMode.Beating;
                 }
 
-                if (Angle < (pr.TWA - 20) && Angle > (pb.TWA + 20)) // Reaching
-                {
-                    TGTSPD.Val = NavPolar.GetTargeInterpolated(Math.Abs(TWA.Val), TWS.Val);
-                    TGTSPD.SetValid(now);
-                    TGTTWA.Val = Math.Abs(TWA.Val);
-                    TGTTWA.SetValid(now);
-                    var z = TGTSPD.Val;
-                    if (z != 0)
+                if (Angle < (130) && Angle > (65)) // Reaching
                     {
-                        PERF.Val = Math.Abs(SPD.Val * Math.Cos((COG.Val - BRG.Val) * Math.PI / 180) / z);
-                        PERF.SetValid(now);
+                        //    TGTSPD.Val = NavPolar.GetTargeInterpolated(Math.Abs(TWA.Val), TWS.Val);
+                        //    TGTSPD.SetValid();
+                        //    TGTTWA.Val = Math.Abs(TWA.Val);
+                        //    TGTTWA.SetValid();
+                        //    var z = TGTSPD.Val;
+                        //    if (z != 0)
+                        //    {
+                        //        PERF.Val = Math.Abs(SPD.Val * Math.Cos((COG.Val - BRG.Val) * Math.PI / 180) / z);
+                        //        PERF.SetValid();
+                        //    }
+                        //    else
+                        //        PERF.Invalidate();
+
+                        sailingMode = SailingMode.Reaching;
                     }
-                    else
-                        PERF.Invalidate();
 
-                    sailingMode = SailingMode.Reaching;
-                }
-
-                if (Angle >= (pr.TWA - 20)) // Running
+                if (Angle >= (130)) // Running
                 {
-                    TGTSPD.Val = pr.SPD;
-                    TGTSPD.SetValid(now);
-                    TGTTWA.Val = pr.TWA;
-                    TGTTWA.SetValid(now);
-                    var z = (pr.SPD * Math.Cos(pr.TWA * Math.PI / 180));
-                    if (z != 0)
-                    {
-                        PERF.Val = VMG.Val / z;
-                        PERF.SetValid(now);
-                    }
-                    else
-                        PERF.Invalidate();
+                    //    TGTSPD.Val = pr.SPD;
+                    //    TGTSPD.SetValid();
+                    //    TGTTWA.Val = pr.TWA;
+                    //    TGTTWA.SetValid();
+                    //    var z = (pr.SPD * Math.Cos(pr.TWA * Math.PI / 180));
+                    //    if (z != 0)
+                    //    {
+                    //        PERF.Val = VMG.Val / z;
+                    //        PERF.SetValid();
+                    //    }
+                    //    else
+                    //        PERF.Invalidate();
 
                     sailingMode = SailingMode.Running;
                 }
 
             }
-            else
+                else
             {
                 if (TGTSPD.IsValid())
                     TGTSPD.Invalidate();
@@ -467,7 +469,7 @@ namespace LionRiver
                 double dst32 = CalcDistance(p3_lat, p3_lon, p2_lat, p2_lon);
 
                 LINEDST.Val = dst32 * Math.Sin((linebrg - brg32) * Math.PI / 180);
-                LINEDST.SetValid(now);
+                LINEDST.SetValid();
             }
             else
             {
@@ -495,11 +497,17 @@ namespace LionRiver
                             ActiveMark = null;
                             ActiveLeg = null;
                             ActiveRoute = null;
+                            WLAT.Invalidate();
+                            WLON.Invalidate();
+                            LWLAT.Invalidate();
+                            LWLON.Invalidate();
                         }
                     }
                     else
                     {
                         ActiveMark = null;
+                        WLAT.Invalidate();
+                        WLON.Invalidate();
                     }
                 }
             }
@@ -510,7 +518,7 @@ namespace LionRiver
                 if (ActiveLeg.NextLeg != null && TWD.IsValid())
                 {
                     NTWA.Val = TWD.Val - ActiveLeg.NextLeg.Bearing;
-                    NTWA.SetValid(now);
+                    NTWA.SetValid();
                 }
                 else
                 {
@@ -546,17 +554,17 @@ namespace LionRiver
                 double dys = TGTSPD.Val * Math.Sin(ttwa * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
 
                 TGTCOGp.Val = Math.Atan2(dys, dxs) * 180 / Math.PI + TWD.Val;
-                TGTCOGp.SetValid(now);
+                TGTCOGp.SetValid();
                 TGTSOGp.Val = Math.Sqrt(dxs * dxs + dys * dys);
-                TGTSOGp.SetValid(now);
+                TGTSOGp.SetValid();
 
                 double dxp = TGTSPD.Val * Math.Cos(-ttwa * Math.PI / 180) + DRIFT.Val * Math.Cos(relset * Math.PI / 180);
                 double dyp = TGTSPD.Val * Math.Sin(-ttwa * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
 
                 TGTCOGs.Val = Math.Atan2(dyp, dxp) * 180 / Math.PI + TWD.Val;
-                TGTCOGs.SetValid(now);
+                TGTCOGs.SetValid();
                 TGTSOGs.Val = Math.Sqrt(dxp * dxp + dyp * dyp);
-                TGTSOGs.SetValid(now);
+                TGTSOGs.SetValid();
 
                 // Determine if sailing inside course +/- 0 degrees
                 double a1 = (BRG.Val - TGTCOGs.Val - 0 + 360) % 360;
@@ -610,21 +618,21 @@ namespace LionRiver
                         }
                     }
                     DSTLYLp.Val = dist_p * 1852;
-                    DSTLYLp.SetValid(now);
+                    DSTLYLp.SetValid();
                     DSTLYLs.Val = dist_s * 1852;
-                    DSTLYLs.SetValid(now);
+                    DSTLYLs.SetValid();
 
                     double xx = DSTLYLp.Val / TGTSOGp.Val * 3600 / 1852;
                     if (xx > TimeSpan.MaxValue.TotalHours) xx = TimeSpan.MaxValue.TotalHours - 1;
                     if (xx < TimeSpan.MinValue.TotalHours) xx = TimeSpan.MinValue.TotalHours + 1;
                     TTGLYLp.Val = TimeSpan.FromSeconds(xx);
-                    TTGLYLp.SetValid(now);
+                    TTGLYLp.SetValid();
 
                     xx = DSTLYLs.Val / TGTSOGs.Val * 3600 / 1852;
                     if (xx > TimeSpan.MaxValue.TotalHours) xx = TimeSpan.MaxValue.TotalHours - 1;
                     if (xx < TimeSpan.MinValue.TotalHours) xx = TimeSpan.MinValue.TotalHours + 1;
                     TTGLYLs.Val = TimeSpan.FromSeconds(xx);
-                    TTGLYLs.SetValid(now);
+                    TTGLYLs.SetValid();
                 }
             }
             else
@@ -755,9 +763,9 @@ namespace LionRiver
             {
                 PolarPoint p = NavPolar.GetTargetVMC(TWS.Val, TWD.Val, BRG.Val, DRIFT.Val, SET.Val);
                 TGTVMC.Val = p.SPD;
-                TGTVMC.SetValid(now);
+                TGTVMC.SetValid();
                 TGTCTS.Val = TWD.Val + p.TWA;
-                TGTCTS.SetValid(now);
+                TGTCTS.SetValid();
             }
         }
 

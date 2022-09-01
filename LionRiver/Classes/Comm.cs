@@ -997,7 +997,6 @@ namespace LionRiver
         private void Ws_OnOpen(object sender, EventArgs e)
         {
             var ws = sender as WebSocket;
-            var json = e.ToString();
 
             SignalkWebSocket = ws;
 
@@ -1239,101 +1238,207 @@ namespace LionRiver
 
             // Subscriptions to vessels.self
 
-            if (Properties.Settings.Default.NavSentence.InPort == signalKport)
+            sksubs.Add(new skSubscribe()
             {
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "navigation.courseOverGroundTrue",
-                    period = 1000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "navigation.speedOverGround",
-                    period = 1000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "navigation.position",
-                    period = 1000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-            }
-
-            if (Properties.Settings.Default.AppWindSentence.InPort == signalKport)
+                path = "navigation.courseOverGroundTrue",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+            sksubs.Add(new skSubscribe()
             {
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "environment.wind.angleApparent",
-                    period = 1000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "environment.wind.speedApparent",
-                    period = 1000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-            }
-
-            if (Properties.Settings.Default.HullSpeedSentence.InPort == signalKport)
+                path = "navigation.speedOverGround",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+            sksubs.Add(new skSubscribe()
             {
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "navigation.speedThroughWater",
-                    period = 1000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-            }
+                path = "navigation.position",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
 
-            if (Properties.Settings.Default.HeadingSentence.InPort == signalKport)
+            sksubs.Add(new skSubscribe()
             {
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "navigation.headingMagnetic",
-                    period = 1000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "navigation.magneticVariation",
-                    period = 600 * 1000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-
-                //
-            }
-
-            if (Properties.Settings.Default.DepthSentence.InPort == signalKport)
+                path = "environment.wind.angleApparent",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+            sksubs.Add(new skSubscribe()
             {
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "environment.depth.belowSurface",
-                    period = 1000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-            }
+                path = "environment.wind.speedApparent",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
 
-            if (Properties.Settings.Default.WaterTempSentence.InPort == signalKport)
+            sksubs.Add(new skSubscribe()
             {
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "environment.water.temperature",
-                    period = 10000,
-                    format = "delta",
-                    policy = "fixed"
-                });
-            }
+                path = "navigation.speedThroughWater",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.headingTrue",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "environment.depth.belowSurface",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "environment.water.temperature",
+                period = 10000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.courseGreatCircle.nextPoint.bearingTrue",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.courseGreatCircle.nextPoint.distance",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.courseGreatCircle.crossTrackError",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.courseGreatCircle.nextPoint.velocityMadeGood",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "environment.wind.angleTrueWater",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "environment.wind.speedTrue",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "performance.velocityMadeGood",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "environment.wind.directionTrue",
+                period = 1000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.leewayAngle",
+                period = 2000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "environment.current.drift",
+                minPeriod = 15000,
+                format = "delta",
+                policy = "instant"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "environment.current.setTrue",
+                minPeriod = 15000,
+                format = "delta",
+                policy = "instant"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "performance.targetSpeed",
+                period = 5000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "performance.targetAngle",
+                period = 5000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+            sksubs.Add(new skSubscribe()
+            {
+                path = "performance.polarSpeedRatio",
+                period = 5000,
+                format = "delta",
+                policy = "fixed"
+            });
+
+
+
+
+
+            //sksubs.Add(new skSubscribe()
+            //{
+            //    path = "navigation.courseGreatCircle.nextPoint.position",
+            //    period = 20000,
+            //    format = "delta",
+            //    policy = "ideal"
+            //});
+
+            //sksubs.Add(new skSubscribe()
+            //{
+            //    path = "navigation.courseGreatCircle.previousPoint.position",
+            //    period = 20000,
+            //    format = "delta",
+            //    policy = "ideal"
+            //});
 
             if (sksubs.Count() != 0)
             {
@@ -1350,18 +1455,18 @@ namespace LionRiver
 
             sksubs.Clear();
 
-            // Subscriptions to vessels.*
+            //// Subscriptions to vessels.*
 
-            if (Properties.Settings.Default.AisSentence.InPort == signalKport)
-            {
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "*",
-                    minPeriod = 20000,
-                    format = "instant",
-                    policy = "fixed"
-                });
-            }
+            //if (Properties.Settings.Default.AisSentence.InPort == signalKport)
+            //{
+            //    sksubs.Add(new skSubscribe()
+            //    {
+            //        path = "*",
+            //        minPeriod = 20000,
+            //        format = "instant",
+            //        policy = "fixed"
+            //    });
+            //}
 
             if (sksubs.Count() != 0)
             {
@@ -1521,11 +1626,17 @@ namespace LionRiver
                                         case "navigation.position":
                                             try
                                             {
-                                                lon = double.Parse((string)v["value"]["longitude"]);
-                                                lat = double.Parse((string)v["value"]["latitude"]);
+                                                LON.Val = double.Parse((string)v["value"]["longitude"]);
+                                                LAT.Val = double.Parse((string)v["value"]["latitude"]);
+                                                LON.SetValid();
+                                                LAT.SetValid();
 
-                                                navSentence_received = true;
-                                                MarkDataReceivedOnPort(port);
+                                                POS.Val.Latitude = LAT.Val;
+                                                POS.Val.Longitude = LON.Val;
+                                                POS.SetValid();
+
+                                                //navSentence_received = true;
+                                                //MarkDataReceivedOnPort(port);
                                             }
                                             catch (Exception)
                                             {
@@ -1536,10 +1647,11 @@ namespace LionRiver
                                         case "navigation.speedOverGround":
                                             try
                                             {
-                                                sog = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                SOG.Val = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                SOG.SetValid();
 
-                                                navSentence_received = true;
-                                                MarkDataReceivedOnPort(port);
+                                                //navSentence_received = true;
+                                                //MarkDataReceivedOnPort(port);
 
                                             }
                                             catch (Exception)
@@ -1551,10 +1663,11 @@ namespace LionRiver
                                         case "navigation.courseOverGroundTrue":
                                             try
                                             {
-                                                cog = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                COG.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                COG.SetValid();
 
-                                                navSentence_received = true;
-                                                MarkDataReceivedOnPort(port);
+                                                //navSentence_received = true;
+                                                //MarkDataReceivedOnPort(port);
                                             }
                                             catch (Exception)
                                             {
@@ -1565,10 +1678,11 @@ namespace LionRiver
                                         case "environment.wind.angleApparent":
                                             try
                                             {
-                                                awa = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                AWA.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                AWA.SetValid();
 
-                                                AppWindSentence_received = true;
-                                                MarkDataReceivedOnPort(port);
+                                                //AppWindSentence_received = true;
+                                                //MarkDataReceivedOnPort(port);
                                             }
                                             catch (Exception)
                                             {
@@ -1579,10 +1693,11 @@ namespace LionRiver
                                         case "environment.wind.speedApparent":
                                             try
                                             {
-                                                aws = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                AWS.Val = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                AWS.SetValid();
 
-                                                AppWindSentence_received = true;
-                                                MarkDataReceivedOnPort(port);
+                                                //AppWindSentence_received = true;
+                                                //MarkDataReceivedOnPort(port);
                                             }
                                             catch (Exception)
                                             {
@@ -1593,10 +1708,11 @@ namespace LionRiver
                                         case "navigation.speedThroughWater":
                                             try
                                             {
-                                                spd = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                SPD.Val = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                SPD.SetValid();
 
-                                                hullSpeedSentence_received = true;
-                                                MarkDataReceivedOnPort(port);
+                                                //hullSpeedSentence_received = true;
+                                                //MarkDataReceivedOnPort(port);
                                             }
                                             catch (Exception)
                                             {
@@ -1604,13 +1720,14 @@ namespace LionRiver
                                             }
                                             break;
 
-                                        case "navigation.headingMagnetic":
+                                        case "navigation.headingTrue":
                                             try
                                             {
-                                                hdg = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                HDT.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                HDT.SetValid();
 
-                                                headingSentence_received = true;
-                                                MarkDataReceivedOnPort(port);
+                                                //headingSentence_received = true;
+                                                //MarkDataReceivedOnPort(port);
                                             }
                                             catch (Exception)
                                             {
@@ -1618,24 +1735,14 @@ namespace LionRiver
                                             }
                                             break;
 
-                                        case "navigation.magneticVariation":
-                                            try
-                                            {
-                                                mvar3 = double.Parse((string)v["value"]) * 180 / Math.PI;
-                                            }
-                                            catch (Exception)
-                                            {
-                                                MarkErrorOnPort(port, "Bad SK navigation.magneticVariation sentence");
-                                            }
-                                            break;
-
                                         case "environment.depth.belowSurface":
                                             try
                                             {
-                                                dpt = double.Parse((string)v["value"]);
+                                                DPT.Val = double.Parse((string)v["value"]);
+                                                DPT.SetValid();
 
-                                                depthSentence_received = true;
-                                                MarkDataReceivedOnPort(port);
+                                                //depthSentence_received = true;
+                                                //MarkDataReceivedOnPort(port);
                                             }
                                             catch (Exception)
                                             {
@@ -1646,18 +1753,196 @@ namespace LionRiver
                                         case "environment.water.temperature":
                                             try
                                             {
-                                                wtemp = double.Parse((string)v["value"]) - 273.15;
+                                                TEMP.Val = double.Parse((string)v["value"]) - 273.15;
+                                                TEMP.SetValid();
 
-                                                waterTempSentence_received = true;
-                                                MarkDataReceivedOnPort(port);
+                                                //waterTempSentence_received = true;
+                                                //MarkDataReceivedOnPort(port);
                                             }
                                             catch (Exception)
                                             {
                                                 MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
                                             }
                                             break;
-                                    }
 
+                                        case "navigation.courseGreatCircle.nextPoint.bearingTrue":
+                                            try
+                                            {
+                                                BRG.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                BRG.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.courseGreatCircle.nextPoint.distance":
+                                            try
+                                            {
+                                                DST.Val = double.Parse((string)v["value"]) / 1852;
+                                                DST.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.courseGreatCircle.crossTrackError":
+                                            try
+                                            {
+                                                XTE.Val = double.Parse((string)v["value"]) / 1852;
+                                                XTE.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.courseGreatCircle.nextPoint.velocityMadeGood":
+                                            try
+                                            {
+                                                VMGWPT.Val = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                VMGWPT.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "environment.wind.angleTrueWater":
+                                            try
+                                            {
+                                                TWA.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                TWA.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "environment.wind.speedTrue":
+                                            try
+                                            {
+                                                TWS.Val = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                TWS.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "performance.velocityMadeGood":
+                                            try
+                                            {
+                                                VMG.Val = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                VMG.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "environment.wind.directionTrue":
+                                            try
+                                            {
+                                                TWD.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                TWD.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.leewayAngle":
+                                            try
+                                            {
+                                                LWY.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                LWY.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "environment.current.drift":
+                                            try
+                                            {
+                                                DRIFT.Val = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                DRIFT.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "environment.current.setTrue":
+                                            try
+                                            {
+                                                SET.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                SET.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "performance.targetSpeed":
+                                            try
+                                            {
+                                                TGTSPD.Val = double.Parse((string)v["value"]) * 3600 / 1852;
+                                                TGTSPD.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "performance.targetAngle":
+                                            try
+                                            {
+                                                TGTTWA.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                TGTTWA.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "performance.polarSpeedRatio":
+                                            try
+                                            {
+                                                PERF.Val = double.Parse((string)v["value"]);
+                                                PERF.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+
+
+
+
+
+
+
+
+
+                                    }
                                 }
                             } 
                         }
@@ -1743,7 +2028,7 @@ namespace LionRiver
                                                         break;
                                                 }
                                             }
-                                            catch (Exception e)
+                                            catch (Exception)
                                             {
                                                 MarkErrorOnPort(port, "Bad SK sentence");
                                             }

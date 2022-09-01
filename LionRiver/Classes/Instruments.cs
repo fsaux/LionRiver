@@ -82,19 +82,18 @@ namespace LionRiver
             }
         }
 
-        public virtual void SetValid(DateTime dt)
+        public virtual void SetValid()
         {
             dampBuffer.Put(Val);
             Val = CalculateAverage(dampBuffer);
-            //PushToBuffer(Val, dt, 0);
             _valid = true;
             OnPropertyChanged("FormattedValue");
         }
 
-        public virtual void SetValid()
-        {
-            SetValid(System.DateTime.Now);
-        }
+        //public virtual void SetValid()
+        //{
+        //    SetValid(System.DateTime.Now);
+        //}
 
         public void Invalidate()
         {
