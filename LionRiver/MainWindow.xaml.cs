@@ -154,15 +154,14 @@ namespace LionRiver
         static LinearInstrument LINEDST = new LinearInstrument("Dst to line", "m", "#", 1, false);
 
         // Laylines
-        static AngularInstrumentAbs TGTCOGp = new AngularInstrumentAbs("Tgt COG Stbd", "°T", "");
-        static AngularInstrumentAbs TGTCOGs = new AngularInstrumentAbs("Tgt COG Port", "°T", "");
-        static LinearInstrument TGTSOGp = new LinearInstrument("Tgt SOG Stbd", "Kn", "");
-        static LinearInstrument TGTSOGs = new LinearInstrument("Tgt SOG Port", "Kn", "");
-        static LinearInstrument DSTLYLp = new LinearInstrumentShort("Dst Lay Port", "m", "");
-        static LinearInstrument DSTLYLs = new LinearInstrumentShort("Dst Lay Stbd", "m", "");
-
-        static TimeSpanInstrument TTGLYLp = new TimeSpanInstrument("TTG Lay Port", "", "");
-        static TimeSpanInstrument TTGLYLs = new TimeSpanInstrument("TTG Lay Stbd", "", "");
+        static AngularInstrumentAbs TGTCOG = new AngularInstrumentAbs("Tgt COG lyl", "°T", "");
+        static AngularInstrumentAbs TGTCOGo = new AngularInstrumentAbs("Tgt COG op lyl", "°T", "");
+        static LinearInstrument TGTSOG = new LinearInstrument("Tgt SOG lyl", "Kn", "");
+        static LinearInstrument TGTSOGo = new LinearInstrument("Tgt SOG op lyl", "Kn", "");
+        static LinearInstrument DSTLYL = new LinearInstrumentShort("Dst Lay lyl", "m", "");
+        static LinearInstrument DSTLYLo = new LinearInstrumentShort("Dst Lay op lyl", "m", "");
+        static TimeSpanInstrument TTGLYL = new TimeSpanInstrument("TTG Lay lyl", "", "");
+        static TimeSpanInstrument TTGLYLo = new TimeSpanInstrument("TTG Lay op lyl", "", "");
 
         #endregion
 
@@ -4842,10 +4841,10 @@ namespace LionRiver
                                 {
                                     if (TGTTWA.IsValid())
                                     {
-                                        if (TGTCOGs.IsValid())
+                                        if (TGTCOGo.IsValid())
                                         {
-                                            a1 = 180 + TGTCOGs.Val;
-                                            a2 = 180 + TGTCOGp.Val;
+                                            a1 = 180 + TGTCOGo.Val;
+                                            a2 = 180 + TGTCOG.Val;
                                         }
                                         else
                                         {
@@ -4877,10 +4876,10 @@ namespace LionRiver
                             case SailingMode.Running:
                                 if (TGTTWA.IsValid())
                                 {
-                                    if (TGTCOGs.IsValid())
+                                    if (TGTCOGo.IsValid())
                                     {
-                                        a1 = 180 + TGTCOGs.Val;
-                                        a2 = 180 + TGTCOGp.Val;
+                                        a1 = 180 + TGTCOGo.Val;
+                                        a2 = 180 + TGTCOG.Val;
                                     }
                                     else
                                     {
@@ -4910,13 +4909,13 @@ namespace LionRiver
                         PrtLaylineTo.FromLocation = l1;
                         PrtLaylineTo.ToLocation = l3;
 
-                        CalcPosition(POS.Val.Latitude, POS.Val.Longitude, DSTLYLp.Val, TGTCOGp.Val, ref lat, ref lon);
+                        CalcPosition(POS.Val.Latitude, POS.Val.Longitude, DSTLYL.Val, TGTCOG.Val, ref lat, ref lon);
                         HitPointPort.Location = new Location(lat, lon);
-                        HitPointPort.Name = TTGLYLp.FormattedValue;
+                        HitPointPort.Name = TTGLYL.FormattedValue;
 
-                        CalcPosition(POS.Val.Latitude, POS.Val.Longitude, DSTLYLs.Val, TGTCOGs.Val, ref lat, ref lon);
+                        CalcPosition(POS.Val.Latitude, POS.Val.Longitude, DSTLYLo.Val, TGTCOGo.Val, ref lat, ref lon);
                         HitPointStbd.Location = new Location(lat, lon);
-                        HitPointStbd.Name = TTGLYLs.FormattedValue;
+                        HitPointStbd.Name = TTGLYLo.FormattedValue;
 
                         if (!insideCourse)
                         {
@@ -4965,10 +4964,10 @@ namespace LionRiver
                             case SailingMode.Beating:
                                 if (TGTTWA.IsValid())
                                 {
-                                    if (TGTCOGs.IsValid())
+                                    if (TGTCOGo.IsValid())
                                     {
-                                        a1 = TGTCOGs.Val;
-                                        a2 = TGTCOGp.Val;
+                                        a1 = TGTCOGo.Val;
+                                        a2 = TGTCOG.Val;
                                     }
                                     else
                                     {
@@ -4991,10 +4990,10 @@ namespace LionRiver
                             case SailingMode.Running:
                                 if (TGTTWA.IsValid())
                                 {
-                                    if (TGTCOGs.IsValid())
+                                    if (TGTCOGo.IsValid())
                                     {
-                                        a1 = TGTCOGs.Val;
-                                        a2 = TGTCOGp.Val;
+                                        a1 = TGTCOGo.Val;
+                                        a2 = TGTCOG.Val;
                                     }
                                     else
                                     {

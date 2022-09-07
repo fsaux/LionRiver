@@ -1420,9 +1420,21 @@ namespace LionRiver
                 policy = "fixed"
             });
 
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.racing.layline.*",
+                period = 2000,
+                format = "delta",
+                policy = "fixed"
+            });
 
-
-
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.racing.oppositeLayline.*",
+                period = 2000,
+                format = "delta",
+                policy = "fixed"
+            });
 
             //sksubs.Add(new skSubscribe()
             //{
@@ -1457,16 +1469,18 @@ namespace LionRiver
 
             //// Subscriptions to vessels.*
 
-            //if (Properties.Settings.Default.AisSentence.InPort == signalKport)
-            //{
-            //    sksubs.Add(new skSubscribe()
-            //    {
-            //        path = "*",
-            //        minPeriod = 20000,
-            //        format = "instant",
-            //        policy = "fixed"
-            //    });
-            //}
+            if (Properties.Settings.Default.AisSentence.InPort == signalKport)
+            {
+
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "*",
+                    period = 20000,
+                    format = "delta",
+                    policy = "instant"
+                });
+
+            }
 
             if (sksubs.Count() != 0)
             {
@@ -1933,6 +1947,79 @@ namespace LionRiver
                                             }
                                             break;
 
+                                        case "navigation.racing.layline.bearingTrue":
+                                            try
+                                            {
+                                                TGTCOG.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                TGTCOG.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.racing.layline.distance":
+                                            try
+                                            {
+                                                DSTLYL.Val = double.Parse((string)v["value"]);
+                                                DSTLYL.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.racing.layline.time":
+                                            try
+                                            {
+                                                var ttg = double.Parse((string)v["value"]);
+                                                TTGLYL.Val = TimeSpan.FromSeconds(ttg);
+                                                TTGLYL.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.racing.oppositeLayline.bearingTrue":
+                                            try
+                                            {
+                                                TGTCOGo.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
+                                                TGTCOGo.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.racing.oppositeLayline.distance":
+                                            try
+                                            {
+                                                DSTLYLo.Val = double.Parse((string)v["value"]);
+                                                DSTLYLo.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
+
+                                        case "navigation.racing.oppositeLayline.time":
+                                            try
+                                            {
+                                                var ttg = double.Parse((string)v["value"]);
+                                                TTGLYLo.Val = TimeSpan.FromSeconds(ttg);
+                                                TTGLYLo.SetValid();
+                                            }
+                                            catch (Exception)
+                                            {
+                                                MarkErrorOnPort(port, "Bad SK environment.water.temperature sentence");
+                                            }
+                                            break;
 
 
 

@@ -461,15 +461,15 @@ namespace LionRiver
             #region Line
             if (p1_set && p2_set && LAT.IsValid() && HDT.IsValid())
             {
-                double p3_lat = LAT.Val, p3_lon = LON.Val;
+                //double p3_lat = LAT.Val, p3_lon = LON.Val;
 
-                if (Properties.Settings.Default.GPSoffsetToBow != 0)
-                    CalcPosition(LAT.Val, LON.Val, Properties.Settings.Default.GPSoffsetToBow, HDT.Val, ref p3_lat, ref p3_lon);
-                double brg32 = CalcBearing(p3_lat, p3_lon, p2_lat, p2_lon);
-                double dst32 = CalcDistance(p3_lat, p3_lon, p2_lat, p2_lon);
+                //if (Properties.Settings.Default.GPSoffsetToBow != 0)
+                //    CalcPosition(LAT.Val, LON.Val, Properties.Settings.Default.GPSoffsetToBow, HDT.Val, ref p3_lat, ref p3_lon);
+                //double brg32 = CalcBearing(p3_lat, p3_lon, p2_lat, p2_lon);
+                //double dst32 = CalcDistance(p3_lat, p3_lon, p2_lat, p2_lon);
 
-                LINEDST.Val = dst32 * Math.Sin((linebrg - brg32) * Math.PI / 180);
-                LINEDST.SetValid();
+                //LINEDST.Val = dst32 * Math.Sin((linebrg - brg32) * Math.PI / 180);
+                //LINEDST.SetValid();
             }
             else
             {
@@ -534,41 +534,56 @@ namespace LionRiver
 
             if (DRIFT.IsValid() && PERF.IsValid() && TWD.IsValid())
             {
-                double ttwa = TGTTWA.Val;
-                double tgtlwy = 0;
-                
-                if(LWY.IsValid())
-                {
-                    double awx = TWS.Val * Math.Cos(ttwa * Math.PI / 180) + TGTSPD.Val;
-                    double awy = TWS.Val * Math.Sin(ttwa * Math.PI / 180);
-                    double tgtawa = Math.Atan2(awy, awx) * 180 / Math.PI;
-                    double tgtaws = Math.Sqrt(awx * awx + awy * awy);
-                    tgtlwy = LWay.Get(tgtawa, tgtaws, TGTSPD.Val);
-                }
+                //double ttwa = TGTTWA.Val;
+                //double tgtlwy = 0;
 
-                ttwa += tgtlwy;
-                if (ttwa > 180) ttwa = 180;
+                //if(LWY.IsValid())
+                //{
+                //    double awx = TWS.Val * Math.Cos(ttwa * Math.PI / 180) + TGTSPD.Val;
+                //    double awy = TWS.Val * Math.Sin(ttwa * Math.PI / 180);
+                //    double tgtawa = Math.Atan2(awy, awx) * 180 / Math.PI;
+                //    double tgtaws = Math.Sqrt(awx * awx + awy * awy);
+                //    tgtlwy = LWay.Get(tgtawa, tgtaws, TGTSPD.Val);
+                //}
 
-                double relset = SET.Val - TWD.Val;
-                double dxs = TGTSPD.Val * Math.Cos(ttwa * Math.PI / 180) + DRIFT.Val * Math.Cos(relset * Math.PI / 180);
-                double dys = TGTSPD.Val * Math.Sin(ttwa * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
+                //ttwa += tgtlwy;
+                //if (ttwa > 180) ttwa = 180;
 
-                TGTCOGp.Val = Math.Atan2(dys, dxs) * 180 / Math.PI + TWD.Val;
-                TGTCOGp.SetValid();
-                TGTSOGp.Val = Math.Sqrt(dxs * dxs + dys * dys);
-                TGTSOGp.SetValid();
+                //double relset = SET.Val - TWD.Val;
+                //double dxs = TGTSPD.Val * Math.Cos(ttwa * Math.PI / 180) + DRIFT.Val * Math.Cos(relset * Math.PI / 180);
+                //double dys = TGTSPD.Val * Math.Sin(ttwa * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
 
-                double dxp = TGTSPD.Val * Math.Cos(-ttwa * Math.PI / 180) + DRIFT.Val * Math.Cos(relset * Math.PI / 180);
-                double dyp = TGTSPD.Val * Math.Sin(-ttwa * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
+                //TGTCOGp.Val = Math.Atan2(dys, dxs) * 180 / Math.PI + TWD.Val;
+                //TGTCOGp.SetValid();
+                //TGTSOGp.Val = Math.Sqrt(dxs * dxs + dys * dys);
+                //TGTSOGp.SetValid();
 
-                TGTCOGs.Val = Math.Atan2(dyp, dxp) * 180 / Math.PI + TWD.Val;
-                TGTCOGs.SetValid();
-                TGTSOGs.Val = Math.Sqrt(dxp * dxp + dyp * dyp);
-                TGTSOGs.SetValid();
+                //double dxp = TGTSPD.Val * Math.Cos(-ttwa * Math.PI / 180) + DRIFT.Val * Math.Cos(relset * Math.PI / 180);
+                //double dyp = TGTSPD.Val * Math.Sin(-ttwa * Math.PI / 180) + DRIFT.Val * Math.Sin(relset * Math.PI / 180);
+
+                //TGTCOGs.Val = Math.Atan2(dyp, dxp) * 180 / Math.PI + TWD.Val;
+                //TGTCOGs.SetValid();
+                //TGTSOGs.Val = Math.Sqrt(dxp * dxp + dyp * dyp);
+                //TGTSOGs.SetValid();
 
                 // Determine if sailing inside course +/- 0 degrees
-                double a1 = (BRG.Val - TGTCOGs.Val - 0 + 360) % 360;
-                double a2 = (TGTCOGp.Val - 0 - TGTCOGs.Val + 360) % 360;
+                
+                double tgtcogs, tgtcogp;
+                if (TWA.Val < 0)
+                {
+                    tgtcogs = TGTCOG.Val;
+                    tgtcogp = TGTCOGo.Val;
+                }
+                else
+                {
+                    tgtcogp = TGTCOG.Val;
+                    tgtcogs = TGTCOGo.Val;
+                }
+
+
+
+                double a1 = (BRG.Val - tgtcogp - 0 + 360) % 360;
+                double a2 = (tgtcogs - 0 - tgtcogp + 360) % 360;
 
                 switch (sailingMode)
                 {
@@ -590,65 +605,65 @@ namespace LionRiver
 
                 if (ActiveMark != null)
                 {
-                    double alpha = (TGTCOGp.Val - BRG.Val + 360) % 360;
-                    double beta = (BRG.Val - TGTCOGs.Val + 360) % 360;
+                    //double alpha = (TGTCOGp.Val - BRG.Val + 360) % 360;
+                    //double beta = (BRG.Val - TGTCOGs.Val + 360) % 360;
 
-                    double dist_s, dist_p;
+                    //double dist_s, dist_p;
 
-                    if (alpha == 0)
-                    {
-                        dist_p = DST.Val;
-                        dist_s = 0;
-                    }
-                    else
-                    {
-                        if (beta == 0)
-                        {
-                            dist_s = DST.Val;
-                            dist_p = 0;
-                        }
-                        else
-                        {
-                            dist_p = DST.Val * Math.Sin(beta * Math.PI / 180) /
-                                (Math.Sin(alpha * Math.PI / 180) * Math.Cos(beta * Math.PI / 180) +
-                                Math.Cos(alpha * Math.PI / 180) * Math.Sin(beta * Math.PI / 180));
-                            dist_s = DST.Val * Math.Sin(alpha * Math.PI / 180) /
-                                (Math.Sin(alpha * Math.PI / 180) * Math.Cos(beta * Math.PI / 180) +
-                                Math.Cos(alpha * Math.PI / 180) * Math.Sin(beta * Math.PI / 180));
-                        }
-                    }
-                    DSTLYLp.Val = dist_p * 1852;
-                    DSTLYLp.SetValid();
-                    DSTLYLs.Val = dist_s * 1852;
-                    DSTLYLs.SetValid();
+                    //if (alpha == 0)
+                    //{
+                    //    dist_p = DST.Val;
+                    //    dist_s = 0;
+                    //}
+                    //else
+                    //{
+                    //    if (beta == 0)
+                    //    {
+                    //        dist_s = DST.Val;
+                    //        dist_p = 0;
+                    //    }
+                    //    else
+                    //    {
+                    //        dist_p = DST.Val * Math.Sin(beta * Math.PI / 180) /
+                    //            (Math.Sin(alpha * Math.PI / 180) * Math.Cos(beta * Math.PI / 180) +
+                    //            Math.Cos(alpha * Math.PI / 180) * Math.Sin(beta * Math.PI / 180));
+                    //        dist_s = DST.Val * Math.Sin(alpha * Math.PI / 180) /
+                    //            (Math.Sin(alpha * Math.PI / 180) * Math.Cos(beta * Math.PI / 180) +
+                    //            Math.Cos(alpha * Math.PI / 180) * Math.Sin(beta * Math.PI / 180));
+                    //    }
+                    //}
+                    //DSTLYLp.Val = dist_p * 1852;
+                    //DSTLYLp.SetValid();
+                    //DSTLYLs.Val = dist_s * 1852;
+                    //DSTLYLs.SetValid();
 
-                    double xx = DSTLYLp.Val / TGTSOGp.Val * 3600 / 1852;
-                    if (xx > TimeSpan.MaxValue.TotalHours) xx = TimeSpan.MaxValue.TotalHours - 1;
-                    if (xx < TimeSpan.MinValue.TotalHours) xx = TimeSpan.MinValue.TotalHours + 1;
-                    TTGLYLp.Val = TimeSpan.FromSeconds(xx);
-                    TTGLYLp.SetValid();
+                    //double xx = DSTLYLp.Val / TGTSOGp.Val * 3600 / 1852;
+                    //if (xx > TimeSpan.MaxValue.TotalHours) xx = TimeSpan.MaxValue.TotalHours - 1;
+                    //if (xx < TimeSpan.MinValue.TotalHours) xx = TimeSpan.MinValue.TotalHours + 1;
+                    //TTGLYLp.Val = TimeSpan.FromSeconds(xx);
+                    //TTGLYLp.SetValid();
 
-                    xx = DSTLYLs.Val / TGTSOGs.Val * 3600 / 1852;
-                    if (xx > TimeSpan.MaxValue.TotalHours) xx = TimeSpan.MaxValue.TotalHours - 1;
-                    if (xx < TimeSpan.MinValue.TotalHours) xx = TimeSpan.MinValue.TotalHours + 1;
-                    TTGLYLs.Val = TimeSpan.FromSeconds(xx);
-                    TTGLYLs.SetValid();
+                    //xx = DSTLYLs.Val / TGTSOGs.Val * 3600 / 1852;
+                    //if (xx > TimeSpan.MaxValue.TotalHours) xx = TimeSpan.MaxValue.TotalHours - 1;
+                    //if (xx < TimeSpan.MinValue.TotalHours) xx = TimeSpan.MinValue.TotalHours + 1;
+                    //TTGLYLs.Val = TimeSpan.FromSeconds(xx);
+                    //TTGLYLs.SetValid();
                 }
             }
             else
             {
-                if (TGTCOGp.IsValid())
-                    TGTCOGp.Invalidate();
-                if (TGTSOGp.IsValid())
-                    TGTSOGp.Invalidate();
-                if (TGTCOGs.IsValid())
-                    TGTCOGs.Invalidate();
-                if (TGTSOGs.IsValid())
-                    TGTSOGs.Invalidate();
-                if (DSTLYLp.IsValid())
-                    DSTLYLp.Invalidate();
-                if (DSTLYLs.IsValid())
-                    DSTLYLs.Invalidate();
+                if (TGTCOG.IsValid())
+                    TGTCOG.Invalidate();
+                if (TGTSOG.IsValid())
+                    TGTSOG.Invalidate();
+                if (TGTCOGo.IsValid())
+                    TGTCOGo.Invalidate();
+                if (TGTSOGo.IsValid())
+                    TGTSOGo.Invalidate();
+                if (DSTLYL.IsValid())
+                    DSTLYL.Invalidate();
+                if (DSTLYLo.IsValid())
+                    DSTLYLo.Invalidate();
             }
 
             #endregion
