@@ -2218,6 +2218,13 @@ namespace LionRiver
 
                         for (int i = 0; i < n; i++)
                         {
+                            string tmpName;
+
+                            if (sk1.feature.properties.points != null)
+                                tmpName = sk1.feature.properties.points.names[i];
+                            else
+                                tmpName = "mk" + GetLastMarkNumber().ToString();
+
                             nmark = new Mark()
                             {
                                 Location = new Location()
@@ -2225,7 +2232,7 @@ namespace LionRiver
                                     Longitude = sk1.feature.geometry.coordinates[i][0],
                                     Latitude = sk1.feature.geometry.coordinates[i][1]
                                 },
-                                Name = sk1.feature.properties.points.names[i]
+                                Name = tmpName
                             };
 
                             marksItemCollection.Add(nmark);
@@ -2249,6 +2256,7 @@ namespace LionRiver
                             }
                         }
                         rte = nroute;
+                        routeList.Add(rte);
                     }
                     else
                     {
@@ -2268,7 +2276,6 @@ namespace LionRiver
                         }
                     }
 
-                    routeList.Add(rte);
                     if (lg != null)
                     {
                         ActiveRoute = rte;
