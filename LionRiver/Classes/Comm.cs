@@ -38,6 +38,7 @@ namespace LionRiver
         bool skTacktickPerformanceSentenceOut, skRouteSentenceOut;
         Location skActiveWpt, skLastWpt;
         string skSelfUrn;
+        string skRouteHref = null;
 
         static bool rmc_sentence_available = false;
         static bool rmb_sentence_available = false;
@@ -1238,6 +1239,8 @@ namespace LionRiver
 
             // Subscriptions to vessels.self
 
+            #region Subscriptions to self
+
             sksubs.Add(new skSubscribe()
             {
                 path = "navigation.courseOverGroundTrue",
@@ -1282,7 +1285,6 @@ namespace LionRiver
                 format = "delta",
                 policy = "fixed"
             });
-
 
             sksubs.Add(new skSubscribe()
             {
@@ -1436,6 +1438,14 @@ namespace LionRiver
                 policy = "fixed"
             });
 
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.courseGreatCircle.activeRoute.href",
+                period = 10000,
+                format = "delta",
+                policy = "ideal"
+            });
+
             //sksubs.Add(new skSubscribe()
             //{
             //    path = "navigation.courseGreatCircle.nextPoint.position",
@@ -1451,6 +1461,8 @@ namespace LionRiver
             //    format = "delta",
             //    policy = "ideal"
             //});
+
+            #endregion
 
             if (sksubs.Count() != 0)
             {
@@ -1563,6 +1575,7 @@ namespace LionRiver
 
                 if (sk != null)
                 {
+
                     skWebSocketURL = sk.endpoints["v1"].ws;
                     skHttpURL = sk.endpoints["v1"].http;
 
@@ -1610,7 +1623,7 @@ namespace LionRiver
             skLastWpt = new Location();
         }
 
-        public void ProcessSKupdate(string message, int port)
+        public async void ProcessSKupdate(string message, int port)
         {
             skReceiveRootObj sk;
 
@@ -2021,13 +2034,20 @@ namespace LionRiver
                                             }
                                             break;
 
-
-
-
-
-
-
-
+                                        case "navigation.courseGreatCircle.activeRoute.href":
+                                            try
+                                            {
+                                                string rhref = (string)v["value"];
+                                                if (rhref != skRouteHref)
+                                                {
+                                                    skRouteHref = rhref;
+                                                    await SkGetRoute(rhref);
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
+                                            break;
 
                                     }
                                 }
@@ -2128,6 +2148,93 @@ namespace LionRiver
                 }
             }
 
+        }
+
+        private async Task SkGetRoute(string rpath)
+        {
+            string json1 = await HttpGet(skHttpURL + rpath.Remove(0, 1));
+            string json2 = await HttpGet(skHttpURL + "vessels/self/navigation/courseGreatCircle/nextPoint/position/");
+
+
+            skRouteRootobject sk1 = new skRouteRootobject();
+            skPosRootobject sk2 = new skPosRootobject();
+
+            if (json1 != "")
+            {
+                try
+                {
+                    sk1 = JsonConvert.DeserializeObject<skRouteRootobject>(json1);
+                }
+                catch { sk1 = null; }
+            }
+            else
+                sk1 = null;
+
+            if (json2 != "")
+            {
+                try
+                {
+                    sk2 = JsonConvert.DeserializeObject<skPosRootobject>(json2);
+                }
+                catch { sk2 = null; }
+            }
+            else
+                sk2 = null;
+
+
+            if (sk1 != null && sk2 != null)
+            {
+                if (!routeList.Any(r => r.Name == sk1.name)) // Route name doesnt exist?
+                {
+                    // Run this code on the UI thread
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Route nroute = new Route();
+                        nroute.Name = sk1.name;
+
+                        int n = sk1.feature.geometry.coordinates.Count();
+
+                        Mark tmp = null, nmark;
+                        Leg nleg = null;
+
+                        for (int i = 0; i < n; i++)
+                        {
+                            nmark = new Mark()
+                            {
+                                Location = new Location()
+                                {
+                                    Longitude = sk1.feature.geometry.coordinates[i][0],
+                                    Latitude = sk1.feature.geometry.coordinates[i][1]
+                                },
+                                Name = sk1.feature.properties.points.names[i]
+                            };
+
+                            marksItemCollection.Add(nmark);
+
+                            if (tmp != null)
+                            {
+                                nleg = new Leg(tmp, nmark);
+                                nroute.Legs.Add(nleg);
+
+                                legsItemCollection.Add(nleg);
+                            }
+
+                            tmp = nmark;
+
+                            double dist = CalcDistance(nmark.Location.Latitude, nmark.Location.Longitude, sk2.value.latitude, sk2.value.longitude);
+
+                            if (dist < 30)
+                            {
+                                ActiveLeg = nleg;
+                                ActiveMark = nmark;
+                            }
+                        }
+                        routeList.Add(nroute);
+
+                        ActiveRoute = nroute;
+                    });
+                }
+            }
         }
 
         public void ProcessAisSKupdate(string message)

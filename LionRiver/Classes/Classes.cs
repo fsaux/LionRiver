@@ -199,7 +199,7 @@ namespace LionRiver
         {
             double[] v = new double[3];
             double x1, y1;
-            Gdal.ApplyGeoTransform(gtCoef, x, y, out  x1, out y1);
+            Gdal.ApplyGeoTransform(gtCoef, x, y, out x1, out y1);
             transform_to_latlon.TransformPoint(v, x1, y1, 0);
             lon = v[0];
             lat = v[1];
@@ -207,7 +207,7 @@ namespace LionRiver
             lon += DeltaLon / 2;
         }
 
-        public bool GetBandIndex(DateTime dt,ref int idx,ref double distance)
+        public bool GetBandIndex(DateTime dt, ref int idx, ref double distance)
         {
 
             // Finds first index to Band with DateTime<dt
@@ -223,14 +223,14 @@ namespace LionRiver
 
             if (idx == 0)
                 return false; // Required time not covered in windbands
-            
+
             double tspan = (band[idx].datetime - band[idx - 1].datetime).TotalSeconds;
             distance = (dt - band[idx - 1].datetime).TotalSeconds / tspan;
 
             return true;
         }
 
-        public uvpair GetUV(double lat, double lon, int idx,double distance)
+        public uvpair GetUV(double lat, double lon, int idx, double distance)
         {
             uvpair uv = new uvpair();
 
@@ -270,9 +270,9 @@ namespace LionRiver
                     return uv0;
                 else
                     if (uv1 != null)
-                        return uv1;
-                    else
-                        return null;
+                    return uv1;
+                else
+                    return null;
             }
         }
 
@@ -286,7 +286,7 @@ namespace LionRiver
             int i = Convert.ToInt16(Math.Floor(delta_omega / DeltaLon));
             int j = Convert.ToInt16(Math.Floor(delta_phi / DeltaLat));
 
-            if ((i > (SizeX-2) ) || (j > (SizeY-2 )) || i < 0 || j < 0)
+            if ((i > (SizeX - 2)) || (j > (SizeY - 2)) || i < 0 || j < 0)
             {
                 return null; // Out of the grid
             }
@@ -330,9 +330,9 @@ namespace LionRiver
                     return uv0;
                 else
                     if (uv1 != null)
-                        return uv1;
-                    else
-                        return null;
+                    return uv1;
+                else
+                    return null;
             }
         }
 
@@ -379,9 +379,9 @@ namespace LionRiver
                 double y1 = v[i, j - 1].Lat;
                 double y2 = v[i + 1, j].Lat;
 
-                double u11 = v[i, j-1].u;
-                double u12 = v[i , j].u;
-                double u21 = v[i+1, j - 1].u;
+                double u11 = v[i, j - 1].u;
+                double u12 = v[i, j].u;
+                double u21 = v[i + 1, j - 1].u;
                 double u22 = v[i + 1, j].u;
 
                 uv.u = (u11 * (x2 - lon) * (y2 - lat) + u21 * (lon - x1) * (y2 - lat) + u12 * (x2 - lon) * (lat - y1) + u22 * (lon - x1) * (lat - y1)) / ((x2 - x1) * (y2 - y1));
@@ -504,7 +504,7 @@ namespace LionRiver
 
             List<PolarPoint> tempPoints = new List<PolarPoint>();
 
-            for(int a=0;a<180;a+=1)
+            for (int a = 0; a < 180; a += 1)
             {
                 var tempPoint = new PolarPoint() { TWA = a, SPD = this.GetTargetInterpolated(a) };
                 tempPoints.Add(tempPoint);
@@ -589,9 +589,11 @@ namespace LionRiver
     {
         public string Name { get; set; }
         public List<PolarLine> Lines { get; set; }
-        public Boolean IsLoaded {
+        public Boolean IsLoaded
+        {
             get;
-            set; }
+            set;
+        }
 
         public Polar()
         {
@@ -730,13 +732,13 @@ namespace LionRiver
             return p;
         }
 
-        public PolarPoint GetTargetBearing(double tws, double twd, double tgtcog, double drift, double set,double spdadj)
+        public PolarPoint GetTargetBearing(double tws, double twd, double tgtcog, double drift, double set, double spdadj)
         {
             PolarPoint pr = new PolarPoint();
 
             double minDelta = 360; // Let's try to minimize minDelta
 
-            for (double twa = 0; twa < 360; twa+=2)
+            for (double twa = 0; twa < 360; twa += 2)
             {
                 double spd = this.GetTargeInterpolated(twa, tws) * spdadj;
                 double hdg = twd - twa;
@@ -803,7 +805,7 @@ namespace LionRiver
 
             var tlp = new List<LeewayPoint>();
 
-            for (double awa = 0; awa <= 180; awa +=1) // Create new table every degree
+            for (double awa = 0; awa <= 180; awa += 1) // Create new table every degree
                 tlp.Add(GetInterpolated(awa));
 
             leewayPoints = tlp;
@@ -880,7 +882,7 @@ namespace LionRiver
                 else
                     lwy = 0;
 
-                if (lwy>Leeway.MaxLeeway)
+                if (lwy > Leeway.MaxLeeway)
                     lwy = Leeway.MaxLeeway;
 
                 if (double.IsNaN(lwy) || lwy < 0)
@@ -905,7 +907,7 @@ namespace LionRiver
         private int inport;
         public int InPort
         {
-            set { inport = value; }            
+            set { inport = value; }
             get { return inport; }
         }
 
@@ -954,7 +956,7 @@ namespace LionRiver
 
     public class ObservableString : INotifyPropertyChanged
     {
-        private string _value;        
+        private string _value;
 
         public string Value
         {
@@ -1207,7 +1209,7 @@ namespace LionRiver
                 OnPropertyChanged("PredictedCurrentSpeed");
             }
         }
-        
+
         public DateTime Time
         {
             get { return time; }
@@ -1338,7 +1340,7 @@ namespace LionRiver
             }
         }
     }
-    
+
     public class Leg : DependencyObject, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -1742,7 +1744,7 @@ namespace LionRiver
 
         public const int MaxLength = 300;
 
-        public Track(List<Log> logEntries,int level,double minCval, double minCidx, double maxCval, double maxCidx)
+        public Track(List<Log> logEntries, int level, double minCval, double minCidx, double maxCval, double maxCidx)
         {
             this.minColorValue = minCval;
             this.minColorIndex = minCidx;
@@ -1793,7 +1795,7 @@ namespace LionRiver
 
                 lastLocation = toloc;
                 lastLocationTime = logEntries.Last().timestamp;
-                
+
             }
         }
 
@@ -1846,7 +1848,7 @@ namespace LionRiver
             }
         }
 
-        public void AddNewLocation(Location toLoc,double colorValue,DateTime dt)
+        public void AddNewLocation(Location toLoc, double colorValue, DateTime dt)
         {
             TimeSpan duration = dt.Subtract(lastLocationTime);
 
@@ -2370,8 +2372,8 @@ namespace LionRiver
             {
 
                 var p1 = ParentMap.MapTransform.Transform(l);
-                var p2 = new Point(p1.X , p1.Y + 9);
-                var p3 = new Point(p1.X +3, p1.Y + 9);
+                var p2 = new Point(p1.X, p1.Y + 9);
+                var p3 = new Point(p1.X + 3, p1.Y + 9);
 
                 using (var context = geometry.Open())
                 {
@@ -2546,10 +2548,10 @@ namespace LionRiver
         }
 
     }
-    
+
     public class WindArrowGrid : MapPanel
     {
-        public WindArrowGrid(windgrib wgrib,double scale)
+        public WindArrowGrid(windgrib wgrib, double scale)
         {
             foreach (uvpair uv in wgrib.band[0].data)
             {
@@ -2564,8 +2566,8 @@ namespace LionRiver
         {
             LinearGradientBrush cm = (LinearGradientBrush)App.Current.FindResource("ColorMap");
 
-            int idx=0;
-            double distance=0;
+            int idx = 0;
+            double distance = 0;
 
             if (wgrib.GetBandIndex(dt, ref idx, ref distance))
             {
@@ -2588,7 +2590,7 @@ namespace LionRiver
                     {
                         wa.Visibility = Visibility.Hidden;
                     }
-                } 
+                }
             }
         }
     }
@@ -2597,7 +2599,7 @@ namespace LionRiver
     {
         private double Scale;
 
-        public CurrentArrowGrid(currentgrib cgrib,double scale)
+        public CurrentArrowGrid(currentgrib cgrib, double scale)
         {
             this.Scale = scale;
             foreach (uvpair uv in cgrib.band[0].data)
@@ -2663,7 +2665,7 @@ namespace LionRiver
 
 
 
-        public Vertex(Location pos,DateTime cost)
+        public Vertex(Location pos, DateTime cost)
         {
             this.Neighbors = new List<Vertex>();
             this.Position = pos;
@@ -2694,8 +2696,8 @@ namespace LionRiver
             DateTime nextDT = vertexList[0].Cost.Add(ts1);
 
             LinearGradientBrush cmx = (LinearGradientBrush)App.Current.FindResource("ColorMap");
-                        
-            for(int i=0;i<vertexList.Count-1;i++)
+
+            for (int i = 0; i < vertexList.Count - 1; i++)
             {
                 if (vertexList[i].Cost > nextDT)
                 {
@@ -2721,14 +2723,14 @@ namespace LionRiver
             }
 
             vertexReplayList.Add(vertexList[vertexList.Count() - 1]);
-            vertexReplayList[0].BRG = vertexReplayList[1].BRG;            
+            vertexReplayList[0].BRG = vertexReplayList[1].BRG;
         }
 
         public void Select()
         {
-            foreach(UIElement uie in Children)
+            foreach (UIElement uie in Children)
             {
-                if(uie is MapSegment)
+                if (uie is MapSegment)
                 {
                     var ms = uie as MapSegment;
                     ms.Stroke = Brushes.DarkRed;
@@ -2736,7 +2738,7 @@ namespace LionRiver
                 }
 
                 this.ShowWindArrows();
-            }            
+            }
         }
 
         public void UnSelect()
@@ -2821,7 +2823,7 @@ namespace LionRiver
 
     public class skConnectRootObj // Root for JSON object
     {
-        public Dictionary<string,skEndPoint> endpoints { get; set; }
+        public Dictionary<string, skEndPoint> endpoints { get; set; }
         public skServer server { get; set; }
     }
 
@@ -2864,7 +2866,7 @@ namespace LionRiver
     public class skSendUpdateRootObj
     {
         public string requestId { get; set; }
-        [JsonProperty(NullValueHandling=NullValueHandling.Ignore)]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string context { get; set; }
         public object put { get; set; }
     }
@@ -2876,7 +2878,7 @@ namespace LionRiver
         public double? value { get; set; }
     }
 
-    public class skPutPos:skPut
+    public class skPutPos : skPut
     {
         public new skPosition value { get; set; }
     }
@@ -2913,6 +2915,61 @@ namespace LionRiver
         public List<string> roles { get; set; }
     }
 
+    public class skRouteRootobject
+    {
+        public float distance { get; set; }
+        public skRouteFeature feature { get; set; }
+        public object start { get; set; }
+        public object end { get; set; }
+        public string name { get; set; }
+        public object description { get; set; }
+        public DateTime timestamp { get; set; }
+        public string source { get; set; }
+    }
+
+    public class skRouteFeature
+    {
+        public string type { get; set; }
+        public skRouteGeometry geometry { get; set; }
+        public skRouteProperties properties { get; set; }
+        public string id { get; set; }
+    }
+
+    public class skRouteGeometry
+    {
+        public string type { get; set; }
+        public float[][] coordinates { get; set; }
+    }
+
+    public class skRouteProperties
+    {
+        public skRoutePoints points { get; set; }
+    }
+
+    public class skRoutePoints
+    {
+        public string[] names { get; set; }
+    }
+
+    public class skPosRootobject
+    {
+        public skMeta meta { get; set; }
+        public skPosValue value { get; set; }
+        public string source { get; set; }
+        public DateTime timestamp { get; set; }
+    }
+
+    public class skMeta
+    {
+    }
+
+    public class skPosValue
+    {
+        public float latitude { get; set; }
+        public float longitude { get; set; }
+    }
+
+
     #endregion
 
     #region Plot
@@ -2937,7 +2994,7 @@ namespace LionRiver
 
         private Double _minXAxisValue;
         private Double _maxXAxisValue;
-        private Double _xstep;  
+        private Double _xstep;
         private Double _selectionFromValue;
         private Double _selectionToValue;
 
@@ -3059,7 +3116,7 @@ namespace LionRiver
                 _selectionToValue = value;
                 OnPropertyChanged("SelectionToValue");
             }
-        }      
+        }
         public Visibility SelectionVisible
         {
             get
@@ -3189,7 +3246,7 @@ namespace LionRiver
 
     }
 
-    public class PlotSelector 
+    public class PlotSelector
     {
         public string Name { get; set; }
         public string Group { get; set; }

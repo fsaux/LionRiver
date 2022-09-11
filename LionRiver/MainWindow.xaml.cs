@@ -286,6 +286,7 @@ namespace LionRiver
         List<Mark> NewMarksOnRoute = new List<Mark>();
 
         ObservableCollection<Route> routeList = new ObservableCollection<Route>();
+
         #endregion
 
         #region MapItems
@@ -293,8 +294,8 @@ namespace LionRiver
         ICollection<object> fleetBoatItemCollection;
         ICollection<object> aisBoatItemCollection;
         ICollection<object> legsItemCollection;
-
         SampleItemCollection marksItemCollection;
+
 
         public Boat boat = new Boat
         {
@@ -313,7 +314,7 @@ namespace LionRiver
         static public List<Boat> fleetBoats = new List<Boat>();
         public Dictionary<string, AisBoat> AisBoats = new Dictionary<string, AisBoat>();
 
-        public List<string> AisBoatDataAvailable = new List<string>();
+        //public List<string> AisBoatDataAvailable = new List<string>();
             
         static public LinearGradientBrush perfGradientBrush = (LinearGradientBrush)App.Current.FindResource("PerformanceMap");
 
@@ -529,6 +530,7 @@ namespace LionRiver
             aisBoatItemCollection = (ICollection<object>)Resources["AisBoatItemCollection"];
             legsItemCollection = (ICollection<object>)Resources["LegsItemCollection"];
 
+
             //boatsItemCollection.Add(boat);
             //boatsItemCollection.Add(replayBoat);     
 
@@ -539,6 +541,7 @@ namespace LionRiver
             Panel.SetZIndex(mainBoat, 100);
 
             marksItemCollection = new SampleItemCollection();
+
             markItemsControl.DataContext = marksItemCollection;
             marksControl.DataContext = marksItemCollection;
 
