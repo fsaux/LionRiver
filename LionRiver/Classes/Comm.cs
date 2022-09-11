@@ -2037,11 +2037,24 @@ namespace LionRiver
                                         case "navigation.courseGreatCircle.activeRoute.href":
                                             try
                                             {
-                                                string rhref = (string)v["value"];
-                                                if (rhref != skRouteHref)
+                                                string href = (string)v["value"];
+                                                if (href != skRouteHref)
                                                 {
-                                                    skRouteHref = rhref;
-                                                    await SkGetRoute(rhref);
+                                                    skRouteHref = href;
+                                                    if (href != null)
+                                                    {
+                                                        href = href.Remove(0, 1);
+                                                        await SkGetActiveRoute(href);
+                                                    }
+                                                    else
+                                                    {
+                                                        Application.Current.Dispatcher.Invoke(() =>
+                                                        {
+                                                            ActiveMark = null;
+                                                            ActiveLeg = null;
+                                                            ActiveRoute = null;
+                                                        });
+                                                    }
                                                 }
                                             }
                                             catch (Exception e)
@@ -2150,11 +2163,10 @@ namespace LionRiver
 
         }
 
-        private async Task SkGetRoute(string rpath)
+        private async Task SkGetActiveRoute(string rpath)
         {
-            string json1 = await HttpGet(skHttpURL + rpath.Remove(0, 1));
+            string json1 = await HttpGet(skHttpURL + rpath);
             string json2 = await HttpGet(skHttpURL + "vessels/self/navigation/courseGreatCircle/nextPoint/position/");
-
 
             skRouteRootobject sk1 = new skRouteRootobject();
             skPosRootobject sk2 = new skPosRootobject();
@@ -2184,15 +2196,22 @@ namespace LionRiver
 
             if (sk1 != null && sk2 != null)
             {
-                if (!routeList.Any(r => r.Name == sk1.name)) // Route name doesnt exist?
-                {
-                    // Run this code on the UI thread
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        Route nroute = new Route();
-                        nroute.Name = sk1.name;
 
-                        int n = sk1.feature.geometry.coordinates.Count();
+                // Run this code on the UI thread
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Route rte = routeList.FirstOrDefault(r => r.Name == sk1.name);
+                    Leg lg = null;
+                    Mark mk = null;
+
+                    int n = sk1.feature.geometry.coordinates.Count();
+
+                    if (rte == null)
+                    {
+                        Route nroute = new Route
+                        {
+                            Name = sk1.name
+                        };
 
                         Mark tmp = null, nmark;
                         Leg nleg = null;
@@ -2225,15 +2244,44 @@ namespace LionRiver
 
                             if (dist < 30)
                             {
-                                ActiveLeg = nleg;
-                                ActiveMark = nmark;
+                                lg = nleg;
+                                mk = nmark;
                             }
                         }
-                        routeList.Add(nroute);
+                        rte = nroute;
+                    }
+                    else
+                    {
 
-                        ActiveRoute = nroute;
-                    });
-                }
+                        for (int i = 0; i < n; i++)
+                        {
+                            foreach (Leg l in rte.Legs)
+                            {
+                                double dist = CalcDistance(
+                                    l.ToMark.Location.Latitude, l.ToMark.Location.Longitude, sk2.value.latitude, sk2.value.longitude);
+                                if (dist < 30)
+                                {
+                                    lg = l;
+                                    mk = l.ToMark;
+                                }
+                            }
+                        }
+                    }
+
+                    routeList.Add(rte);
+                    if (lg != null)
+                    {
+                        ActiveRoute = rte;
+                        ActiveLeg = lg;
+                        ActiveMark = mk;
+                    }
+                    else
+                    {
+                        ActiveRoute = null;
+                        ActiveLeg = null;
+                        ActiveMark = mk;
+                    }
+                });
             }
         }
 
