@@ -254,8 +254,8 @@ namespace LionRiver
                 //XTE.SetValid();
             }
             else
-                if (XTE.IsValid())
-                XTE.Invalidate();
+                //if (XTE.IsValid())
+                //XTE.Invalidate();
 
             if (SOG.IsValid() && BRG.IsValid() && WPT.IsValid())
             {
