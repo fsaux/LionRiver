@@ -1297,7 +1297,7 @@ namespace LionRiver
 
         private void MediumNavTimer_Tick(object sender, EventArgs e)
         {
-            WriteSKDeltas();
+            //WriteSKDeltas();
         }
 
         private void LongNavTimer_Tick(object sender, EventArgs e)
@@ -1306,7 +1306,7 @@ namespace LionRiver
             //CalcRouteData();
             //routeControl.DataGrid1.Items.Refresh();
 
-            WriteSKDeltaWptPos();
+            //WriteSKDeltaWptPos();
 
             UpdateScreenAIS();
 
@@ -2956,7 +2956,7 @@ namespace LionRiver
             LWLAT.Invalidate();
             LWLON.Invalidate();
 
-            WriteSKDeltaStopNav();
+            //WriteSKDeltaStopNav();
         }
 
         private void StopNavCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -5050,14 +5050,6 @@ namespace LionRiver
                 foreach (KeyValuePair<string, AisBoat> kvp in AisBoats)
                 {
                     AisBoat b = kvp.Value;
-
-                    if (!b.IsAvailable)
-                    {
-                        MapItem mi = new MapItem();
-                        mi.DataContext = b;
-                        aisBoatItemCollection.Add(mi);
-                        b.IsAvailable = true;
-                    }
 
                     if (b.LastUpdate != null)
                     {

@@ -1487,7 +1487,7 @@ namespace LionRiver
                 sksubs.Add(new skSubscribe()
                 {
                     path = "*",
-                    period = 20000,
+                    period = 5000,
                     format = "delta",
                     policy = "instant"
                 });
@@ -2079,10 +2079,17 @@ namespace LionRiver
                                     {
                                         BoatColor = Brushes.DarkRed.Color,
                                         BoatVisible = Visibility.Visible,
-                                        IsAvailable = false,
                                         Location = new Location()
                                     };
                                     AisBoats.Add(urn, b);
+
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        MapItem mi = new MapItem();
+                                        mi.DataContext = b;
+                                        aisBoatItemCollection.Add(mi);
+                                        b.IsAvailable = true;
+                                    });
                                 }
                                 else
                                 {
@@ -2103,6 +2110,8 @@ namespace LionRiver
                                                 };
 
                                                 b.LastUpdate = upd.timestamp;
+                                                b.BoatVisible = Visibility.Visible;
+                                                b.BoatColor = Brushes.Red.Color;
                                             }
                                             catch (Exception)
                                             {
@@ -2114,7 +2123,6 @@ namespace LionRiver
                                             try
                                             {
                                                 b.BoatSpeed = double.Parse((string)v["value"]) * 3600 / 1852;
-                                                b.LastUpdate = upd.timestamp;
                                             }
                                             catch (Exception)
                                             {
@@ -2126,7 +2134,6 @@ namespace LionRiver
                                             try
                                             {
                                                 b.Heading = double.Parse((string)v["value"]) * 180 / Math.PI;
-                                                b.LastUpdate = upd.timestamp;
                                             }
                                             catch (Exception)
                                             {
@@ -2144,7 +2151,6 @@ namespace LionRiver
                                                 {
                                                     case "name":
                                                         b.Name = (string)jp.Value;
-                                                        b.LastUpdate = upd.timestamp;
                                                         break;
                                                 }
                                             }
