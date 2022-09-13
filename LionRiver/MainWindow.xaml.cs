@@ -4698,16 +4698,16 @@ namespace LionRiver
 
                 if (LAT.IsValid())
                 {
-                    boat.Location = new Location(LAT.Val, LON.Val);
-                    boat.Course = COG.Val;
-                    boat.BoatVisible = Visibility.Visible;
+                    //boat.Location = new Location(LAT.Val, LON.Val);
+                    //boat.Course = COG.Val;
+                    //boat.BoatVisible = Visibility.Visible;
 
                     double heading = COG.Val;
 
                     if (HDT.IsValid())
                         heading = HDT.Val;
 
-                    boat.Heading = heading;
+                    //boat.Heading = heading;
 
                     NavPlotModel.CurrentPosition = POS.GetLastVal(0).Time.Ticks;
 
@@ -4790,20 +4790,20 @@ namespace LionRiver
 
                 if (TWD.IsValid())
                 {
-                    boat.WindDirection = TWD.Val;
+                    //boat.WindDirection = TWD.Val;
                     if (mapOrientationMode == MapOrientationMode.CourseUp)
                         boat.WindDirection -= COG.Val;
-                    boat.WindSpeed = TWS.Val;
+                    //boat.WindSpeed = TWS.Val;
                 }
 
                 if (SOG.IsValid())
                 {
-                    boat.BoatSpeed = SOG.Val;
+                    //boat.BoatSpeed = SOG.Val;
                 }
 
                 if (PERF.IsValid())
                 {
-                    boat.BoatPerf = PERF.Val;
+                    //boat.BoatPerf = PERF.Val;
                 }
                 else
                 {
@@ -4812,10 +4812,10 @@ namespace LionRiver
 
                 if (DRIFT.IsValid())
                 {
-                    boat.CurrentDirection = SET.Val + 180;
+                    //boat.CurrentDirection = SET.Val + 180;
                     if (mapOrientationMode == MapOrientationMode.CourseUp)
                         boat.CurrentDirection -= COG.Val;
-                    boat.CurrentSpeed = DRIFT.Val;
+                    //boat.CurrentSpeed = DRIFT.Val;
                 }
 
                 if (Properties.Settings.Default.LaylinesCheck == true)

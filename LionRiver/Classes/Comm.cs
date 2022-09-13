@@ -1385,17 +1385,15 @@ namespace LionRiver
             sksubs.Add(new skSubscribe()
             {
                 path = "environment.current.drift",
-                minPeriod = 15000,
-                format = "delta",
-                policy = "instant"
+                period = 15000,
+                policy = "fixed"
             });
 
             sksubs.Add(new skSubscribe()
             {
                 path = "environment.current.setTrue",
-                minPeriod = 15000,
-                format = "delta",
-                policy = "instant"
+                period = 15000,
+                policy = "fixed"
             });
 
             sksubs.Add(new skSubscribe()
@@ -1487,9 +1485,29 @@ namespace LionRiver
                 sksubs.Add(new skSubscribe()
                 {
                     path = "*",
-                    period = 5000,
-                    format = "delta",
+                    minPeriod = 15000,
                     policy = "instant"
+                });
+
+                //sksubs.Add(new skSubscribe()
+                //{
+                //    path = "navigation.position",
+                //    period = 15000,
+                //    policy = "fixed"
+                //});
+
+                //sksubs.Add(new skSubscribe()
+                //{
+                //    path = "navigation.speedOverGround",
+                //    period = 15000,
+                //    policy = "fixed"
+                //});
+
+                sksubs.Add(new skSubscribe()
+                {
+                    path = "navigation.courseOverGroundTrue",
+                    period = 15000,
+                    policy = "fixed"
                 });
 
             }
@@ -1662,10 +1680,12 @@ namespace LionRiver
                                                 POS.Val.Longitude = LON.Val;
                                                 POS.SetValid();
 
-                                                //navSentence_received = true;
-                                                //MarkDataReceivedOnPort(port);
+
+                                                boat.Location = new Location(LAT.Val, LON.Val);
+                                                boat.BoatVisible = Visibility.Visible;
+
                                             }
-                                            catch (Exception)
+                                            catch (Exception e)
                                             {
                                                 MarkErrorOnPort(port, "Bad SK navigation.position sentence");
                                             }
@@ -1676,6 +1696,8 @@ namespace LionRiver
                                             {
                                                 SOG.Val = double.Parse((string)v["value"]) * 3600 / 1852;
                                                 SOG.SetValid();
+
+                                                boat.BoatSpeed = SOG.Val;
 
                                                 //navSentence_received = true;
                                                 //MarkDataReceivedOnPort(port);
@@ -1692,6 +1714,10 @@ namespace LionRiver
                                             {
                                                 COG.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
                                                 COG.SetValid();
+
+                                                boat.Course = COG.Val;
+                                                if (!HDT.IsValid())
+                                                    boat.Heading = COG.Val;
 
                                                 //navSentence_received = true;
                                                 //MarkDataReceivedOnPort(port);
@@ -1752,6 +1778,10 @@ namespace LionRiver
                                             {
                                                 HDT.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
                                                 HDT.SetValid();
+
+                                                boat.Heading = HDT.Val;
+                                                if (!COG.IsValid())
+                                                    boat.Course = HDT.Val;
 
                                                 //headingSentence_received = true;
                                                 //MarkDataReceivedOnPort(port);
@@ -1857,6 +1887,8 @@ namespace LionRiver
                                             {
                                                 TWS.Val = double.Parse((string)v["value"]) * 3600 / 1852;
                                                 TWS.SetValid();
+
+                                                boat.WindSpeed = TWS.Val;
                                             }
                                             catch (Exception)
                                             {
@@ -1881,6 +1913,8 @@ namespace LionRiver
                                             {
                                                 TWD.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
                                                 TWD.SetValid();
+
+                                                boat.WindDirection = TWD.Val;
                                             }
                                             catch (Exception)
                                             {
@@ -1905,6 +1939,9 @@ namespace LionRiver
                                             {
                                                 DRIFT.Val = double.Parse((string)v["value"]) * 3600 / 1852;
                                                 DRIFT.SetValid();
+
+                                                boat.CurrentSpeed = DRIFT.Val;
+
                                             }
                                             catch (Exception)
                                             {
@@ -1917,6 +1954,9 @@ namespace LionRiver
                                             {
                                                 SET.Val = double.Parse((string)v["value"]) * 180 / Math.PI;
                                                 SET.SetValid();
+
+                                                boat.CurrentDirection = SET.Val + 180;
+
                                             }
                                             catch (Exception)
                                             {
@@ -1953,6 +1993,9 @@ namespace LionRiver
                                             {
                                                 PERF.Val = double.Parse((string)v["value"]);
                                                 PERF.SetValid();
+
+                                                boat.BoatPerf = PERF.Val;
+
                                             }
                                             catch (Exception)
                                             {
@@ -2068,6 +2111,8 @@ namespace LionRiver
                         }
                         else
                         {
+                            //System.Diagnostics.Debug.WriteLine(message);
+
                             foreach (skReceiveUpdate upd in sk.updates)
                             {
                                 var urn = sk.context;
