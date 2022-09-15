@@ -2761,6 +2761,9 @@ namespace LionRiver
                 if (ActiveLeg == null)
                     ActiveRoute = null;
             }
+
+            WriteSKDeltaActiveWpt();
+
         }
 
         private void NavigateToCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -2782,6 +2785,7 @@ namespace LionRiver
             ActiveRoute = cb.SelectedItem as Route;
             ActiveLeg = ActiveRoute.Legs[0];
             ActiveMark = (Mark)ActiveLeg.ToMark;
+            WriteSKDeltaActiveWpt();
         }
 
         public void RouteCtrlCommandReceived(object sender, RouteCtrlEventArgs e)
@@ -2955,6 +2959,7 @@ namespace LionRiver
             WLON.Invalidate();
             LWLAT.Invalidate();
             LWLON.Invalidate();
+            WriteSKDeltaActiveWpt();
 
             //WriteSKDeltaStopNav();
         }
@@ -3002,6 +3007,7 @@ namespace LionRiver
                 {
                     ActiveLeg = ActiveLeg.NextLeg;
                     ActiveMark = ActiveLeg.ToMark;
+                    WriteSKDeltaActiveWpt();
                 }
             }
             e.Handled = true;
@@ -3025,6 +3031,7 @@ namespace LionRiver
                 {
                     ActiveLeg = ActiveLeg.PreviousLeg;
                     ActiveMark = ActiveLeg.ToMark;
+                    WriteSKDeltaActiveWpt();
                 }
             }
             e.Handled = true;
@@ -5579,6 +5586,8 @@ namespace LionRiver
                 ActiveLeg = null;
                 ActiveMark = MOB;
 
+                WriteSKDeltaActiveWpt();
+
                 LatLonGrid.Background = Brushes.DarkRed;
                 ContextMenuMOBClear.IsEnabled = true;
             }
@@ -5595,6 +5604,8 @@ namespace LionRiver
             WLON.Invalidate();
             LWLAT.Invalidate();
             LWLON.Invalidate();
+
+            WriteSKDeltaActiveWpt();
 
             foreach (Mark mk in marksItemCollection.ToList())
             {

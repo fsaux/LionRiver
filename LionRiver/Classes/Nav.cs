@@ -491,6 +491,7 @@ namespace LionRiver
                         {
                             ActiveLeg = ActiveLeg.NextLeg;
                             ActiveMark = ActiveLeg.ToMark;
+                            WriteSKDeltaActiveWpt();
                         }
                         else
                         {
@@ -501,6 +502,7 @@ namespace LionRiver
                             WLON.Invalidate();
                             LWLAT.Invalidate();
                             LWLON.Invalidate();
+                            WriteSKDeltaActiveWpt();
                         }
                     }
                     else
@@ -508,6 +510,7 @@ namespace LionRiver
                         ActiveMark = null;
                         WLAT.Invalidate();
                         WLON.Invalidate();
+                        WriteSKDeltaActiveWpt();
                     }
                 }
             }

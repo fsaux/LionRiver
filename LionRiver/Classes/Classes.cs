@@ -2951,18 +2951,6 @@ namespace LionRiver
         public string[] names { get; set; }
     }
 
-    public class skPosRootobject
-    {
-        public skMeta meta { get; set; }
-        public skPosValue value { get; set; }
-        public string source { get; set; }
-        public DateTime timestamp { get; set; }
-    }
-
-    public class skMeta
-    {
-    }
-
     public class skPosValue
     {
         public float latitude { get; set; }

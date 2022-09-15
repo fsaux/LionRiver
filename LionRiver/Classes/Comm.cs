@@ -36,7 +36,6 @@ namespace LionRiver
         string skWebSocketURL, skHttpURL, skToken;
         WebSocket SignalkWebSocket;
         bool skTacktickPerformanceSentenceOut, skRouteSentenceOut;
-        Location skActiveWpt, skLastWpt;
         string skSelfUrn;
         string skRouteHref = null;
 
@@ -1004,98 +1003,28 @@ namespace LionRiver
             SubscribeSK((WebSocket)sender);
         }
 
-        public void WriteSKDeltas()
+        public void WriteSKDeltaActiveWpt()
         {
             if (SignalkWebSocket != null)
             {
-
                 try
                 {
                     List<skSendUpdateRootObj> skList = new List<skSendUpdateRootObj>();
-                    double? val;
-                    skPosition pval;
+
+                    skPosition pval = null;
 
                     if (skRouteSentenceOut)
                     {
-
-                        #region VMG
-                        if (VMGWPT.IsValid())
-                            val = VMG.Val * 1852 / 3600;
-                        else
-                            val = null;
-
-                        skList.Add(new skSendUpdateRootObj()
+                        Application.Current.Dispatcher.Invoke(() =>
                         {
-                            requestId = Guid.NewGuid().ToString(),
-                            put = new skPut()
+                            if (ActiveMark != null)
                             {
-                                path = "navigation.courseGreatCircle.nextPoint.velocityMadeGood",
-                                value = val,
-                                source = "Lionriver"
+                                pval = new skPosition
+                                {
+                                    latitude = ActiveMark.Location.Latitude,
+                                    longitude = ActiveMark.Location.Longitude
+                                };
                             }
-                        });
-                        #endregion
-
-                        #region XTE
-                        if (XTE.IsValid())
-                            val = XTE.Val * 1852;
-                        else
-                            val = null;
-
-                        skList.Add(new skSendUpdateRootObj()
-                        {
-                            requestId = Guid.NewGuid().ToString(),
-                            put = new skPut()
-                            {
-                                path = "navigation.courseGreatCircle.crossTrackError",
-                                value = val,
-                                source = "Lionriver"
-                            }
-                        });
-                        #endregion
-
-                        #region DST
-                        if (DST.IsValid())
-                            val = DST.Val * 1852;
-                        else
-                            val = null;
-
-                        skList.Add(new skSendUpdateRootObj()
-                        {
-                            requestId = Guid.NewGuid().ToString(),
-                            put = new skPut()
-                            {
-                                path = "navigation.courseGreatCircle.nextPoint.distance",
-                                value = val,
-                                source = "Lionriver"
-                            }
-                        });
-                        #endregion
-
-                        #region BRG
-                        if (BRG.IsValid())
-                            val = BRG.Val * Math.PI / 180;
-                        else
-                            val = null;
-
-                        skList.Add(new skSendUpdateRootObj()
-                        {
-                            requestId = Guid.NewGuid().ToString(),
-                            put = new skPut()
-                            {
-                                path = "navigation.courseGreatCircle.nextPoint.bearingTrue",
-                                value = val,
-                                source = "Lionriver"
-                            }
-                        });
-                        #endregion
-
-                        #region WPT position
-
-                        if (WLAT.Val != skActiveWpt.Latitude || WLON.Val != skActiveWpt.Longitude)
-                        {
-                            skActiveWpt.Latitude = WLAT.Val;
-                            skActiveWpt.Longitude = WLON.Val;
 
                             skList.Add(new skSendUpdateRootObj()
                             {
@@ -1103,47 +1032,41 @@ namespace LionRiver
                                 put = new skPutPos()
                                 {
                                     path = "navigation.courseGreatCircle.nextPoint.position",
-                                    value = pval = new skPosition
-                                    {
-                                        latitude = WLAT.Val,
-                                        longitude = WLON.Val
-                                    }
+                                    value = pval
                                 }
                             });
-                        }
-                        #endregion
-                    }
 
-                    if(skTacktickPerformanceSentenceOut)
-                    {
-                        #region PERF
-                        if (PERF.IsValid())
-                            val = PERF.Val;
-                        else
-                            val = null;
+                            pval = null;
 
-                        skList.Add(new skSendUpdateRootObj()
-                        {
-                            requestId = Guid.NewGuid().ToString(),
-                            put = new skPut()
+                            if (ActiveLeg != null)
                             {
-                                path = "performance.polarSpeedRatio",
-                                value = val,
-                                source = "Lionriver"
+                                pval = new skPosition
+                                {
+                                    latitude = ActiveLeg.FromMark.Location.Latitude,
+                                    longitude = ActiveLeg.FromMark.Location.Longitude
+                                };
+                            }
+
+                            skList.Add(new skSendUpdateRootObj()
+                            {
+                                requestId = Guid.NewGuid().ToString(),
+                                put = new skPutPos()
+                                {
+                                    path = "navigation.courseGreatCircle.previousPoint.position",
+                                    value = pval
+                                }
+                            });
+
+
+                            foreach (skSendUpdateRootObj sko in skList)
+                            {
+                                string json = JsonConvert.SerializeObject(sko);
+                                SignalkWebSocket.Send(json);
                             }
                         });
-                        #endregion
                     }
-
-                    foreach (skSendUpdateRootObj sko in skList)
-                    {
-                        string json = JsonConvert.SerializeObject(sko);
-                        SignalkWebSocket.Send(json);
-                    }
-
-
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                 }
             }
@@ -1440,17 +1363,15 @@ namespace LionRiver
             {
                 path = "navigation.courseGreatCircle.activeRoute.href",
                 period = 10000,
-                format = "delta",
                 policy = "ideal"
             });
 
-            //sksubs.Add(new skSubscribe()
-            //{
-            //    path = "navigation.courseGreatCircle.nextPoint.position",
-            //    period = 20000,
-            //    format = "delta",
-            //    policy = "ideal"
-            //});
+            sksubs.Add(new skSubscribe()
+            {
+                path = "navigation.courseGreatCircle.nextPoint.position",
+                period = 10000,
+                policy = "ideal"
+            });
 
             //sksubs.Add(new skSubscribe()
             //{
@@ -1503,12 +1424,12 @@ namespace LionRiver
                 //    policy = "fixed"
                 //});
 
-                sksubs.Add(new skSubscribe()
-                {
-                    path = "navigation.courseOverGroundTrue",
-                    period = 15000,
-                    policy = "fixed"
-                });
+                //sksubs.Add(new skSubscribe()
+                //{
+                //    path = "navigation.courseOverGroundTrue",
+                //    period = 15000,
+                //    policy = "fixed"
+                //});
 
             }
 
@@ -1637,8 +1558,6 @@ namespace LionRiver
                 }
             }
 
-            skActiveWpt = new Location();
-            skLastWpt = new Location();
         }
 
         public async void ProcessSKupdate(string message, int port)
@@ -2080,25 +1999,38 @@ namespace LionRiver
                                         case "navigation.courseGreatCircle.activeRoute.href":
                                             try
                                             {
-                                                string href = (string)v["value"];
-                                                if (href != skRouteHref)
-                                                {
-                                                    skRouteHref = href;
-                                                    if (href != null)
-                                                    {
-                                                        href = href.Remove(0, 1);
-                                                        await SkGetActiveRoute(href);
-                                                    }
-                                                    else
-                                                    {
-                                                        Application.Current.Dispatcher.Invoke(() =>
-                                                        {
-                                                            ActiveMark = null;
-                                                            ActiveLeg = null;
-                                                            ActiveRoute = null;
-                                                        });
-                                                    }
-                                                }
+                                                //string href = (string)v["value"];
+                                                //if (href != skRouteHref)
+                                                //{
+                                                //    skRouteHref = href;
+                                                //    if (href != null)
+                                                //    {
+                                                //        href = href.Remove(0, 1);
+                                                //        await SkGetActiveRoute(href);
+                                                //    }
+                                                //    else
+                                                //    {
+                                                //        Application.Current.Dispatcher.Invoke(() =>
+                                                //        {
+                                                //            ActiveMark = null;
+                                                //            ActiveLeg = null;
+                                                //            ActiveRoute = null;
+                                                //        });
+                                                //    }
+                                                //}
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
+                                            break;
+
+                                        case "navigation.courseGreatCircle.nextPoint.position":
+                                            try
+                                            {
+                                                ////double lat = (double)v["value"]["latitude"];
+                                                ////double lon = (double)v["value"]["longitude"];
+
+                                                ////SkGetActiveWpt(lat, lon);
                                             }
                                             catch (Exception e)
                                             {
@@ -2111,8 +2043,6 @@ namespace LionRiver
                         }
                         else
                         {
-                            //System.Diagnostics.Debug.WriteLine(message);
-
                             foreach (skReceiveUpdate upd in sk.updates)
                             {
                                 var urn = sk.context;
@@ -2217,10 +2147,8 @@ namespace LionRiver
         private async Task SkGetActiveRoute(string rpath)
         {
             string json1 = await HttpGet(skHttpURL + rpath);
-            string json2 = await HttpGet(skHttpURL + "vessels/self/navigation/courseGreatCircle/nextPoint/position/");
 
             skRouteRootobject sk1 = new skRouteRootobject();
-            skPosRootobject sk2 = new skPosRootobject();
 
             if (json1 != "")
             {
@@ -2233,27 +2161,12 @@ namespace LionRiver
             else
                 sk1 = null;
 
-            if (json2 != "")
+            if (sk1 != null)
             {
-                try
-                {
-                    sk2 = JsonConvert.DeserializeObject<skPosRootobject>(json2);
-                }
-                catch { sk2 = null; }
-            }
-            else
-                sk2 = null;
-
-
-            if (sk1 != null && sk2 != null)
-            {
-
                 // Run this code on the UI thread
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Route rte = routeList.FirstOrDefault(r => r.Name == sk1.name);
-                    Leg lg = null;
-                    Mark mk = null;
 
                     int n = sk1.feature.geometry.coordinates.Count();
 
@@ -2264,29 +2177,46 @@ namespace LionRiver
                             Name = sk1.name
                         };
 
-                        Mark tmp = null, nmark;
+                        Mark tmp = null;
                         Leg nleg = null;
 
                         for (int i = 0; i < n; i++)
                         {
+                            double lon = sk1.feature.geometry.coordinates[i][0];
+                            double lat = sk1.feature.geometry.coordinates[i][1];
+
                             string tmpName;
+                            Mark nmark = null;
 
                             if (sk1.feature.properties.points != null)
                                 tmpName = sk1.feature.properties.points.names[i];
                             else
                                 tmpName = "mk" + GetLastMarkNumber().ToString();
 
-                            nmark = new Mark()
+                            foreach (Mark m in marksItemCollection)
                             {
-                                Location = new Location()
+                                double dist = CalcDistance(m.Location.Latitude, m.Location.Longitude, lat, lon);
+                                if (dist < 30)
                                 {
-                                    Longitude = sk1.feature.geometry.coordinates[i][0],
-                                    Latitude = sk1.feature.geometry.coordinates[i][1]
-                                },
-                                Name = tmpName
-                            };
+                                    m.Name = tmpName;
+                                    nmark = m;
+                                }
+                            }
 
-                            marksItemCollection.Add(nmark);
+                            if (nmark==null)
+                            {
+                                nmark = new Mark()
+                                {
+                                    Location = new Location()
+                                    {
+                                        Longitude = lon,
+                                        Latitude = lat
+                                    },
+                                    Name = tmpName
+                                };
+
+                                marksItemCollection.Add(nmark);
+                            }
 
                             if (tmp != null)
                             {
@@ -2298,49 +2228,73 @@ namespace LionRiver
 
                             tmp = nmark;
 
-                            double dist = CalcDistance(nmark.Location.Latitude, nmark.Location.Longitude, sk2.value.latitude, sk2.value.longitude);
-
-                            if (dist < 30)
-                            {
-                                lg = nleg;
-                                mk = nmark;
-                            }
                         }
                         rte = nroute;
                         routeList.Add(rte);
                     }
-                    else
-                    {
 
-                        for (int i = 0; i < n; i++)
-                        {
-                            foreach (Leg l in rte.Legs)
-                            {
-                                double dist = CalcDistance(
-                                    l.ToMark.Location.Latitude, l.ToMark.Location.Longitude, sk2.value.latitude, sk2.value.longitude);
-                                if (dist < 30)
-                                {
-                                    lg = l;
-                                    mk = l.ToMark;
-                                }
-                            }
-                        }
-                    }
+                    ActiveRoute = rte;
+                    ActiveLeg = rte.Legs[0];
+                    ActiveMark = ActiveLeg.ToMark;
 
-                    if (lg != null)
-                    {
-                        ActiveRoute = rte;
-                        ActiveLeg = lg;
-                        ActiveMark = mk;
-                    }
-                    else
-                    {
-                        ActiveRoute = null;
-                        ActiveLeg = null;
-                        ActiveMark = mk;
-                    }
                 });
             }
+        }
+
+        private void SkGetActiveWpt(double lat, double lon)
+        {
+            // Run this code on the UI thread
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Mark mk = null;
+                Leg lg = null;
+
+                if (ActiveRoute != null) // Search for mark in Active Route
+                {
+                    foreach (Leg l in ActiveRoute.Legs)
+                    {
+                        double dist = CalcDistance(
+                            l.ToMark.Location.Latitude, l.ToMark.Location.Longitude, lat, lon);
+                        if (dist < 30)
+                        {
+                            lg = l;
+                            mk = l.ToMark;
+                        }
+                    }
+                }
+                else // Search for Mark in Waypoint List
+                {
+                    foreach (Mark m in marksItemCollection)
+                    {
+                        double dist = CalcDistance(
+                            m.Location.Latitude, m.Location.Longitude, lat, lon);
+                        if (dist < 30)
+                        {
+                            mk = m;
+                        }
+                    }
+                }
+
+                if (mk == null)
+                {
+                    mk = new Mark()
+                    {
+                        Location = new Location()
+                        {
+                            Longitude = lon,
+                            Latitude = lat
+                        },
+                        Name = "mk" + GetLastMarkNumber().ToString()
+                    };
+
+                    marksItemCollection.Add(mk);
+                }
+
+                if (ActiveLeg == null)
+                    ActiveRoute = null;
+                ActiveLeg = lg;
+                ActiveMark = mk;
+            });
         }
 
         public void ProcessAisSKupdate(string message)
