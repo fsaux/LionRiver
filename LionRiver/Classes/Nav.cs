@@ -491,6 +491,10 @@ namespace LionRiver
                         {
                             ActiveLeg = ActiveLeg.NextLeg;
                             ActiveMark = ActiveLeg.ToMark;
+                            WLAT.Invalidate();
+                            WLON.Invalidate();
+                            LWLAT.Invalidate();
+                            LWLON.Invalidate();
                             DST.Invalidate();
                             WriteSKDeltaActiveWpt();
                         }
